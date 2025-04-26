@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('master_tipe_gmd', function (Blueprint $table) {
             $table->uuid('tipe_gmd_id')->primary();
             $table->string('nama', 255);
-            $table->string('kode', 255)->unique();
+            $table->string('kode', 150)->unique();
             $table->timestamps();
             $table->softDeletes(); // deleted_at
             $table->uuid('created_by')->nullable();

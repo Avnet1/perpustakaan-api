@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class MasterLokasi extends Model
 {
@@ -26,4 +27,15 @@ class MasterLokasi extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->lokasi_id)) {
+                $model->lokasi_id = (string) Str::uuid();
+            }
+        });
+    }
 }

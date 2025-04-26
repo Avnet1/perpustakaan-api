@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('personal_access_tokens', function (Blueprint $table) {
-            $table->uuidMorphs('tokenable'); // Automatically creates: tokenable_id (uuid) and tokenable_type (string)
-            $table->id(); // Primary key (bigint auto-increment)
+            $table->id();
+            $table->morphs('tokenable');
             $table->string('name');
             $table->string('token', 64)->unique();
             $table->text('abilities')->nullable();

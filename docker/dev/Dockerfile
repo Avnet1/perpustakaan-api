@@ -61,4 +61,4 @@ RUN npm install && npm run build
 # Hot reload using Laravel Octane or Laravel's built-in server can be added later
 
 
-EXPOSE 9000
+EXPOSE 8000

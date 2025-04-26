@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class MasterAgen extends Model
 {
@@ -21,6 +22,7 @@ class MasterAgen extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'agen_id',
         'nama',
         'alamat',
         'kontak',
@@ -31,4 +33,15 @@ class MasterAgen extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->agen_id)) {
+                $model->agen_id = (string) Str::uuid();
+            }
+        });
+    }
 }
