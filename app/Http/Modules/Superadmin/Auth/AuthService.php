@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Services;
+namespace App\Http\Modules\Superadmin\Auth;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use App\Http\Repositories\AuthRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -12,23 +11,23 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AuthService
 {
 
-    protected $authRepository;
+    protected $repository;
 
-    public function __construct(AuthRepository $authRepository)
+    public function __construct(AuthRepository $repository)
     {
-        $this->authRepository = $authRepository;
+        $this->repository = $repository;
     }
 
     public function login(Request $req, $payload): LaravelResponseInterface
     {
-        $user = $this->authRepository->findIdentity($payload->identity_code);
+        $user = $this->repository->findIdentity($payload->identity_code);
 
         if(!$user) {
-            return new LaravelResponseContract(false, 404, __('validation.error.default.notFound', ["attribute" => "ID Anggota"]), $user);
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "ID Anggota"]), $user);
         }
 
         if (!Hash::check($payload->password, $user->password)) {
-            return new LaravelResponseContract(false, 404, __('validation.error.auth.invalidPassword'), $payload);
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.passwordInvalid'), $payload);
         }
 
         $credentials = [
@@ -38,7 +37,7 @@ class AuthService
 
         // Attempt to generate the JWT token using the custom credentials
         if (!$token = JWTAuth::attempt($credentials)) {
-            return new LaravelResponseContract(false, 400, __('validation.error.auth.generateToken'), $token);
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.tokenGenerate'), $token);
         }
 
         $jwtPayload = [
@@ -52,11 +51,11 @@ class AuthService
         $token = JWTAuth::fromUser($user, $jwtPayload);
 
         if (!$token) {
-            return new LaravelResponseContract(false, 400, __('validation.error.auth.generateToken'), $token);
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.tokenGenerate'), $token);
         }
 
 
-        return new LaravelResponseContract(true, 200, __('validation.success.auth.login'), (object) [
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.login'), (object) [
             "access_token" => $token
         ]);
     }
@@ -68,14 +67,14 @@ class AuthService
 
         // If no token is provided, return an error
         if (!$token) {
-            return new LaravelResponseContract(false, 404, __('validation.error.auth.noProvideToken'), $token);
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.noProvideToken'), $token);
 
         }
 
         try {
             // Refresh the token
             $newToken = JWTAuth::refresh($token);
-            return new LaravelResponseContract(true, 200, __('validation.success.auth.refreshToken'), [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.refreshToken'), [
                 "access_token" => $newToken
             ]);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {

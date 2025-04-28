@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Modules\Superadmin\Auth;
 
 use App\Helpers\ResponseHelper;
-use App\Http\Requests\MasterAuthLoginRequest;
-use App\Http\Services\AuthService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SuperadminAuthRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,7 @@ class AuthController extends Controller
         $this->service = $service;
     }
 
-    public function login(MasterAuthLoginRequest $req): JsonResponse
+    public function login(SuperadminAuthRequest $req): JsonResponse
     {
         $payload = (object) [
             "identity_code" => $req->identity_code,
@@ -26,12 +26,6 @@ class AuthController extends Controller
         ];
 
         $result = $this->service->login($req, $payload);
-        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
-    }
-
-    public function refreshToken(Request $req): JsonResponse
-    {
-        $result = $this->service->refreshToken();
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }

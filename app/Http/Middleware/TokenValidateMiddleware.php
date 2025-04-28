@@ -2,14 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use App\Helpers\ResponseHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Helpers\ResponseHelper;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class ValidateAuthTokenMiddleware
+class TokenValidateMiddleware
 {
     /**
      * Handle an incoming request.
@@ -21,10 +21,10 @@ class ValidateAuthTokenMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
         } catch (JWTException $e) {
-            return ResponseHelper::sendResponseJson(false, 401, __('validation.error.auth.invalidToken'), $e);
+            return ResponseHelper::sendResponseJson(false, 401, __('validation.custom.error.auth.tokenInvalid'), $e);
         }
 
-        $request->attributes->set('user', $user);
+        \setUser($request, $user);
         return $next($request);
     }
 }

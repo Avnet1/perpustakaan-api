@@ -1,0 +1,175 @@
+<?php
+
+use App\Http\Contracts\LaravelResponseContract;
+use App\Http\Interfaces\LaravelResponseInterface;
+use Illuminate\Http\Request;
+
+if (!function_exists('setPagination')) {
+    function setPagination($data, $totalRow, $page = 1, $limit = 20): object
+    {
+        // Ensure page and limit are at least 1
+        $page = max($page, 1);
+        $limit = max($limit, 1);
+
+        // Calculate pagination details
+        $totalPage = ceil($totalRow / $limit);
+        $nextPage = $page < $totalPage ? $page + 1 : null;
+        $prevPage = $page > 1 ? $page - 1 : null;
+
+        // Prepare the pagination response
+        return (object)[
+            'rows' => $data,
+            'total_page' => $totalPage,
+            'next_page' => $nextPage,
+            'prev_page' => $prevPage,
+            'limit' => $limit,
+            'page' => $page,
+            'total_row' => $totalRow,
+        ];
+    }
+}
+
+if (!function_exists('defineRequestOrder')) {
+    function defineRequestOrder($request, $defaultOrder = ['created_at', 'ASC'], $sortColumn = []): object
+    {
+        $orderOption = [];
+        $direction = $request->query('direction_name', $defaultOrder[0]);
+        $orders = strtoupper($request->query('order_name', $defaultOrder[1]));
+
+        if (is_string($orders) && is_string($direction)) {
+            // Single direction and order
+            if (isset($sortColumn[$direction])) {
+                $orderOption[$sortColumn[$direction]] = $orders;
+            }
+        } else {
+            // Multiple directions and orders
+            $content = [];
+            $directions = is_array($direction) ? $direction : [$direction];
+            $ordersArray = is_array($orders) ? $orders : [$orders];
+            $count = min(count($directions), count($ordersArray));
+
+            for ($index = 0; $index < $count; $index++) {
+                if (isset($sortColumn[$directions[$index]])) {
+                    $content[$sortColumn[$directions[$index]]] = $ordersArray[$index];
+                }
+            }
+
+            $orderOption = $content;
+        }
+
+        return (object) $orderOption;
+    }
+}
+
+
+if (!function_exists('defineRequestPaginateArgs')) {
+    function defineRequestPaginateArgs($request): object
+    {
+        // Fetch query parameters
+        $page = $request->query('page', 1); // Default to page 1
+        $limit = $request->query('limit', 10); // Default to limit 10
+        $search = $request->query('search', ''); // Default to empty search string
+        $directionName = $request->query('direction_name', ''); // Additional direction name parameter
+        $orderName = $request->query('order_name', 'asc'); // Default sort order 'asc'
+
+        $skip = ($page - 1) * $limit;
+
+        return (object) [
+            'page' => $page,
+            'skip' => max(0, $skip), // Ensure skip is non-negative
+            'search' => $search,
+            'limit' => $limit,
+            'direction_name' => $directionName,
+            'order_name' => $orderName,
+        ];
+    }
+}
+
+
+if (!function_exists('setUser')) {
+    function setUser(Request $request, mixed $user)
+    {
+        $request->attributes->set('user', $user);
+    }
+}
+
+if (!function_exists('getUser')) {
+    function getUser(Request $request)
+    {
+        return $request->attributes->get('user');
+    }
+}
+
+
+if (!function_exists('formatPhoneNumber')) {
+    function formatPhoneNumber($phone)
+    {
+        // Example: format to (123) 456-7890
+        return preg_replace("/(\d{3})(\d{3})(\d{4})/", '($1) $2-$3', $phone);
+    }
+}
+
+if (!function_exists('generateUniqueCode')) {
+    function generateUniqueCode($length = 8)
+    {
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersArray = str_split($characters);
+
+        if ($length > count($charactersArray)) {
+            throw new InvalidArgumentException('Length exceeds unique characters available.');
+        }
+
+        shuffle($charactersArray);
+
+        return substr(implode('', $charactersArray), 0, $length);
+    }
+}
+
+if (!function_exists('generateRandomPassword')) {
+    function generateRandomPassword($length = 8)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomPassword = '';
+
+        for ($i = 0; $i < $length; ++$i) {
+            $randomPassword .= $characters[random_int(0, $charactersLength - 1)];
+        }
+
+        return $randomPassword;
+    }
+}
+
+/* Convert string to slug */
+if (!function_exists('formatStringToSlug')) {
+    function formatStringToSlug($string)
+    {
+        $string = strtolower($string);
+        $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
+        $string = preg_replace('/[\s-]+/', '-', $string);
+        $string = trim($string, '-');
+
+        return $string;
+    }
+}
+
+/* Convert string to slug */
+if (!function_exists('formatStringToSlug')) {
+    function formatStringToTag($string)
+    {
+        $string = strtolower($string);
+        $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
+        $string = preg_replace('/[\s-]+/', '_', $string);
+        $string = trim($string, '_');
+
+        return $string;
+    }
+}
+
+/* Convert string to slug */
+if (!function_exists('formatStringToSlug')) {
+    function sendErrorResponse(Exception $e): LaravelResponseInterface
+    {
+        return new LaravelResponseContract(false, 500, $e->getMessage(), $e);
+    }
+}

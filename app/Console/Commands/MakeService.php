@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\File;
 class MakeService extends Command
 {
     protected $signature = 'make:service {name}';
-    protected $description = 'Create a new Service class in App\Http\Service';
+    protected $description = 'Create a new Service class in App\Http\Services';
 
     public function handle()
     {

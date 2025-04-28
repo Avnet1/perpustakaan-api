@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\File;
 class MakeRepository extends Command
 {
     protected $signature = 'make:repository {name}';
-    protected $description = 'Create a new Repository class in App\Http\Service';
+    protected $description = 'Create a new Repository class in App\Http\Repositories';
 
     public function handle()
     {
@@ -25,11 +25,11 @@ class MakeRepository extends Command
 
         // Cek jika file sudah ada
         if (File::exists($filePath)) {
-            $this->error("Service {$fileName} already exists!");
+            $this->error("Repository {$fileName} already exists!");
             return 1;
         }
 
-        // Template isi file service
+        // Template isi file repository
         $content = <<<PHP
 <?php
 

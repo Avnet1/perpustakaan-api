@@ -79,6 +79,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
+    public function client()
+    {
+        return $this->hasOne(Client::class, 'user_id', 'user_id');
+    }
+
     public function anggota() {
         return $this->hasOne(MasterTipeKeanggotaan::class, 'user_id', 'user_id');
     }
