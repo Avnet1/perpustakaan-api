@@ -34,7 +34,9 @@ class VillageRequest extends FormRequest
                         'nama_kelurahan' => 'required',
                         'kode_kelurahan' => 'required',
                         'kode_dikti' => 'required',
-                        'kecamatan_id' => 'required'
+                        'kecamatan_id' => 'required',
+                        'provinsi_id' => 'required',
+                        'kabupaten_kota_id' => 'required',
                     ];
                 }
 
@@ -51,6 +53,8 @@ class VillageRequest extends FormRequest
             'kode_kelurahan.required' => __('validation.required', ['attribute' => 'Kode Kelurahan']),
             'kode_dikti.required' => __('validation.required', ['attribute' => 'Kode Dikti']),
             'kecamatan_id.required' =>  __('validation.required', ['attribute' => 'Kecamatan']),
+            'provinsi_id.required' =>  __('validation.required', ['attribute' => 'Provinsi']),
+            'kabupaten_kota_id.required' =>  __('validation.required', ['attribute' => 'Kabupaten/Kota']),
         ];
     }
 }

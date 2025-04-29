@@ -21,14 +21,7 @@ class RegionService
     {
         try {
             $sqlQuery = MasterKabupatenKota::with([
-                'provinsi' => function ($query) {
-                    $query->select(
-                        'provinsi_id',
-                        'nama_provinsi',
-                        'kode_provinsi',
-                        'kode_dikti',
-                    );
-                }
+                'provinsi'
             ])->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
@@ -114,7 +107,7 @@ class RegionService
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kabupaten/Kota']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kode Kabupaten/Kota']), $row);
             }
 
 

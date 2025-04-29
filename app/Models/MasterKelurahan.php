@@ -17,6 +17,8 @@ class MasterKelurahan extends Model
 
     protected $fillable = [
         'kelurahan_id',
+        'provinsi_id',
+        'kabupaten_kota_id',
         'kecamatan_id',
         'nama_kelurahan',
         'kode_kelurahan',
@@ -26,22 +28,28 @@ class MasterKelurahan extends Model
         'deleted_by',
     ];
 
+    protected $hidden = [
+        'deleted_at',
+        'deleted_by',
+    ];
+
+
+    public function provinsi()
+    {
+        return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');
+    }
+
+    public function kabupatenKota()
+    {
+        return $this->belongsTo(MasterKabupatenKota::class, 'kabupaten_kota_id', 'kabupaten_kota_id');
+    }
+
+
     public function kecamatan()
     {
         return $this->belongsTo(MasterKecamatan::class, 'kecamatan_id', 'kecamatan_id');
     }
 
-    public function kabupatenKota()
-    {
-        return $this->hasOneThrough(
-            MasterKabupatenKota::class, // model tujuan akhirnya
-            MasterKecamatan::class,     // model perantaranya
-            'kecamatan_id',             // foreign key di MasterKecamatan yang menunjuk ke MasterKelurahan
-            'kabupaten_kota_id',        // foreign key di MasterKabupatenKota yang menunjuk ke MasterKecamatan
-            'kecamatan_id',             // local key di MasterKelurahan yang menunjuk ke MasterKecamatan
-            'kabupaten_kota_id'
-        );
-    }
 
 
     protected static function boot()

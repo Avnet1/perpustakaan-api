@@ -31,6 +31,7 @@ class SubdistrictRequest extends FormRequest
             case 'sub-districts':
                 if ($this->method() == 'POST') {
                     return [
+                        'provinsi_id' => 'required',
                         'kabupaten_kota_id' => 'required',
                         'nama_kecamatan' => 'required',
                         'kode_kecamatan' => 'required',
@@ -51,6 +52,7 @@ class SubdistrictRequest extends FormRequest
             'kode_kecamatan.required' => __('validation.required', ['attribute' => 'Kode Kecamatan']),
             'kode_dikti.required' => __('validation.required', ['attribute' => 'Kode Dikti']),
             'kabupaten_kota_id.required' =>  __('validation.required', ['attribute' => 'Kabupaten/Kota']),
+            'provinsi_id.required' =>  __('validation.required', ['attribute' => 'Provinsi']),
         ];
     }
 }

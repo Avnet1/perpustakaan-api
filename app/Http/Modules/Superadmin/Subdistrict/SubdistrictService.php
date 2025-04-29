@@ -93,7 +93,7 @@ class SubdistrictService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.create'), (object) [
-                self::$primaryKey => $result->provinsi_id,
+                self::$primaryKey => $result->kecamatan_id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -111,7 +111,7 @@ class SubdistrictService
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kecamatan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kode Kecamatan']), $row);
             }
 
             $row = $this->repository->findById($id);

@@ -22,14 +22,7 @@ class RegionRepository
     public function findByCondition(mixed $condition)
     {
         $query = MasterKabupatenKota::with([
-            'provinsi' => function ($query) {
-                $query->select(
-                    'provinsi_id',
-                    'nama_provinsi',
-                    'kode_provinsi',
-                    'kode_dikti',
-                );
-            }
+            'provinsi'
         ])->whereNull('deleted_at');
 
         foreach ($condition as $key => $value) {

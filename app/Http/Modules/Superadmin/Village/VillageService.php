@@ -21,7 +21,9 @@ class VillageService
     {
         try {
             $sqlQuery = MasterKelurahan::with([
-                'kecamatan'
+                'provinsi',
+                'kabupatenKota',
+                'kecamatan',
             ])->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
@@ -31,7 +33,9 @@ class VillageService
                         ->where("nama_kelurahan", "ilike", "%{$search}%")
                         ->orWhere("kode_kelurahan", "ilike", '%' . "%{$search}%")
                         ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kecamatan.nama_kecamatan", "ilike", '%' . "%{$search}%");
+                        ->orWhere("kecamatan.nama_kecamatan", "ilike", '%' . "%{$search}%")
+                        ->orWhere("provinsi.nama_provinsi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kabupatenKota.nama_kabupaten_kota", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -75,21 +79,24 @@ class VillageService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_kelurahan' => $payload->client_code,
+                'provinsi_id' => $payload->provinsi_id,
+                'kabupaten_kota_id' => $payload->kabupaten_kota_id,
+                'kecamatan_id' => $payload->kecamatan_id,
+                'kode_kelurahan' => $payload->kode_kelurahan,
             ]);
 
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kelurahan ({$row->kode_kelurahan})"]), $row);
             }
 
-            $result = $this->repository->insert($payload);
+            $result = $this->repository->insert((array) $payload);
 
             if (!$result) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.village.create'), $result);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.create'), (object) [
-                "{$this->primaryKey}" => $result->provinsi_id,
+                self::$primaryKey => $result->kecamatan_id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -99,16 +106,29 @@ class VillageService
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         try {
+
+            $row = $this->repository->checkExisted($id,  [
+                'provinsi_id' => $payload->provinsi_id,
+                'kabupaten_kota_id' => $payload->kabupaten_kota_id,
+                'kecamatan_id' => $payload->kecamatan_id,
+                'kode_kelurahan' => $payload->kode_kelurahan,
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kode Kelurahan']), $row);
+            }
+
+
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
-            $row->update($payload);
+            $row->update((array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.update'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -124,10 +144,10 @@ class VillageService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
-            $row->update($payload);
+            $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.delete'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

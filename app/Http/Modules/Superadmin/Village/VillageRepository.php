@@ -3,6 +3,7 @@
 namespace App\Http\Modules\Superadmin\Village;
 
 use App\Models\MasterKelurahan;
+use Illuminate\Support\Facades\DB;
 
 class VillageRepository
 {
@@ -17,14 +18,26 @@ class VillageRepository
     {
         return MasterKelurahan::with([
             'kecamatan',
-        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+            'provinsi',
+            'kabupatenKota'
+        ])->whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+    }
+
+    public function checkExisted(string $id, array $where)
+    {
+        return MasterKelurahan::whereNull('deleted_at')
+            ->where($where)
+            ->where(self::$primaryKey, '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
         $query = MasterKelurahan::with([
-            'kecamatan'
-        ])->query()->whereNull('deleted_at');
+            'kecamatan',
+            'provinsi',
+            'kabupatenKota'
+        ])->whereNull('deleted_at');
+
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);
@@ -38,5 +51,12 @@ class VillageRepository
         }
 
         return $query->first();
+    }
+
+    public function delete(string $id, array $payload)
+    {
+        DB::table('master_kelurahan')
+            ->where(self::$primaryKey, $id)
+            ->update($payload);
     }
 }

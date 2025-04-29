@@ -38,12 +38,6 @@ class MasterKabupatenKota extends Model
         return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');
     }
 
-    public function listKecamatan()
-    {
-        return $this->hasMany(MasterKecamatan::class, 'kabupaten_kota_id', 'kabupaten_kota_id');
-    }
-
-
     protected static function boot()
     {
         parent::boot();

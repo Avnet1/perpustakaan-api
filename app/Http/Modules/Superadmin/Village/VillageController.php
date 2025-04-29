@@ -17,7 +17,9 @@ class VillageController extends Controller
         'nama_kelurahan' => 'nama_kelurahan',
         'kode_kelurahan' => 'kode_kelurahan',
         'kode_dikti' => 'kode_dikti',
-        'nama_kecamatan' => 'kecamatan.nama_kecamatan'
+        'nama_kecamatan' => 'kecamatan.nama_kecamatan',
+        'nama_provinsi' => 'provinsi.nama_provinsi',
+        'nama_kabupaten_kota' => 'kabupatenKota.nama_kabupaten_kota'
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
@@ -36,6 +38,14 @@ class VillageController extends Controller
 
         if ($request->has('kecamatan_id')) {
             $payload['kecamatan_id'] = $request->input('kecamatan_id');
+        }
+
+        if ($request->has('provinsi_id')) {
+            $payload['provinsi_id'] = $request->input('provinsi_id');
+        }
+
+        if ($request->has('kabupaten_kota_id')) {
+            $payload['kabupaten_kota_id'] = $request->input('kabupaten_kota_id');
         }
 
         if ($request->has('nama_kelurahan')) {
@@ -80,6 +90,7 @@ class VillageController extends Controller
         $payload = (object) array_merge($this->bodyValidation($request), [
             'created_at' => $today,
             'created_by' => $user->user_id,
+            'updated_at' => null
         ]);
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
