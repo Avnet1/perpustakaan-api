@@ -20,7 +20,9 @@ class OrganizationRepository
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterOrganisasi::query()->whereNull('deleted_at');
+        $query = MasterOrganisasi::with([
+            'universitas'
+        ])->query()->whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);

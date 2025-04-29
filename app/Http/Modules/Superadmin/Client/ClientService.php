@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ClientService
 {
+    public static $primaryKey = 'client_id';
     protected $repository;
 
     public function __construct(ClientRepository $repository)
@@ -81,7 +82,7 @@ class ClientService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Pelanggan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Pelanggan']), $row);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.find'), $row);
@@ -90,7 +91,7 @@ class ClientService
         }
     }
 
-    public function store(mixed $payload): LaravelResponseInterface
+    public function storeInfo(mixed $payload): LaravelResponseInterface
     {
         DB::transaction();
         try {
@@ -101,7 +102,7 @@ class ClientService
             if ($row) {
                 DB::rollBack();
                 $this->deleteStorage($payload->client_photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "ID Client ({$payload->client_code})"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "ID Pelanggan ({$payload->client_code})"]), $row);
             }
 
             $result = $this->repository->insert($payload);
@@ -114,11 +115,34 @@ class ClientService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.create'), (object) [
-                'client_id' => $result->client_id,
+                "{$this->primaryKey}" => $result->client_id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->deleteStorage($payload->client_photo);
+            return \sendErrorResponse($e);
+        }
+    }
+
+    public function storeAccount(string $id, mixed $payload): LaravelResponseInterface
+    {
+        DB::transaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Pelanggan']), $row);
+            }
+
+            $row->update($payload);
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.client.update'), (object) [
+                "{$this->primaryKey}" => $id,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return \sendErrorResponse($e);
         }
     }
@@ -155,7 +179,7 @@ class ClientService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.update'), (object) [
-                'client_id' => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -180,7 +204,7 @@ class ClientService
             $row->update($payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.delete'), (object) [
-                'client_id' => $id,
+                'id' => $id,
             ]);
         } catch (\Exception $e) {
             return \sendErrorResponse($e);

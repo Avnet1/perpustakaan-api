@@ -1,26 +1,24 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Client;
+namespace App\Http\Modules\Superadmin\Provinsi;
 
-use App\Models\Client;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Models\MasterProvinsi;
 
-class ClientRepository
+class ProvinsiRepository
 {
     public function insert(mixed $payload)
     {
-        return Client::create($payload);
+        return MasterProvinsi::create($payload);
     }
 
     public function findById(string $id)
     {
-        return Client::whereNull('deleted_at')->where('client_id', $id)->first();
+        return MasterProvinsi::whereNull('deleted_at')->where('provinsi_id', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
-        $query = Client::query()->whereNull('deleted_at');
+        $query = MasterProvinsi::query()->whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);

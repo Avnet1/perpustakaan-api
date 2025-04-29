@@ -5,7 +5,6 @@ namespace App\Http\Modules\Superadmin\Organization;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrganizationRequest;
@@ -95,8 +94,8 @@ class OrganizationController extends Controller
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    /** Create Client */
-    public function store(OrganizationRequest $request): JsonResponse
+    /** Create Informasi Organisasi */
+    public function storeInfo(OrganizationRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();
@@ -107,9 +106,23 @@ class OrganizationController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $payload->logo = $request->file('logo')->store(self::$pathLocation, 'public');
+            $payload->logo = $request->file('logo')->storeInfo(self::$pathLocation, 'public');
         }
         $result = $this->service->store($payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+    /** Create Akun Organisasi */
+    public function storeAccount(OrganizationRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route(self::$primaryKey);
+        $today = Carbon::now();
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'updated_at' => $today,
+            'updated_by' => $user->user_id,
+        ]);
+        $result = $this->service->storeAccount($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 

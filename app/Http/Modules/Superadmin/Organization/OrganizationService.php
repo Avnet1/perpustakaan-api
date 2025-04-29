@@ -103,35 +103,59 @@ class OrganizationService
         }
     }
 
-    public function store(mixed $payload): LaravelResponseInterface
+    public function storeInfo(mixed $payload): LaravelResponseInterface
     {
         DB::transaction();
         try {
             $row = $this->repository->findByCondition([
-                '' => $payload->client_code,
+                'universitas_id' => $payload->client_code,
             ]);
 
             if ($row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "ID Client ({$payload->client_code})"]), $row);
+                $this->deleteStorage($payload->logo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Organisasi ({$row->universitas->nama_universitas})"]), $row);
             }
 
             $result = $this->repository->insert($payload);
 
             if (!$result) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
+                $this->deleteStorage($payload->logo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.create'), $result);
             }
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.create'), (object) [
-                'client_id' => $result->client_id,
+                'id' => $result->organisasi_id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->deleteStorage($payload->client_photo);
+            $this->deleteStorage($payload->logo);
+            return \sendErrorResponse($e);
+        }
+    }
+
+    public function storeAccount(string $id, mixed $payload): LaravelResponseInterface
+    {
+        DB::transaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
+            }
+
+
+            $row->update($payload);
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
+                'id' => $id,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return \sendErrorResponse($e);
         }
     }
@@ -146,17 +170,17 @@ class OrganizationService
 
             if (!$row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Pelanggan']), $row);
+                $this->deleteStorage($payload->logo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
-            if ($row->client_photo != null) {
-                $storageOldPath = $row->client_photo;
+            if ($row->logo != null) {
+                $storageOldPath = $row->logo;
             }
 
-            if ($payload->client_photo == null) {
+            if ($payload->logo == null) {
                 $hasPhoto = false;
-                unset($payload->client_photo);
+                unset($payload->logo);
             }
 
             $row->update($payload);
@@ -168,15 +192,11 @@ class OrganizationService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
-                'client_id' => $id,
+                'id' => $id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
-            if ($payload->client_photo != null) {
-                Storage::disk('public')->delete($payload->client_photo);
-            }
-
+            Storage::disk('public')->delete($payload->logo);
             return \sendErrorResponse($e);
         }
     }
@@ -193,7 +213,7 @@ class OrganizationService
             $row->update($payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.delete'), (object) [
-                'client_id' => $id,
+                'id' => $id,
             ]);
         } catch (\Exception $e) {
             return \sendErrorResponse($e);

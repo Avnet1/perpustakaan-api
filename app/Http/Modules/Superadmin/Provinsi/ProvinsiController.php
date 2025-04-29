@@ -1,23 +1,30 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Client;
+namespace App\Http\Modules\Superadmin\Provinsi;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ClientRequest;
+use App\Http\Requests\ProvinsiRequest;
 
-class ClientController extends Controller
+class ProvinsiController extends Controller
 {
-    public static $primaryKey = 'client_id';
-    public static $pathLocation = 'clients/photo';
+    public static $primaryKey = 'provinsi_id';
+
+    const SORT_COLUMNS = [
+        'nama_provinsi' => 'nama_provinsi',
+        'kode_provinsi' => 'kode_provinsi',
+        'kode_dikti' => 'kode_dikti'
+    ];
+
+    const DEFAULT_SORT = ['created_at', 'ASC'];
+
 
     protected $service;
 
-    public function __construct(ClientService $service)
+    public function __construct(ProvinsiService $service)
     {
         $this->service = $service;
     }
@@ -26,25 +33,16 @@ class ClientController extends Controller
     {
         $payload = [];
 
-        if ($request->has('client_code')) {
-            $payload['client_code'] = $request->input('client_code');
+        if ($request->has('nama_provinsi')) {
+            $payload['nama_provinsi'] = $request->input('nama_provinsi');
         }
 
-        if ($request->has('client_name')) {
-            $payload['client_name'] = $request->input('client_name');
+        if ($request->has('kode_provinsi')) {
+            $payload['kode_provinsi'] = $request->input('kode_provinsi');
         }
 
-        if ($request->has('client_job')) {
-            $payload['client_job'] = $request->input('client_job');
-        }
-
-        if ($request->has('client_phone')) {
-            $payload['client_phone'] = $request->input('client_phone');
-        }
-
-
-        if ($request->has('client_address')) {
-            $payload['client_address'] = $request->input('client_address');
+        if ($request->has('kode_dikti')) {
+            $payload['kode_dikti'] = $request->input('kode_dikti');
         }
 
         return $payload;
@@ -55,7 +53,7 @@ class ClientController extends Controller
     {
         $filters = (object) [
             "paging" => defineRequestPaginateArgs($request),
-            "sorting" => defineRequestOrder($request)
+            "sorting" => defineRequestOrder($request, self::DEFAULT_SORT, self::SORT_COLUMNS)
         ];
         $result = $this->service->fetch($filters);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
@@ -70,34 +68,15 @@ class ClientController extends Controller
     }
 
     /** Create Client */
-    public function storeInfo(ClientRequest $request): JsonResponse
+    public function store(ProvinsiRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'client_photo' => null,
             'created_at' => $today,
             'created_by' => $user->user_id,
         ]);
-
-        if ($request->hasFile('photo')) {
-            $payload->client_photo = $request->file('photo')->store(self::$pathLocation, 'public');
-        }
-        $result = $this->service->storeInfo($payload);
-        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
-    }
-
-    public function storeAccount(ClientRequest $request): JsonResponse
-    {
-        $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
-        $today = Carbon::now();
-        $payload = (object) array_merge($this->bodyValidation($request), [
-            'updated_at' => $today,
-            'updated_by' => $user->user_id,
-        ]);
-
-        $result = $this->service->storeAccount($id, $payload);
+        $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -108,14 +87,9 @@ class ClientController extends Controller
         $id = $request->route(self::$primaryKey);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'client_photo' => null,
             'updated_at' => $today,
             'updated_by' => $user->user_id,
         ]);
-
-        if ($request->hasFile('photo')) {
-            $payload->client_photo = $request->file('photo')->store(self::$pathLocation, 'public');
-        }
 
         $result = $this->service->update($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);

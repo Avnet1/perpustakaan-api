@@ -4,6 +4,7 @@ return [
     'required' => ':attribute wajib diisi.',
     'unique' => ':attribute sudah digunakan.',
     'exists' => ':attribute tidak ditemukan.',
+    'image' => ':attribute wajib file image',
     'min' => [
         'string' => ':attribute minimal harus :min karakter.',
         'numeric' => ':attribute minimal :min.',
@@ -24,6 +25,13 @@ return [
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
+            ],
+            'provinsi' => [
+                'create' => 'Data provinsi berhasil ditambahkan',
+                'fetch' => 'Tarik data provinsi berhasil',
+                'find' => 'Tarik data provinsi berhasil',
+                'update' => 'Data provinsi berhasil diubah',
+                'delete' => 'Data provinsi berhasil dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi berhasil ditambahkan',
@@ -61,6 +69,16 @@ return [
                 'tokenUnprovide' => 'Token tidak tersedia',
                 "notApproved" => "Akun anda bulum disetujui. Silahkan hubungi customer support",
                 "expiredAccount" => "Masa aktif berlangganan anda telah jatuh tempo. Silahkan perpanjang layanan"
+            ],
+            'provinsi' => [
+                'create' => 'Data provinsi gagal ditambahkan',
+                'update' => 'Data provinsi gagal diubah',
+                'delete' => 'Data provinsi gagal dihapus',
+            ],
+            'organization' => [
+                'create' => 'Data organisasi gagal ditambahkan',
+                'update' => 'Data organisasi gagal diubah',
+                'delete' => 'Data organisasi gagal dihapus',
             ],
             'client' => [
                 'create' => 'Data pelanggan gagal ditambahkan',
