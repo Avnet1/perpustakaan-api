@@ -42,17 +42,24 @@ return [
             ],
             'sub_district' => [
                 'create' => 'Data kecamatan berhasil ditambahkan',
-                'fetch' => 'Tarik kecamatan berhasil',
-                'find' => 'Tarik kecamatan berhasil',
+                'fetch' => 'Tarik data kecamatan berhasil',
+                'find' => 'Tarik data kecamatan berhasil',
                 'update' => 'Data kecamatan berhasil diubah',
                 'delete' => 'Data kecamatan berhasil dihapus',
             ],
             'village' => [
                 'create' => 'Data kelurahan berhasil ditambahkan',
-                'fetch' => 'Tarik kelurahan berhasil',
-                'find' => 'Tarik kelurahan berhasil',
+                'fetch' => 'Tarik data kelurahan berhasil',
+                'find' => 'Tarik data kelurahan berhasil',
                 'update' => 'Data kelurahan berhasil diubah',
                 'delete' => 'Data kelurahan berhasil dihapus',
+            ],
+            'grade' => [
+                'create' => 'Data jenjang berhasil ditambahkan',
+                'fetch' => 'Tarik data jenjang berhasil',
+                'find' => 'Tarik data jenjang berhasil',
+                'update' => 'Data jenjang berhasil diubah',
+                'delete' => 'Data jenjang berhasil dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi berhasil ditambahkan',
@@ -111,6 +118,11 @@ return [
                 'create' => 'Data kelurahan gagal ditambahkan',
                 'update' => 'Data kelurahan gagal diubah',
                 'delete' => 'Data kelurahan gagal dihapus',
+            ],
+            'grade' => [
+                'create' => 'Data jenjang gagal ditambahkan',
+                'update' => 'Data jenjang gagal diubah',
+                'delete' => 'Data jenjang gagal dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi gagal ditambahkan',
