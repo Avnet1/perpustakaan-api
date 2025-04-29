@@ -9,7 +9,7 @@ use Exception;
 
 class VillageService
 {
-    public static $primaryKey = 'kecamatan_id';
+    public static $primaryKey = 'kelurahan_id';
     protected $repository;
 
     public function __construct(VillageRepository $repository)
@@ -96,7 +96,7 @@ class VillageService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.create'), (object) [
-                self::$primaryKey => $result->kecamatan_id,
+                self::$primaryKey => $result->kelurahan_id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
