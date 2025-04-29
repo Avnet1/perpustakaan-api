@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SubdistrictRequest extends FormRequest
+class VillageRequest extends FormRequest
 {
 
     /**
@@ -28,13 +28,13 @@ class SubdistrictRequest extends FormRequest
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($routeUri) {
-            case 'sub-districts':
+            case 'villages':
                 if ($this->method() == 'POST') {
                     return [
-                        'kabupaten_kota_id' => 'required',
-                        'nama_kecamatan' => 'required',
-                        'kode_kecamatan' => 'required',
+                        'nama_kelurahan' => 'required',
+                        'kode_kelurahan' => 'required',
                         'kode_dikti' => 'required',
+                        'kecamatan_id' => 'required'
                     ];
                 }
 
@@ -47,10 +47,10 @@ class SubdistrictRequest extends FormRequest
     public function messages()
     {
         return [
-            'nama_kecamatan.required' =>  __('validation.required', ['attribute' => 'Nama Kecamatan']),
-            'kode_kecamatan.required' => __('validation.required', ['attribute' => 'Kode Kecamatan']),
+            'nama_kelurahan.required' =>  __('validation.required', ['attribute' => 'Nama Kelurahan']),
+            'kode_kelurahan.required' => __('validation.required', ['attribute' => 'Kode Kelurahan']),
             'kode_dikti.required' => __('validation.required', ['attribute' => 'Kode Dikti']),
-            'kabupaten_kota_id.required' =>  __('validation.required', ['attribute' => 'Kabupaten/Kota']),
+            'kecamatan_id.required' =>  __('validation.required', ['attribute' => 'Kecamatan']),
         ];
     }
 }

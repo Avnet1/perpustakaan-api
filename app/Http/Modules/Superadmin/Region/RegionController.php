@@ -82,11 +82,12 @@ class RegionController extends Controller
     {
         $user = getUser($request);
         $today = Carbon::now();
-        $payload = (object) array_merge($this->bodyValidation($request), [
+        $payload =  array_merge($this->bodyValidation($request), [
             'created_at' => $today,
             'created_by' => $user->user_id,
+            'updated_at' => null
         ]);
-        $result = $this->service->store($payload);
+        $result = $this->service->store((object) $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -110,8 +111,9 @@ class RegionController extends Controller
     {
         $user = getUser($request);
         $id = $request->route(self::$primaryKey);
+        $today = Carbon::now();
         $payload = (object) [
-            'deleted_at' => Carbon::now(),
+            'deleted_at' => $today,
             'deleted_by' => $user->user_id,
         ];
 

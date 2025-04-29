@@ -4,7 +4,6 @@ namespace App\Http\Modules\Superadmin\Auth;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -18,11 +17,11 @@ class AuthService
         $this->repository = $repository;
     }
 
-    public function login(Request $req, $payload): LaravelResponseInterface
+    public function login($payload): LaravelResponseInterface
     {
-        $user = $this->repository->findIdentity($payload->identity_code);
+        $user = $this->repository->findIdentity($payload->username);
 
-        if(!$user) {
+        if (!$user) {
             return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "ID Anggota"]), $user);
         }
 
@@ -31,7 +30,7 @@ class AuthService
         }
 
         $credentials = [
-            'identity_code' => $user->identity_code, // This should be the custom field you want to use
+            'username' => $user->username, // This should be the custom field you want to use
             'password' => $payload->password,        // The password provided by the user
         ];
 
@@ -42,7 +41,7 @@ class AuthService
 
         $jwtPayload = [
             'user_id' => $user->user_id,
-            'identity_code' => $user->identity_code,
+            'username' => $user->username,
             'role_id' => $user->role->role_id,
             'role_name' => $user->role->role_name,
             'role_slug' => $user->role->role_slug,
@@ -60,7 +59,7 @@ class AuthService
         ]);
     }
 
-    public function refreshToken():LaravelResponseInterface
+    public function refreshToken(): LaravelResponseInterface
     {
         // Get the token from the request (usually in the Authorization header as a Bearer token)
         $token = JWTAuth::getToken();
@@ -68,7 +67,6 @@ class AuthService
         // If no token is provided, return an error
         if (!$token) {
             return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.noProvideToken'), $token);
-
         }
 
         try {

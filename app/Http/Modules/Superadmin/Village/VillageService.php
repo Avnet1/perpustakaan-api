@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Subdistrict;
+namespace App\Http\Modules\Superadmin\Village;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use App\Models\MasterKecamatan;
+use App\Models\MasterKelurahan;
 use Exception;
 
-class SubdistrictService
+class VillageService
 {
     public static $primaryKey = 'kecamatan_id';
     protected $repository;
 
-    public function __construct(SubdistrictRepository $repository)
+    public function __construct(VillageRepository $repository)
     {
         $this->repository = $repository;
     }
@@ -20,18 +20,18 @@ class SubdistrictService
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
-            $sqlQuery = MasterKecamatan::with([
-                'kabupatenKota'
+            $sqlQuery = MasterKelurahan::with([
+                'kecamatan'
             ])->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("nama_kecamatan", "ilike", "%{$search}%")
-                        ->orWhere("kode_kecamatan", "ilike", '%' . "%{$search}%")
+                        ->where("nama_kelurahan", "ilike", "%{$search}%")
+                        ->orWhere("kode_kelurahan", "ilike", '%' . "%{$search}%")
                         ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kabupatenKota.nama_kabupaten_kota", "ilike", '%' . "%{$search}%");
+                        ->orWhere("kecamatan.nama_kecamatan", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -50,7 +50,7 @@ class SubdistrictService
                 ->get();
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.fetch'), $response);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.village.fetch'), $response);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -62,10 +62,10 @@ class SubdistrictService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.find'), $row);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.village.find'), $row);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -75,20 +75,20 @@ class SubdistrictService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_kecamatan' => $payload->client_code,
+                'kode_kelurahan' => $payload->client_code,
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kecamatan ({$row->kode_kecamatan})"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kelurahan ({$row->kode_kelurahan})"]), $row);
             }
 
             $result = $this->repository->insert($payload);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.sub_district.create'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.village.create'), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.create'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.village.create'), (object) [
                 "{$this->primaryKey}" => $result->provinsi_id,
             ]);
         } catch (Exception $e) {
@@ -102,12 +102,12 @@ class SubdistrictService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
             $row->update($payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.update'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.village.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
@@ -121,12 +121,12 @@ class SubdistrictService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
             $row->update($payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.delete'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.village.delete'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {

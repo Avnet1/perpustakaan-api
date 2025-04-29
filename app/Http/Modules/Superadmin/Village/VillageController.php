@@ -1,22 +1,23 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Province;
+namespace App\Http\Modules\Superadmin\Village;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProvinceRequest;
+use App\Http\Requests\VillageRequest;
 
-class ProvinsiController extends Controller
+class VillageController extends Controller
 {
-    public static $primaryKey = 'provinsi_id';
+    public static $primaryKey = 'kelurahan_id';
 
     const SORT_COLUMNS = [
-        'nama_provinsi' => 'nama_provinsi',
-        'kode_provinsi' => 'kode_provinsi',
-        'kode_dikti' => 'kode_dikti'
+        'nama_kelurahan' => 'nama_kelurahan',
+        'kode_kelurahan' => 'kode_kelurahan',
+        'kode_dikti' => 'kode_dikti',
+        'nama_kecamatan' => 'kecamatan.nama_kecamatan'
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
@@ -24,7 +25,7 @@ class ProvinsiController extends Controller
 
     protected $service;
 
-    public function __construct(ProvinsiService $service)
+    public function __construct(VillageService $service)
     {
         $this->service = $service;
     }
@@ -33,12 +34,16 @@ class ProvinsiController extends Controller
     {
         $payload = [];
 
-        if ($request->has('nama_provinsi')) {
-            $payload['nama_provinsi'] = $request->input('nama_provinsi');
+        if ($request->has('kecamatan_id')) {
+            $payload['kecamatan_id'] = $request->input('kecamatan_id');
         }
 
-        if ($request->has('kode_provinsi')) {
-            $payload['kode_provinsi'] = $request->input('kode_provinsi');
+        if ($request->has('nama_kelurahan')) {
+            $payload['nama_kelurahan'] = $request->input('nama_kelurahan');
+        }
+
+        if ($request->has('kode_kelurahan')) {
+            $payload['kode_kelurahan'] = $request->input('kode_kelurahan');
         }
 
         if ($request->has('kode_dikti')) {
@@ -68,14 +73,13 @@ class ProvinsiController extends Controller
     }
 
     /** Create Client */
-    public function store(ProvinceRequest $request): JsonResponse
+    public function store(VillageRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'created_at' => $today,
             'created_by' => $user->user_id,
-            'updated_at' => null,
         ]);
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
@@ -101,10 +105,8 @@ class ProvinsiController extends Controller
     {
         $user = getUser($request);
         $id = $request->route(self::$primaryKey);
-        $today = Carbon::now();
-
         $payload = (object) [
-            'deleted_at' => $today,
+            'deleted_at' => Carbon::now(),
             'deleted_by' => $user->user_id,
         ];
 

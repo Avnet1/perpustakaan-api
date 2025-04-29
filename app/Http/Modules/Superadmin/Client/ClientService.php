@@ -5,9 +5,9 @@ namespace App\Http\Modules\Superadmin\Client;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\Client;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Exception;
 
 class ClientService
 {
@@ -71,8 +71,8 @@ class ClientService
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.fetch'), $response);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -86,8 +86,8 @@ class ClientService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.find'), $row);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -117,10 +117,10 @@ class ClientService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.create'), (object) [
                 "{$this->primaryKey}" => $result->client_id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             $this->deleteStorage($payload->client_photo);
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -143,7 +143,7 @@ class ClientService
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -181,14 +181,14 @@ class ClientService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             if ($payload->client_photo != null) {
                 Storage::disk('public')->delete($payload->client_photo);
             }
 
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -206,8 +206,8 @@ class ClientService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.client.delete'), (object) [
                 'id' => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 }

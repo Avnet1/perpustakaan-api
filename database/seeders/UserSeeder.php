@@ -19,9 +19,9 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'Indosistem',
-            'identity_code' => 'indosistem',
+            'username' => 'indosistem',
             'password' => Hash::make('password123'),
-            'role_id' => $role->role_id ,
+            'role_id' => $role->role_id,
             'email' => 'admin@indosistem.com',
         ]);
     }

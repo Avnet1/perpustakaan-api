@@ -16,6 +16,7 @@ class MasterProvinsi extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+
     protected $fillable = [
         'provinsi_id',
         'nama_provinsi',
@@ -25,6 +26,12 @@ class MasterProvinsi extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    protected $hidden = [
+        'deleted_at',
+        'deleted_by',
+    ];
+
 
     public function listKabupatenKota()
     {

@@ -30,7 +30,7 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'user_id',
         'name',
-        'identity_code',
+        'username',
         'password',
         'role_id',
         'email',
@@ -84,7 +84,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Client::class, 'user_id', 'user_id');
     }
 
-    public function anggota() {
+    public function anggota()
+    {
         return $this->hasOne(MasterTipeKeanggotaan::class, 'user_id', 'user_id');
     }
 

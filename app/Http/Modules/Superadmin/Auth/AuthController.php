@@ -21,11 +21,11 @@ class AuthController extends Controller
     public function login(SuperadminAuthRequest $req): JsonResponse
     {
         $payload = (object) [
-            "identity_code" => $req->identity_code,
+            "username" => $req->username,
             "password" => $req->password
         ];
 
-        $result = $this->service->login($req, $payload);
+        $result = $this->service->login($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }

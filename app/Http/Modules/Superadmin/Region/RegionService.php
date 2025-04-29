@@ -5,6 +5,7 @@ namespace App\Http\Modules\Superadmin\Region;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterKabupatenKota;
+use Exception;
 
 class RegionService
 {
@@ -58,8 +59,8 @@ class RegionService
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.fetch'), $response);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -73,8 +74,8 @@ class RegionService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.find'), $row);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -82,43 +83,54 @@ class RegionService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_kabupaten_kota' => $payload->client_code,
+                'provinsi_id' => $payload->provinsi_id,
+                'kode_kabupaten_kota' => $payload->kode_kabupaten_kota,
             ]);
 
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kabupaten/Kota ({$row->kode_kabupaten_kota})"]), $row);
             }
 
-            $result = $this->repository->insert($payload);
+            $result = $this->repository->insert((array) $payload);
 
-            if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.region.create'), $result);
+            if (!$result || !isset($result->kabupaten_kota_id)) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.region.create'),  $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.create'), (object) [
-                "{$this->primaryKey}" => $result->provinsi_id,
+            return new LaravelResponseContract(true, 200,  __('validation.custom.success.region.create'), [
+                self::$primaryKey => $result->kabupaten_kota_id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         try {
+            $row = $this->repository->checkExisted($id, (object) [
+                'provinsi_id' => $payload->provinsi_id,
+                'kode_kabupaten_kota' => $payload->kode_kabupaten_kota
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kabupaten/Kota']), $row);
+            }
+
+
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
-            $row->update($payload);
+            $row->update((array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.update'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -131,13 +143,15 @@ class RegionService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
-            $row->update($payload);
+
+            $this->repository->delete($id, (array) $payload);
+
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.delete'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 }

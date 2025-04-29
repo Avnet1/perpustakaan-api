@@ -31,7 +31,7 @@ class SuperadminAuthRequest extends FormRequest
         switch ($routeUri) {
             case 'auth/login':
                 return [
-                    'identity_code' => 'required',
+                    'username' => 'required',
                     'password' => 'required|min:8',
                 ];
 
@@ -48,11 +48,12 @@ class SuperadminAuthRequest extends FormRequest
     public function messages()
     {
         return [
+            'username.required' =>  __('validation.required', ['attribute' => 'Username']),
+            'password.required' =>  __('validation.required', ['attribute' => 'Password']),
             'email.required' =>  __('validation.required', ['attribute' => 'Email']),
-            'email.email' =>  __('validation.email', ['attribute' => 'Email']),
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
             'password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Password', 'number' => 8]),
-            'password.required' =>  __('validation.required', ['attribute' => 'Password']),
+
         ];
     }
 }

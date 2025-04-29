@@ -5,9 +5,9 @@ namespace App\Http\Modules\Superadmin\Organization;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterOrganisasi;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Exception;
 
 class OrganizationService
 {
@@ -83,8 +83,8 @@ class OrganizationService
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.fetch'), $response);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -98,8 +98,8 @@ class OrganizationService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.find'), $row);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -129,10 +129,10 @@ class OrganizationService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.create'), (object) [
                 'id' => $result->organisasi_id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             $this->deleteStorage($payload->logo);
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -154,9 +154,9 @@ class OrganizationService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
                 'id' => $id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -194,10 +194,10 @@ class OrganizationService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
                 'id' => $id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Storage::disk('public')->delete($payload->logo);
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -215,8 +215,8 @@ class OrganizationService
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.delete'), (object) [
                 'id' => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 }

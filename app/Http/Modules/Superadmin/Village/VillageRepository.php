@@ -1,27 +1,30 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Province;
+namespace App\Http\Modules\Superadmin\Village;
 
-use App\Models\MasterProvinsi;
-use Illuminate\Support\Facades\DB;
+use App\Models\MasterKelurahan;
 
-class ProvinsiRepository
+class VillageRepository
 {
-    public static $primaryKey = 'provinsi_id';
+    public static $primaryKey = 'kelurahan_id';
 
     public function insert(mixed $payload)
     {
-        return MasterProvinsi::create($payload);
+        return MasterKelurahan::create($payload);
     }
 
     public function findById(string $id)
     {
-        return MasterProvinsi::whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        return MasterKelurahan::with([
+            'kecamatan',
+        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterProvinsi::whereNull('deleted_at');
+        $query = MasterKelurahan::with([
+            'kecamatan'
+        ])->query()->whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);
@@ -35,12 +38,5 @@ class ProvinsiRepository
         }
 
         return $query->first();
-    }
-
-    public function delete(string $id, array $payload)
-    {
-        DB::table('master_provinsi')
-            ->where(self::$primaryKey, $id)
-            ->update($payload);
     }
 }

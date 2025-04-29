@@ -28,6 +28,11 @@ class MasterKabupatenKota extends Model
         'deleted_by',
     ];
 
+    protected $hidden = [
+        'deleted_at',
+        'deleted_by',
+    ];
+
     public function provinsi()
     {
         return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');

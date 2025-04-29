@@ -11,6 +11,7 @@ use App\Http\Modules\Superadmin\Organization\OrganizationController as SA_Organi
 use App\Http\Modules\Superadmin\Province\ProvinsiController as SA_ProvinceController;
 use App\Http\Modules\Superadmin\Region\RegionController as SA_RegionController;
 use App\Http\Modules\Superadmin\Subdistrict\SubdistrictController as SA_SubdistrictController;
+use App\Http\Modules\Superadmin\Village\VillageController as SA_VillageController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,15 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{kecamatan_id}', [SA_SubdistrictController::class, 'findById']);
                 Route::put('/{kecamatan_id}', [SA_SubdistrictController::class, 'update']);
                 Route::delete('/{kecamatan_id}', [SA_SubdistrictController::class, 'delete']);
+            });
+
+            /** Master Kelurahan */
+            Route::prefix('villages')->group(function () {
+                Route::get('/', [SA_VillageController::class, 'fetch']);
+                Route::post('/', [SA_VillageController::class, 'store']);
+                Route::get('/{kelurahan_id}', [SA_VillageController::class, 'findById']);
+                Route::put('/{kelurahan_id}', [SA_VillageController::class, 'update']);
+                Route::delete('/{kelurahan_id}', [SA_VillageController::class, 'delete']);
             });
 
 

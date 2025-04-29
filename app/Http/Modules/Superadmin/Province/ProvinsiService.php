@@ -5,6 +5,7 @@ namespace App\Http\Modules\Superadmin\Province;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterProvinsi;
+use Exception;
 
 class ProvinsiService
 {
@@ -48,7 +49,7 @@ class ProvinsiService
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
             return new LaravelResponseContract(true, 200, __('validation.custom.success.province.fetch'), $response);
         } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+            return sendErrorResponse($e);
         }
     }
 
@@ -62,8 +63,8 @@ class ProvinsiService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.province.find'), $row);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -71,24 +72,24 @@ class ProvinsiService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_provinsi' => $payload->client_code,
+                'kode_provinsi' => $payload->kode_provinsi,
             ]);
 
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Provinsi ({$row->kode_provinsi})"]), $row);
             }
 
-            $result = $this->repository->insert($payload);
+            $result = $this->repository->insert((array) $payload);
 
-            if (!$result) {
+            if (!$result || !isset($result->provinsi_id)) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.province.create'), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.create'), (object) [
-                "{$this->primaryKey}" => $result->provinsi_id,
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.create'), [
+                self::$primaryKey => $result->provinsi_id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -101,13 +102,13 @@ class ProvinsiService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
             }
 
-            $row->update($payload);
+            $row->update((array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.province.update'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 
@@ -120,13 +121,14 @@ class ProvinsiService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
             }
 
-            $row->update($payload);
+            $row->updateQuietly((array) $payload);
+            $row->delete();
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.province.delete'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
-        } catch (\Exception $e) {
-            return \sendErrorResponse($e);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
     }
 }

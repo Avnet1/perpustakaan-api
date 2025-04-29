@@ -47,6 +47,13 @@ return [
                 'update' => 'Data kecamatan berhasil diubah',
                 'delete' => 'Data kecamatan berhasil dihapus',
             ],
+            'village' => [
+                'create' => 'Data kelurahan berhasil ditambahkan',
+                'fetch' => 'Tarik kelurahan berhasil',
+                'find' => 'Tarik kelurahan berhasil',
+                'update' => 'Data kelurahan berhasil diubah',
+                'delete' => 'Data kelurahan berhasil dihapus',
+            ],
             'organization' => [
                 'create' => 'Data organisasi berhasil ditambahkan',
                 'fetch' => 'Tarik data organisasi berhasil',
@@ -74,6 +81,7 @@ return [
                 'exists' => 'Data :attribute sudah digunakan',
                 'minCharacter' => 'Jumlah karakter :attribute minimal :number karakge',
                 'notFound' => 'Data :attribute tidak ditemukan',
+                'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem'
             ],
             'auth' => [
                 'passwordInvalid' => 'Password yang diinput tidak sesuai',
@@ -98,6 +106,11 @@ return [
                 'create' => 'Data kecamatan gagal ditambahkan',
                 'update' => 'Data kecamatan gagal diubah',
                 'delete' => 'Data kecamatan gagal dihapus',
+            ],
+            'village' => [
+                'create' => 'Data kelurahan gagal ditambahkan',
+                'update' => 'Data kelurahan gagal diubah',
+                'delete' => 'Data kelurahan gagal dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi gagal ditambahkan',
