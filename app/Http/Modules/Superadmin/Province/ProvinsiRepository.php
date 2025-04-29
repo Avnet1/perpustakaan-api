@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Provinsi;
+namespace App\Http\Modules\Superadmin\Province;
 
 use App\Models\MasterProvinsi;
 

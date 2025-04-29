@@ -1,22 +1,24 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Provinsi;
+namespace App\Http\Modules\Superadmin\Region;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProvinsiRequest;
+use App\Http\Requests\RegionRequest;
 
-class ProvinsiController extends Controller
+class RegionController extends Controller
 {
-    public static $primaryKey = 'provinsi_id';
+    public static $primaryKey = 'kabupaten_kota_id';
 
     const SORT_COLUMNS = [
-        'nama_provinsi' => 'nama_provinsi',
-        'kode_provinsi' => 'kode_provinsi',
-        'kode_dikti' => 'kode_dikti'
+        'nama_kabupaten_kota' => 'nama_kabupaten_kota',
+        'status_administrasi' => 'status_administrasi',
+        'kode_kabupaten_kota' => 'kode_kabupaten_kota',
+        'kode_dikti' => 'kode_dikti',
+        'nama_provinsi' => 'master_provinsi.nama_provinsi'
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
@@ -24,7 +26,7 @@ class ProvinsiController extends Controller
 
     protected $service;
 
-    public function __construct(ProvinsiService $service)
+    public function __construct(RegionService $service)
     {
         $this->service = $service;
     }
@@ -33,12 +35,20 @@ class ProvinsiController extends Controller
     {
         $payload = [];
 
-        if ($request->has('nama_provinsi')) {
-            $payload['nama_provinsi'] = $request->input('nama_provinsi');
+        if ($request->has('provinsi_id')) {
+            $payload['provinsi_id'] = $request->input('provinsi_id');
         }
 
-        if ($request->has('kode_provinsi')) {
-            $payload['kode_provinsi'] = $request->input('kode_provinsi');
+        if ($request->has('nama_kabupaten_kota')) {
+            $payload['nama_kabupaten_kota'] = $request->input('nama_kabupaten_kota');
+        }
+
+        if ($request->has('status_administrasi')) {
+            $payload['status_administrasi'] = $request->input('status_administrasi');
+        }
+
+        if ($request->has('kode_kabupaten_kota')) {
+            $payload['kode_kabupaten_kota'] = $request->input('kode_kabupaten_kota');
         }
 
         if ($request->has('kode_dikti')) {
@@ -68,7 +78,7 @@ class ProvinsiController extends Controller
     }
 
     /** Create Client */
-    public function store(ProvinsiRequest $request): JsonResponse
+    public function store(RegionRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();

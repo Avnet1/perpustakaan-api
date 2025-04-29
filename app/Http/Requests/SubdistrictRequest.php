@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProvinsiRequest extends FormRequest
+class SubdistricRequest extends FormRequest
 {
 
     /**
@@ -28,11 +28,12 @@ class ProvinsiRequest extends FormRequest
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($routeUri) {
-            case 'provinsi':
+            case 'sub-districts':
                 if ($this->method() == 'POST') {
                     return [
-                        'nama_provinsi' => 'required',
-                        'kode_provinsi' => 'required',
+                        'kabupaten_kota_id' => 'required',
+                        'nama_kecamatan' => 'required',
+                        'kode_kecamatan' => 'required',
                         'kode_dikti' => 'required',
                     ];
                 }
@@ -46,9 +47,10 @@ class ProvinsiRequest extends FormRequest
     public function messages()
     {
         return [
-            'nama_provinsi.required' =>  __('validation.required', ['attribute' => 'Nama Provinsi']),
-            'kode_provinsi.required' => __('validation.required', ['attribute' => 'Kode Provinsi']),
-            'kode_dikti.required' =>  __('validation.required', ['attribute' => 'Kode Dikti']),
+            'nama_kecamatan.required' =>  __('validation.required', ['attribute' => 'Nama Kecamatan']),
+            'kode_kecamatan.required' => __('validation.required', ['attribute' => 'Kode Kecamatan']),
+            'kode_dikti.required' => __('validation.required', ['attribute' => 'Kode Dikti']),
+            'kabupaten_kota_id.required' =>  __('validation.required', ['attribute' => 'Kabupaten/Kota']),
         ];
     }
 }

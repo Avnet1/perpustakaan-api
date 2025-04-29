@@ -30,7 +30,7 @@ class MasterKabupatenKota extends Model
 
     public function provinsi()
     {
-        return $this->belongsTo(User::class, 'provinsi_id', 'provinsi_id');
+        return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');
     }
 
     public function listKecamatan()

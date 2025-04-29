@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Provinsi;
+namespace App\Http\Modules\Superadmin\Region;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use App\Models\MasterProvinsi;
+use App\Models\MasterKabupatenKota;
 
-class ProvinsiService
+class RegionService
 {
-    public static $primaryKey = 'provinsi_id';
+    public static $primaryKey = 'kabupaten_kota_id';
     protected $repository;
 
-    public function __construct(ProvinsiRepository $repository)
+    public function __construct(RegionRepository $repository)
     {
         $this->repository = $repository;
     }
@@ -19,15 +19,26 @@ class ProvinsiService
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
-            $sqlQuery = MasterProvinsi::whereNull('deleted_at');
+            $sqlQuery = MasterKabupatenKota::with([
+                'provinsi' => function ($query) {
+                    $query->select(
+                        'provinsi_id',
+                        'nama_provinsi',
+                        'kode_provinsi',
+                        'kode_dikti',
+                    );
+                }
+            ])->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("nama_provinsi", "ilike", "%{$search}%")
-                        ->orWhere("kode_provinsi", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%");
+                        ->where("nama_kabupaten_kota", "ilike", "%{$search}%")
+                        ->orWhere("status_administrasi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kode_kabupaten_kota", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%")
+                        ->orWhere("provinsi.nama_provinsi", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -46,7 +57,7 @@ class ProvinsiService
                 ->get();
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.provinsi.fetch'), $response);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.fetch'), $response);
         } catch (\Exception $e) {
             return \sendErrorResponse($e);
         }
@@ -58,10 +69,10 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.provinsi.find'), $row);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.find'), $row);
         } catch (\Exception $e) {
             return \sendErrorResponse($e);
         }
@@ -71,20 +82,20 @@ class ProvinsiService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_provinsi' => $payload->client_code,
+                'kode_kabupaten_kota' => $payload->client_code,
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Provinsi ({$row->kode_provinsi})"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kabupaten/Kota ({$row->kode_kabupaten_kota})"]), $row);
             }
 
             $result = $this->repository->insert($payload);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.provinsi.create'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.region.create'), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.provinsi.create'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.create'), (object) [
                 "{$this->primaryKey}" => $result->provinsi_id,
             ]);
         } catch (\Exception $e) {
@@ -98,12 +109,12 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
             $row->update($payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.provinsi.update'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (\Exception $e) {
@@ -117,12 +128,12 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
             $row->update($payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.provinsi.delete'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.region.delete'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (\Exception $e) {

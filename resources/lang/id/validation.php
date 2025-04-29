@@ -26,12 +26,26 @@ return [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
             ],
-            'provinsi' => [
+            'province' => [
                 'create' => 'Data provinsi berhasil ditambahkan',
                 'fetch' => 'Tarik data provinsi berhasil',
                 'find' => 'Tarik data provinsi berhasil',
                 'update' => 'Data provinsi berhasil diubah',
                 'delete' => 'Data provinsi berhasil dihapus',
+            ],
+            'region' => [
+                'create' => 'Data kabupaten/kota berhasil ditambahkan',
+                'fetch' => 'Tarik data kabupaten/kota berhasil',
+                'find' => 'Tarik data kabupaten/kota berhasil',
+                'update' => 'Data kabupaten/kota berhasil diubah',
+                'delete' => 'Data kabupaten/kota berhasil dihapus',
+            ],
+            'sub_district' => [
+                'create' => 'Data kecamatan berhasil ditambahkan',
+                'fetch' => 'Tarik kecamatan berhasil',
+                'find' => 'Tarik kecamatan berhasil',
+                'update' => 'Data kecamatan berhasil diubah',
+                'delete' => 'Data kecamatan berhasil dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi berhasil ditambahkan',
@@ -70,10 +84,20 @@ return [
                 "notApproved" => "Akun anda bulum disetujui. Silahkan hubungi customer support",
                 "expiredAccount" => "Masa aktif berlangganan anda telah jatuh tempo. Silahkan perpanjang layanan"
             ],
-            'provinsi' => [
+            'province' => [
                 'create' => 'Data provinsi gagal ditambahkan',
                 'update' => 'Data provinsi gagal diubah',
                 'delete' => 'Data provinsi gagal dihapus',
+            ],
+            'region' => [
+                'create' => 'Data kabupaten/kota gagal ditambahkan',
+                'update' => 'Data kabupaten/kota gagal diubah',
+                'delete' => 'Data kabupaten/kota gagal dihapus',
+            ],
+            'sub_district' => [
+                'create' => 'Data kecamatan gagal ditambahkan',
+                'update' => 'Data kecamatan gagal diubah',
+                'delete' => 'Data kecamatan gagal dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi gagal ditambahkan',

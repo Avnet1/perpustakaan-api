@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('client_name')->nullable()->default(null);
             $table->string('client_job')->nullable()->default(null);
             $table->string('client_phone', 100)->nullable()->default(null);
+            $table->string('client_email')->nullable()->default(null);
             $table->text('client_address')->nullable()->default(null);
             $table->text('client_photo')->nullable()->default(null);
             $table->uuid('organisasi_id')->nullable()->default(null);
