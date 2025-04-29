@@ -21,7 +21,8 @@ class SubdistrictService
     {
         try {
             $sqlQuery = MasterKecamatan::with([
-                'kabupatenKota'
+                'kabupatenKota',
+                'provinsi'
             ])->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
@@ -31,7 +32,8 @@ class SubdistrictService
                         ->where("nama_kecamatan", "ilike", "%{$search}%")
                         ->orWhere("kode_kecamatan", "ilike", '%' . "%{$search}%")
                         ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kabupatenKota.nama_kabupaten_kota", "ilike", '%' . "%{$search}%");
+                        ->orWhere("kabupatenKota.nama_kabupaten_kota", "ilike", '%' . "%{$search}%")
+                        ->orWhere("provinsi.nama_provinsi", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -75,21 +77,23 @@ class SubdistrictService
     {
         try {
             $row = $this->repository->findByCondition([
-                'kode_kecamatan' => $payload->client_code,
+                'provinsi_id' => $payload->provinsi_id,
+                'kabupaten_kota_id' => $payload->kabupaten_kota_id,
+                'kode_kecamatan' => $payload->kode_kecamatan,
             ]);
 
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Kecamatan ({$row->kode_kecamatan})"]), $row);
             }
 
-            $result = $this->repository->insert($payload);
+            $result = $this->repository->insert((array) $payload);
 
             if (!$result) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.sub_district.create'), $result);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.create'), (object) [
-                "{$this->primaryKey}" => $result->provinsi_id,
+                self::$primaryKey => $result->provinsi_id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -99,16 +103,27 @@ class SubdistrictService
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         try {
+
+            $row = $this->repository->checkExisted($id,  [
+                'provinsi_id' => $payload->provinsi_id,
+                'kabupaten_kota_id' => $payload->kabupaten_kota_id,
+                'kode_kecamatan' => $payload->kode_kecamatan,
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kecamatan']), $row);
+            }
+
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
             }
 
-            $row->update($payload);
+            $row->update((array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.update'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -124,10 +139,10 @@ class SubdistrictService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
             }
 
-            $row->update($payload);
+            $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.delete'), (object) [
-                "{$this->primaryKey}" => $id,
+                self::$primaryKey => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

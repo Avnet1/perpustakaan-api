@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SubdistricRequest;
+use App\Http\Requests\SubdistrictRequest;
 
 class SubdistrictController extends Controller
 {
@@ -17,7 +17,8 @@ class SubdistrictController extends Controller
         'nama_kecamatan' => 'nama_kecamatan',
         'kode_kecamatan' => 'kode_kecamatan',
         'kode_dikti' => 'kode_dikti',
-        'nama_kabupaten_kota' => 'kabupatenKota.nama_kabupaten_kota'
+        'nama_kabupaten_kota' => 'kabupatenKota.nama_kabupaten_kota',
+        'nama_provinsi' => 'provinsi.nama_provinsi'
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
@@ -36,6 +37,10 @@ class SubdistrictController extends Controller
 
         if ($request->has('kabupaten_kota_id')) {
             $payload['kabupaten_kota_id'] = $request->input('kabupaten_kota_id');
+        }
+
+        if ($request->has('provinsi_id')) {
+            $payload['provinsi_id'] = $request->input('provinsi_id');
         }
 
         if ($request->has('nama_kecamatan')) {
@@ -73,7 +78,7 @@ class SubdistrictController extends Controller
     }
 
     /** Create Client */
-    public function store(SubdistricRequest $request): JsonResponse
+    public function store(SubdistrictRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();
@@ -105,8 +110,9 @@ class SubdistrictController extends Controller
     {
         $user = getUser($request);
         $id = $request->route(self::$primaryKey);
+        $today = Carbon::now();
         $payload = (object) [
-            'deleted_at' => Carbon::now(),
+            'deleted_at' => $today,
             'deleted_by' => $user->user_id,
         ];
 

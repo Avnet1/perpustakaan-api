@@ -3,6 +3,7 @@
 namespace App\Http\Modules\Superadmin\Subdistrict;
 
 use App\Models\MasterKecamatan;
+use Illuminate\Support\Facades\DB;
 
 class SubdistrictRepository
 {
@@ -17,14 +18,16 @@ class SubdistrictRepository
     {
         return MasterKecamatan::with([
             'kabupatenKota',
-        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+            'provinsi'
+        ])->whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
         $query = MasterKecamatan::with([
-            'kabupatenKota'
-        ])->query()->whereNull('deleted_at');
+            'kabupatenKota',
+            'provinsi'
+        ])->whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);
@@ -38,5 +41,20 @@ class SubdistrictRepository
         }
 
         return $query->first();
+    }
+
+    public function checkExisted(string $id, array $where)
+    {
+        return MasterKecamatan::whereNull('deleted_at')
+            ->where($where)
+            ->where(self::$primaryKey, '!=', $id)->first();
+    }
+
+
+    public function delete(string $id, array $payload)
+    {
+        DB::table('master_kecamatan')
+            ->where(self::$primaryKey, $id)
+            ->update($payload);
     }
 }

@@ -47,11 +47,10 @@ class RegionRepository
         return $query->first();
     }
 
-    public function checkExisted(string $id, mixed $where)
+    public function checkExisted(string $id, array $where)
     {
         return MasterKabupatenKota::whereNull('deleted_at')
-            ->where('provinsi_id', $where->provinsi_id)
-            ->where('kode_kabupaten_kota', $where->kode_kabupaten_kota)
+            ->where($where)
             ->where(self::$primaryKey, '!=', $id)->first();
     }
 

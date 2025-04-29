@@ -18,12 +18,18 @@ class MasterKecamatan extends Model
 
     protected $fillable = [
         'kecamatan_id',
+        'provinsi_id',
         'kabupaten_kota_id',
         'nama_kecamatan',
         'kode_kecamatan',
         'kode_dikti',
         'created_by',
         'updated_by',
+        'deleted_by',
+    ];
+
+    protected $hidden = [
+        'deleted_at',
         'deleted_by',
     ];
 
@@ -34,19 +40,7 @@ class MasterKecamatan extends Model
 
     public function provinsi()
     {
-        return $this->hasOneThrough(
-            MasterProvinsi::class, // model tujuan akhirnya
-            MasterKabupatenKota::class,     // model perantaranya
-            'kabupaten_kota_id',
-            'provinsi_id',
-            'kabupaten_kota_id',
-            'provinsi_id'
-        );
-    }
-
-    public function listKelurahan()
-    {
-        return $this->hasMany(MasterKelurahan::class, 'kecamatan_id', 'kecamatan_id');
+        return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');
     }
 
     protected static function boot()

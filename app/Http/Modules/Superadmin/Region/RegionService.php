@@ -108,7 +108,7 @@ class RegionService
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         try {
-            $row = $this->repository->checkExisted($id, (object) [
+            $row = $this->repository->checkExisted($id, (array) [
                 'provinsi_id' => $payload->provinsi_id,
                 'kode_kabupaten_kota' => $payload->kode_kabupaten_kota
             ]);
