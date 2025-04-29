@@ -10,6 +10,8 @@ use App\Http\Modules\Superadmin\Client\ClientController as SA_ClientController;
 use App\Http\Modules\Superadmin\Organization\OrganizationController as SA_OrganizationController;
 use App\Http\Modules\Superadmin\Province\ProvinsiController as SA_ProvinceController;
 use App\Http\Modules\Superadmin\Region\RegionController as SA_RegionController;
+use App\Http\Modules\Superadmin\Subdistrict\SubdistrictController as SA_SubdistrictController;
+
 use Illuminate\Support\Facades\Route;
 
 
@@ -42,6 +44,16 @@ Route::prefix('v1')->group(function () {
                 Route::put('/{kabupaten_kota_id}', [SA_RegionController::class, 'update']);
                 Route::delete('/{kabupaten_kota_id}', [SA_RegionController::class, 'delete']);
             });
+
+            /** Master Kecamatan */
+            Route::prefix('sub-districts')->group(function () {
+                Route::get('/', [SA_SubdistrictController::class, 'fetch']);
+                Route::post('/', [SA_SubdistrictController::class, 'store']);
+                Route::get('/{kecamatan_id}', [SA_SubdistrictController::class, 'findById']);
+                Route::put('/{kecamatan_id}', [SA_SubdistrictController::class, 'update']);
+                Route::delete('/{kecamatan_id}', [SA_SubdistrictController::class, 'delete']);
+            });
+
 
             /** Master Organisasi */
             Route::prefix('organizations')->group(function () {
