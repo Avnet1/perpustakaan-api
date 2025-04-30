@@ -78,6 +78,7 @@ class ClientController extends Controller
             'client_photo' => null,
             'created_at' => $today,
             'created_by' => $user->user_id,
+            'updated_at' => null
         ]);
 
         if ($request->hasFile('photo')) {

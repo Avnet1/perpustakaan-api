@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Modules\Superadmin\Identity;
+
+use App\Http\Contracts\LaravelResponseContract;
+use App\Http\Interfaces\LaravelResponseInterface;
+use App\Models\MasterIdentitas;
+use Exception;
+use Illuminate\Support\Facades\DB;
+
+class IdentityService
+{
+    public static $primaryKey = 'identitas_id';
+    protected $repository;
+
+    public function __construct(IdentityRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    public function fetch(): LaravelResponseInterface
+    {
+        try {
+            $result = MasterIdentitas::whereNull('deleted_at')->first();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.fetch'), $result);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function findById(string $id): LaravelResponseInterface
+    {
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+            }
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.find'), $row);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function store(mixed $payload): LaravelResponseInterface
+    {
+        DB::beginTransaction();
+        try {
+            $row = $this->repository->checkRow();
+
+            if ($row > 0) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Identitas"]), $row);
+            }
+
+            $result = $this->repository->insert((array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.identity.create'), $result);
+            }
+
+            DB::commit();
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.create'), (object) [
+                self::$primaryKey => $result[self::$primaryKey],
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->photo);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function update(string $id, mixed $payload): LaravelResponseInterface
+    {
+        $storageOldPath = null;
+        $hasPhoto = true;
+        DB::beginTransaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+            }
+
+            if ($row->photo != null) {
+                $storageOldPath = $row->photo;
+            }
+
+            if ($payload->photo == null) {
+                $hasPhoto = false;
+                unset($payload->photo);
+            }
+
+            $row->update((array) $payload);
+
+            if ($hasPhoto == true) {
+                deleteFileInStorage($storageOldPath);
+            }
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.update'), (object) [
+                self::$primaryKey => $id,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->photo);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function delete(string $id, mixed $payload): LaravelResponseInterface
+    {
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+            }
+
+            $this->repository->delete($id, (array) $payload);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.delete'), (object) [
+                self::$primaryKey => $id,
+            ]);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+}

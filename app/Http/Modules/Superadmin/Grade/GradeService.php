@@ -58,7 +58,7 @@ class GradeService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Grade']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Master jenjang']), $row);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.grade.find'), $row);
@@ -77,6 +77,15 @@ class GradeService
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama jenjang ({$row->nama_jenjang})"]), $row);
             }
+
+            $row = $this->repository->findByCondition([
+                'urutan' => $payload->urutan,
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut ({$row->urutan})"]), $row);
+            }
+
 
             $result = $this->repository->insert((array) $payload);
 
@@ -97,21 +106,26 @@ class GradeService
         try {
 
             $row = $this->repository->checkExisted($id,  [
-                'provinsi_id' => $payload->provinsi_id,
-                'kabupaten_kota_id' => $payload->kabupaten_kota_id,
-                'kecamatan_id' => $payload->kecamatan_id,
-                'kode_kelurahan' => $payload->kode_kelurahan,
+                'nama_jenjang' => $payload->nama_jenjang,
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => 'Kode Kelurahan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Jenjang {$payload->nama_jenjang}"]), $row);
+            }
+
+            $row = $this->repository->checkExisted($id,  [
+                'urutan' => $payload->urutan,
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "No. urut {$payload->urutan}"]), $row);
             }
 
 
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Master jenjang']), $row);
             }
 
             $row->update((array) $payload);

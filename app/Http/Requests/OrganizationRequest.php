@@ -36,7 +36,7 @@ class OrganizationRequest extends FormRequest
                         'kabupaten_kota_id' => 'required',
                         'kecamatan_id' => 'required',
                         'kelurahan_id' => 'required',
-                        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
+                        'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                     ];
                 }
 

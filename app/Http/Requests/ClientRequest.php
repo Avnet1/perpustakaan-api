@@ -35,7 +35,7 @@ class ClientRequest extends FormRequest
                         'client_name' => 'required',
                         'client_phone' => 'required',
                         'organisasi_id' => 'required',
-                        'client_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
+                        'client_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                     ];
                 }
 

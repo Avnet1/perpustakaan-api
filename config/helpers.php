@@ -3,6 +3,16 @@
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+if (!function_exists('deleteFileInStorage')) {
+    function deleteFileInStorage($path)
+    {
+        if ($path != null) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+}
 
 if (!function_exists('setPagination')) {
     function setPagination($data, $totalRow, $page = 1, $limit = 20): object

@@ -75,6 +75,20 @@ return [
                 'update' => 'Data pelanggan berhasil diubah',
                 'delete' => 'Data pelanggan berhasil dihapus',
             ],
+            'identity' => [
+                'create' => 'Data identitas berhasil ditambahkan',
+                'fetch' => 'Tarik data identitas berhasil',
+                'find' => 'Tarik data identitas berhasil',
+                'update' => 'Data identitas berhasil diubah',
+                'delete' => 'Data identitas berhasil dihapus',
+            ],
+            'socialMedia' => [
+                'create' => 'Data social media berhasil ditambahkan',
+                'fetch' => 'Tarik data social media berhasil',
+                'find' => 'Tarik data social media berhasil',
+                'update' => 'Data social media berhasil diubah',
+                'delete' => 'Data social media berhasil dihapus',
+            ],
             "tipeGMD" => [
                 "store" => "Data GMD berhasil ditambahkan",
                 "update" => "Data GMD berhasil diubah",
@@ -123,6 +137,16 @@ return [
                 'create' => 'Data jenjang gagal ditambahkan',
                 'update' => 'Data jenjang gagal diubah',
                 'delete' => 'Data jenjang gagal dihapus',
+            ],
+            'identity' => [
+                'create' => 'Data identitas gagal ditambahkan',
+                'update' => 'Data identitas gagal diubah',
+                'delete' => 'Data identitas gagal dihapus',
+            ],
+            'socialMedia' => [
+                'create' => 'Data social media gagal ditambahkan',
+                'update' => 'Data social media gagal diubah',
+                'delete' => 'Data social media gagal dihapus',
             ],
             'organization' => [
                 'create' => 'Data organisasi gagal ditambahkan',

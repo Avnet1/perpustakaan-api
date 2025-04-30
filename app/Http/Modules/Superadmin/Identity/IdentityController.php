@@ -1,29 +1,21 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Grade;
+namespace App\Http\Modules\Superadmin\Identity;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\GradeRequest;
+use App\Http\Requests\IdentityRequest;
 
-class GradeController extends Controller
+class IdentityController extends Controller
 {
-    public static $primaryKey = 'jenjang_id';
-
-    const SORT_COLUMNS = [
-        'nama_jenjang' => 'nama_jenjang',
-        'urutan' => 'urutan',
-    ];
-
-    const DEFAULT_SORT = ['created_at', 'ASC'];
-
-
+    public static $primaryKey = 'identitas_id';
+    public static $pathLocation = 'identity/photo';
     protected $service;
 
-    public function __construct(GradeService $service)
+    public function __construct(IdentityService $service)
     {
         $this->service = $service;
     }
@@ -32,24 +24,46 @@ class GradeController extends Controller
     {
         $payload = [];
 
-        if ($request->has('nama_jenjang')) {
-            $payload['nama_jenjang'] = $request->input('nama_jenjang');
+        if ($request->has('nama_perusahaan')) {
+            $payload['nama_perusahaan'] = $request->input('nama_perusahaan');
         }
 
-        if ($request->has('urutan')) {
-            $payload['urutan'] = $request->input('urutan');
+        if ($request->has('kota')) {
+            $payload['kota'] = $request->input('kota');
         }
+
+        if ($request->has('email')) {
+            $payload['email'] = $request->input('email');
+        }
+
+        if ($request->has('telepon')) {
+            $payload['telepon'] = $request->input('telepon');
+        }
+        if ($request->has('website')) {
+            $payload['website'] = $request->input('website');
+        }
+
+        if ($request->has('alamat')) {
+            $payload['alamat'] = $request->input('alamat');
+        }
+        if ($request->has('footer')) {
+            $payload['footer'] = $request->input('footer');
+        }
+
+        if ($request->has('deskripsi')) {
+            $payload['deskripsi'] = $request->input('deskripsi');
+        }
+        if ($request->has('privacy_policy')) {
+            $payload['privacy_policy'] = $request->input('privacy_policy');
+        }
+
         return $payload;
     }
 
     /** Fetch Client (Pagination) */
     public function fetch(Request $request): JsonResponse
     {
-        $filters = (object) [
-            "paging" => defineRequestPaginateArgs($request),
-            "sorting" => defineRequestOrder($request, self::DEFAULT_SORT, self::SORT_COLUMNS)
-        ];
-        $result = $this->service->fetch($filters);
+        $result = $this->service->fetch();
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -62,15 +76,21 @@ class GradeController extends Controller
     }
 
     /** Create Client */
-    public function store(GradeRequest $request): JsonResponse
+    public function store(IdentityRequest $request): JsonResponse
     {
         $user = getUser($request);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
+            'photo' => null,
             'created_at' => $today,
             'created_by' => $user->user_id,
             'updated_at' => null
         ]);
+
+        if ($request->hasFile('photo')) {
+            $payload->photo = $request->file('photo')->store(self::$pathLocation, 'public');
+        }
+
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -82,9 +102,14 @@ class GradeController extends Controller
         $id = $request->route(self::$primaryKey);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
+            'photo' => null,
             'updated_at' => $today,
             'updated_by' => $user->user_id,
         ]);
+
+        if ($request->hasFile('photo')) {
+            $payload->photo = $request->file('photo')->store(self::$pathLocation, 'public');
+        }
 
         $result = $this->service->update($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);

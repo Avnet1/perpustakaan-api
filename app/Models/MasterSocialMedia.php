@@ -2,21 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class MasterJenisPengarang extends Model
+class MasterSocialMedia extends Model
 {
 
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
-    protected $table = 'master_jenis_pengarang';
-
-    protected $primaryKey = 'jenis_pengarang_id';
-
+    protected $table = 'master_social_media';
+    protected $primaryKey = 'social_media_id';
     public $incrementing = false;
+    protected $keyType = 'string';
 
     // Enables timestamps for the model
     public $timestamps = true;
@@ -24,11 +22,13 @@ class MasterJenisPengarang extends Model
     // Disables the updated_at field
     const UPDATED_AT = null;
 
-    protected $keyType = 'string';
 
     protected $fillable = [
-        'jenis_pengarang_id',
-        'nama',
+        'social_media_id',
+        'identitas_id',
+        'nama_sosmed',
+        'link_sosmed',
+        'logo',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -39,19 +39,19 @@ class MasterJenisPengarang extends Model
         'deleted_by',
     ];
 
-
-    public function listPengarang()
+    public function identitas()
     {
-        return $this->hasMany(MasterPengarang::class, 'jenis_pengarang_id', 'jenis_pengarang_id');
+        return $this->belongsTo(MasterIdentitas::class, 'identitas_id', 'identitas_id');
     }
+
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->jenis_pengarang_id)) {
-                $model->jenis_pengarang_id = (string) Str::uuid();
+            if (empty($model->social_media_id)) {
+                $model->social_media_id = (string) Str::uuid();
             }
         });
     }

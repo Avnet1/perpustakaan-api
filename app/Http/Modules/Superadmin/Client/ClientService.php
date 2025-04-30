@@ -19,13 +19,6 @@ class ClientService
         $this->repository = $repository;
     }
 
-    public function deleteStorage($path)
-    {
-        if ($path != null) {
-            Storage::disk('public')->delete($path);
-        }
-    }
-
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
@@ -93,7 +86,7 @@ class ClientService
 
     public function storeInfo(mixed $payload): LaravelResponseInterface
     {
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findByCondition([
                 'client_code' => $payload->client_code,
@@ -101,7 +94,7 @@ class ClientService
 
             if ($row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
+                deleteFileInStorage($payload->client_photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "ID Pelanggan ({$payload->client_code})"]), $row);
             }
 
@@ -109,7 +102,7 @@ class ClientService
 
             if (!$result) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
+                deleteFileInStorage($payload->client_photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.client.create'), $result);
             }
 
@@ -119,14 +112,14 @@ class ClientService
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            $this->deleteStorage($payload->client_photo);
+            deleteFileInStorage($payload->client_photo);
             return sendErrorResponse($e);
         }
     }
 
     public function storeAccount(string $id, mixed $payload): LaravelResponseInterface
     {
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
@@ -151,13 +144,13 @@ class ClientService
     {
         $storageOldPath = null;
         $hasPhoto = true;
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->client_photo);
+                deleteFileInStorage($payload->client_photo);
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Pelanggan']), $row);
             }
 
@@ -173,7 +166,7 @@ class ClientService
             $row->update($payload);
 
             if ($hasPhoto == true) {
-                $this->deleteStorage($storageOldPath);
+                deleteFileInStorage($storageOldPath);
             }
 
 
@@ -183,11 +176,7 @@ class ClientService
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-
-            if ($payload->client_photo != null) {
-                Storage::disk('public')->delete($payload->client_photo);
-            }
-
+            deleteFileInStorage($payload->client_photo);
             return sendErrorResponse($e);
         }
     }

@@ -15,6 +15,12 @@ class MasterKelurahan extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    // Enables timestamps for the model
+    public $timestamps = true;
+
+    // Disables the updated_at field
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'kelurahan_id',
         'provinsi_id',

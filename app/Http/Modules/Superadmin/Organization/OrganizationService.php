@@ -18,12 +18,6 @@ class OrganizationService
         $this->repository = $repository;
     }
 
-    public function deleteStorage($path)
-    {
-        if ($path != null) {
-            Storage::disk('public')->delete($path);
-        }
-    }
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
@@ -105,7 +99,7 @@ class OrganizationService
 
     public function storeInfo(mixed $payload): LaravelResponseInterface
     {
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findByCondition([
                 'universitas_id' => $payload->client_code,
@@ -113,7 +107,7 @@ class OrganizationService
 
             if ($row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->logo);
+                deleteFileInStorage($payload->logo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Organisasi ({$row->universitas->nama_universitas})"]), $row);
             }
 
@@ -121,7 +115,7 @@ class OrganizationService
 
             if (!$result) {
                 DB::rollBack();
-                $this->deleteStorage($payload->logo);
+                deleteFileInStorage($payload->logo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.create'), $result);
             }
 
@@ -131,14 +125,14 @@ class OrganizationService
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            $this->deleteStorage($payload->logo);
+            deleteFileInStorage($payload->logo);
             return sendErrorResponse($e);
         }
     }
 
     public function storeAccount(string $id, mixed $payload): LaravelResponseInterface
     {
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
@@ -164,13 +158,13 @@ class OrganizationService
     {
         $storageOldPath = null;
         $hasPhoto = true;
-        DB::transaction();
+        DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 DB::rollBack();
-                $this->deleteStorage($payload->logo);
+                deleteFileInStorage($payload->logo);
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
@@ -186,7 +180,7 @@ class OrganizationService
             $row->update($payload);
 
             if ($hasPhoto == true) {
-                $this->deleteStorage($storageOldPath);
+                deleteFileInStorage($storageOldPath);
             }
 
 

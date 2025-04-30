@@ -12,6 +12,9 @@ use App\Http\Modules\Superadmin\Province\ProvinsiController as SA_ProvinceContro
 use App\Http\Modules\Superadmin\Region\RegionController as SA_RegionController;
 use App\Http\Modules\Superadmin\Subdistrict\SubdistrictController as SA_SubdistrictController;
 use App\Http\Modules\Superadmin\Village\VillageController as SA_VillageController;
+use App\Http\Modules\Superadmin\Grade\GradeController as SA_GradeController;
+use App\Http\Modules\Superadmin\Identity\IdentityController as SA_IdentityController;
+use App\Http\Modules\Superadmin\SocialMedia\SocialMediaController as SA_SocialMediaController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +65,35 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{kelurahan_id}', [SA_VillageController::class, 'findById']);
                 Route::put('/{kelurahan_id}', [SA_VillageController::class, 'update']);
                 Route::delete('/{kelurahan_id}', [SA_VillageController::class, 'delete']);
+            });
+
+
+            /** Master Jenjang */
+            Route::prefix('grades')->group(function () {
+                Route::get('/', [SA_GradeController::class, 'fetch']);
+                Route::post('/', [SA_GradeController::class, 'store']);
+                Route::get('/{jenjang_id}', [SA_GradeController::class, 'findById']);
+                Route::put('/{jenjang_id}', [SA_GradeController::class, 'update']);
+                Route::delete('/{jenjang_id}', [SA_GradeController::class, 'delete']);
+            });
+
+            /** Master Identitas */
+            Route::prefix('identity')->group(function () {
+                Route::get('/', [SA_IdentityController::class, 'fetch']);
+                Route::post('/', [SA_IdentityController::class, 'store']);
+                Route::get('/{identitas_id}', [SA_IdentityController::class, 'findById']);
+                Route::post('/{identitas_id}', [SA_IdentityController::class, 'update']);
+                Route::delete('/{identitas_id}', [SA_IdentityController::class, 'delete']);
+            });
+
+
+            /** Master Social Media */
+            Route::prefix('social-media')->group(function () {
+                Route::get('/', [SA_SocialMediaController::class, 'fetch']);
+                Route::post('/', [SA_SocialMediaController::class, 'store'])->name('storeSosmed_superadmin');
+                Route::get('/{social_media_id}', [SA_SocialMediaController::class, 'findById']);
+                Route::post('/{social_media_id}', [SA_SocialMediaController::class, 'update'])->name('updateSosmed_superadmin');
+                Route::delete('/{social_media_id}', [SA_SocialMediaController::class, 'delete']);
             });
 
 

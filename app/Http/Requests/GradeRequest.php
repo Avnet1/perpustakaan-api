@@ -46,7 +46,7 @@ class GradeRequest extends FormRequest
     {
         return [
             'nama_jenjang.required' =>  __('validation.required', ['attribute' => 'Nama Jenjang']),
-            'urutan.required' => __('validation.required', ['attribute' => 'Urutan']),
+            'urutan.required' => __('validation.required', ['attribute' => 'No. Urut']),
         ];
     }
 }
