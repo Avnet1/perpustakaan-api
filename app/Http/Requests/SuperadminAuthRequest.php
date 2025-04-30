@@ -24,21 +24,50 @@ class SuperadminAuthRequest extends FormRequest
     public function rules(): array
     {
         $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $routeName =  $this->route()->getName(); //authSuperadminLogin_superadmin
+        $validationName = "";
+
+        if ($routeName) {
+            $validationName =  explode("_", $routeName)[0]; //storeSosmed
+        }
+
+
+        // $routeUri = $route ? $route->uri() : '';
+        // $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'auth/login':
+        switch ($validationName) {
+            case 'authSuperadminLogin':
                 return [
-                    'username' => 'required',
+                    'email' => 'required',
                     'password' => 'required|min:8',
                 ];
 
-            case 'auth/forgot-password':
+            case 'authSuperadminForgotPassword':
                 return [
-                    'email' => 'required|exists:users,email',
+                    'email' => 'required',
                 ];
+
+            case 'authSuperadminVerifiedOtp':
+                return [
+                    'email' => 'required',
+                    'otp_code' => 'required'
+                ];
+
+            case 'authSuperadminResetPassword':
+                return [
+                    'permission_code' => 'required',
+                    'new_password' => 'required',
+                    'confirm_password' => 'required'
+                ];
+
+            case 'authSuperadminChangePassword':
+                return [
+                    'old_password' => 'required',
+                    'new_password' => 'required',
+                    'confirm_password' => 'required'
+                ];
+
             default:
                 return [];
                 break;
@@ -50,9 +79,15 @@ class SuperadminAuthRequest extends FormRequest
         return [
             'username.required' =>  __('validation.required', ['attribute' => 'Username']),
             'password.required' =>  __('validation.required', ['attribute' => 'Password']),
+            'otp_code.required' => __('validation.required', ['attribute' => 'Kode OTP']),
             'email.required' =>  __('validation.required', ['attribute' => 'Email']),
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
             'password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Password', 'number' => 8]),
+
+            'old_password.required' =>  __('validation.required', ['attribute' => 'Password Lama']),
+            'permission_code.required' =>  __('validation.required', ['attribute' => 'Token/Kode Permission']),
+            'new_password.required' =>  __('validation.required', ['attribute' => 'Password Baru']),
+            'confirm_password.required' => __('validation.required', ['attribute' => 'Konfirmasi Password Baru']),
 
         ];
     }

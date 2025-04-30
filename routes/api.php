@@ -23,13 +23,21 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('superadmin')->group(function () {
         Route::prefix('auth')->group(function () {
-            Route::post('/login', [SA_AuthController::class, 'login']);
+            Route::post('/login', [SA_AuthController::class, 'login'])->name('authSuperadminLogin_superadmin');
+            Route::post('/forgot-password', [SA_AuthController::class, 'forgotPassword'])->name('authSuperadminForgotPassword_superadmin');
+            Route::post('/otp-verification', [SA_AuthController::class, 'verificationOtp'])->name('authSuperadminVerifiedOtp_superadmin');
+            Route::post('/reset-password', [SA_AuthController::class, 'resetPassword'])->name('authSuperadminResetPassword_superadmin');
         });
 
         Route::middleware([
             TokenValidateMiddleware::class,
             SuperAdminMiddleware::class,
         ])->group(function () {
+
+            Route::prefix('auth')->group(function () {
+                Route::get('/profile', [SA_AuthController::class, 'fetchProfile']);
+                Route::post('/manual-change-password',  [SA_AuthController::class, 'manualChangePassword'])->name('authSuperadminChangePassword_superadmin');
+            });
 
             /** Master Provinsi */
             Route::prefix('provinces')->group(function () {

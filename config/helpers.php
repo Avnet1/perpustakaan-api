@@ -4,6 +4,58 @@ use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
+
+
+if (!function_exists('executeEncrypt')) {
+    function executeEncrypt(array $payload): string
+    {
+        return Crypt::encrypt(json_encode($payload));
+    }
+}
+
+if (!function_exists('executeDecrypt')) {
+    function executeDecrypt(string $plainText): array
+    {
+        return json_decode(Crypt::decrypt($plainText), true);
+    }
+}
+
+
+if (!function_exists('getOtpRandomize')) {
+    function makeMailSender(string $subject, string $title, string $content, mixed $payload = null, mixed $attachments = []): array
+    {
+        return [
+            "mail_title" => $title,
+            "mail_subject" => $subject,
+            "mail_content" => $content,
+            "mail_payload" => $payload,
+            "mail_attachments" => $attachments,
+            'supported' => [
+                "company_url" => env('COMPANY_URL', 'https://avnet.id'),
+                "company_name" => env('COMPANY_NAME', 'Indosistem'),
+            ]
+        ];
+    }
+}
+
+if (!function_exists('getOtpRandomize')) {
+    function getOtpRandomize(): object
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $otp = '';
+
+        // Menghasilkan 6 karakter acak
+        for ($i = 0; $i < 6; $i++) {
+            $otp .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+        return (object) [
+            "otp_code" => $otp,
+            "otp_time" => 300
+        ];
+    }
+}
+
 
 if (!function_exists('deleteFileInStorage')) {
     function deleteFileInStorage($path)

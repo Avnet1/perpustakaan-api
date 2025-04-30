@@ -3,13 +3,14 @@
 namespace App\Http\Modules\Superadmin\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AuthRepository
 {
 
-    public function findIdentity($identity)
+    public function findIdentity($where)
     {
-        return  User::where('username', $identity)
+        return  User::where($where)
             ->whereNull('deleted_at')  // Ensure the user is not soft-deleted
             ->with([
                 'role' => function ($query) {
@@ -18,5 +19,39 @@ class AuthRepository
                 'client'
             ])
             ->first();
+    }
+
+    public function findById($id)
+    {
+        return User::with(['role', 'client'])->whereNull('deleted_at')
+            ->where(["user_id", $id])
+            ->first();
+    }
+
+    public function insertOtp($payload)
+    {
+        return DB::table('password_resets')->insert($payload);
+    }
+
+    public function getOtp($condition)
+    {
+        return DB::table('password_resets')
+            ->where($condition)
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
+
+    public function deleteOtp($condition)
+    {
+        DB::table('password_resets')
+            ->where($condition)
+            ->delete();
+    }
+
+    public function verifiedOtp($condition, $payload)
+    {
+        return DB::table('password_resets')
+            ->where($condition)
+            ->update($payload);
     }
 }

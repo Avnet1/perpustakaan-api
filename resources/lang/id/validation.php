@@ -25,6 +25,10 @@ return [
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
+                'fetch' => 'Data :attribute berhasil ditemukan',
+                'resetPassword' => 'Reset password berhasil, Silahkan check email anda',
+                'verifiedOtp' => 'Data :attribute berhasil diverifikasi',
+                'changePassword' => 'Password berhasil diubah'
             ],
             'province' => [
                 'create' => 'Data provinsi berhasil ditambahkan',
@@ -111,7 +115,12 @@ return [
                 'unauthorized' => 'Proses Otentikasi gagal',
                 'tokenUnprovide' => 'Token tidak tersedia',
                 "notApproved" => "Akun anda bulum disetujui. Silahkan hubungi customer support",
-                "expiredAccount" => "Masa aktif berlangganan anda telah jatuh tempo. Silahkan perpanjang layanan"
+                "expiredAccount" => "Masa aktif berlangganan anda telah jatuh tempo. Silahkan perpanjang layanan",
+                "storeReset" => "Data :attribute gagal disimpan",
+                "expiredOtp" => "Data :attribute telah kadaluarsa. Masa aktif hanya :num menit",
+                "hadVerified" => "Data :attribute sudah pernah diverifikasi",
+                "verifiedOtp" => "Data :attribute gagal diverifikasi",
+                "permissionCode" => "Akses ubah password ditolak"
             ],
             'province' => [
                 'create' => 'Data provinsi gagal ditambahkan',
