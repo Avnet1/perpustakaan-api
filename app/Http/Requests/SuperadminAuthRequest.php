@@ -58,6 +58,12 @@ class SuperadminAuthRequest extends FormRequest
                     'confirm_password' => 'required'
                 ];
 
+            case config('constants.route_name.superadmin.auth.update_profile'):
+                return [
+                    'name' => 'required',
+                    'email' => 'required',
+                ];
+
             default:
                 return [];
                 break;

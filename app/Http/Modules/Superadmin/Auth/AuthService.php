@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class AuthService
 {
@@ -230,12 +231,65 @@ class AuthService
     }
 
     /** Fetch Profile */
-    public function fetchProfile($id): LaravelResponseInterface
+    public function fetchProfile(string $id): LaravelResponseInterface
     {
         try {
             $result = $this->repository->findById($id);
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.fetch', ["attribute" => "profil"]), $result);
         } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+
+    /** Update Profile */
+    public function updateProfile(string $id,  mixed $payload): LaravelResponseInterface
+    {
+        $storageOldPath = null;
+        $hasPhoto = true;
+        DB::beginTransaction();
+        try {
+
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+            }
+
+
+            if ($row->photo != null) {
+                $storageOldPath = $row->photo;
+            }
+
+            if ($payload->photo == null) {
+                $hasPhoto = false;
+                unset($payload->photo);
+            }
+
+
+            $result = $this->repository->updateUser($id, (array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.update', ["attribute" => "user"]), $result);
+            }
+
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+
+            if ($hasPhoto == true) {
+                deleteFileInStorage($storageOldPath);
+            }
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.update', ["attribute" => "user"]), (object) [
+                "user_id" => $id
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->photo);
             return sendErrorResponse($e);
         }
     }

@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
 
             Route::prefix('auth')->group(function () {
                 Route::get('/profile', [SA_AuthController::class, 'fetchProfile']);
+                Route::post('/profile', [SA_AuthController::class, 'updateProfile'])->name(config('constants.route_name.superadmin.auth.update_profile'));
                 Route::post('/manual-change-password',  [SA_AuthController::class, 'manualChangePassword'])->name(config('constants.route_name.superadmin.auth.change_password'));
             });
 

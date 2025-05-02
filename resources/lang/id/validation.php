@@ -42,7 +42,8 @@ return [
                 'fetch' => 'Data :attribute berhasil ditemukan',
                 'resetPassword' => 'Reset password berhasil, Silahkan check email anda',
                 'verifiedOtp' => 'Data :attribute berhasil diverifikasi',
-                'changePassword' => 'Password berhasil diubah'
+                'changePassword' => 'Password berhasil diubah',
+                'update' => 'Data :attribute berhasil diubah'
             ],
             'province' => [
                 'create' => 'Data provinsi berhasil ditambahkan',
@@ -144,7 +145,8 @@ return [
                 "expiredOtp" => "Data :attribute telah kadaluarsa. Masa aktif hanya :num menit",
                 "hadVerified" => "Data :attribute sudah pernah diverifikasi",
                 "verifiedOtp" => "Data :attribute gagal diverifikasi",
-                "permissionCode" => "Akses ubah password ditolak"
+                "permissionCode" => "Akses ubah password ditolak",
+                "update" => "Data :attribute gagal diubah"
             ],
             'province' => [
                 'create' => 'Data provinsi gagal ditambahkan',

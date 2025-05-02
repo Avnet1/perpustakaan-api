@@ -13,6 +13,7 @@ class AuthController extends Controller
 {
 
     protected $service;
+    public static $pathLocation = 'user/photo';
 
     public function __construct(AuthService $service)
     {
@@ -88,6 +89,26 @@ class AuthController extends Controller
     {
         $user = getUser($request);
         $result = $this->service->fetchProfile($user->user_id);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+    public function updateProfile(SuperadminAuthRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+
+        $payload = (object) [
+            "name" =>  $request->name,
+            "email" => $request->email,
+            "updated_at" => now(),
+            "updated_by" => $user->user_id,
+            "photo" => null
+        ];
+
+        if ($request->hasFile('photo')) {
+            $payload->photo = $request->file('photo')->store(self::$pathLocation, 'public');
+        }
+
+        $result = $this->service->updateProfile($user->user_id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }

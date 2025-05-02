@@ -2,16 +2,16 @@ compose-dev-file=docker-compose.dev.yml
 container-app-dev=perpustakaan_dev_api
 
 local-clear:
-    php artisan cache:clear && php artisan config:clear && php artisan route:clear
+	php artisan cache:clear && php artisan config:clear && php artisan route:clear
 
 local-migration-run:
-    php artisan migration
+	php artisan migration
 
 local-seed-run:
-    php artisan db:seed
+	php artisan db:seed
 
 local-run:
-    php artisan serve
+	php artisan serve
 
 
 # Deploy Dev
@@ -32,3 +32,6 @@ app-dev-setup:
 
 app-dev-down:
 	docker compose -f $(compose-dev-file) down
+
+app-dev-sh:
+	docker exec -it $(container-app-dev) sh

@@ -9,7 +9,8 @@ return [
                 "forgot_password" => "authForgotPasswordSuperadmin",
                 "verified_otp" => "authVerifiedOtpSuperadmin",
                 "reset_password" => "authResetPasswordSuperadmin",
-                "change_password" => "authChangePasswordSuperadmin"
+                "change_password" => "authChangePasswordSuperadmin",
+                "update_profile" => "authUpdateProfileSuperadmin"
             ],
             "role" => [
                 "store" => "storeRoleSuperadmin",

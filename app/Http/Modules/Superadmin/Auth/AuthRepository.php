@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\DB;
 class AuthRepository
 {
 
+    public function updateUser(string $id, mixed $payload)
+    {
+        return DB::table("users")
+            ->where("user_id", $id)
+            ->update($payload);
+    }
+
     public function findIdentity($where)
     {
         return  User::where($where)
