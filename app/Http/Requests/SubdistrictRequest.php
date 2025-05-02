@@ -22,23 +22,18 @@ class SubdistrictRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //authLoginSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'sub-districts':
-                if ($this->method() == 'POST') {
-                    return [
-                        'provinsi_id' => 'required',
-                        'kabupaten_kota_id' => 'required',
-                        'nama_kecamatan' => 'required',
-                        'kode_kecamatan' => 'required',
-                        'kode_dikti' => 'required',
-                    ];
-                }
-
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.sub_district.store'):
+                return [
+                    'provinsi_id' => 'required',
+                    'kabupaten_kota_id' => 'required',
+                    'nama_kecamatan' => 'required',
+                    'kode_kecamatan' => 'required',
+                    'kode_dikti' => 'required',
+                ];
             default:
                 return [];
                 break;

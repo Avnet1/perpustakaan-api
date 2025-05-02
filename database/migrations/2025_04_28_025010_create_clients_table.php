@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->uuid('client_id')->primary();
-            $table->uuid('user_id')->nullable()->default(null);
+            $table->uuid('user_client_id')->nullable()->default(null);
             $table->string('client_code')->nullable()->default(null);
             $table->string('client_name')->nullable()->default(null);
             $table->string('client_job')->nullable()->default(null);
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->uuid('updated_by')->nullable();
             $table->uuid('deleted_by')->nullable();
 
-            $table->foreign('user_id')
-                ->references('user_id')
-                ->on('users')
+            $table->foreign('user_client_id')
+                ->references('user_client_id')
+                ->on('user_client')
                 ->onDelete('set null');
 
             $table->foreign('organisasi_id')

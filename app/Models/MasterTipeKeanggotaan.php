@@ -20,6 +20,7 @@ class MasterTipeKeanggotaan extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'tipe_anggota_id',
         'nama',
         'total_pinjaman',
         'lama_pinjaman',
@@ -35,7 +36,8 @@ class MasterTipeKeanggotaan extends Model
     ];
 
 
-    public function user() {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    public function user()
+    {
+        return $this->belongsTo(UserClient::class, 'user_client_id', 'user_client_id');
     }
 }

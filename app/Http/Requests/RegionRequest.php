@@ -22,22 +22,18 @@ class RegionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //authLoginSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'regions':
-                if ($this->method() == 'POST') {
-                    return [
-                        'nama_kabupaten_kota' => 'required',
-                        'kode_kabupaten_kota' => 'required',
-                        'status_administrasi' => 'required',
-                        'kode_dikti' => 'required',
-                        'provinsi_id' => 'required'
-                    ];
-                }
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.region.store'):
+                return [
+                    'nama_kabupaten_kota' => 'required',
+                    'kode_kabupaten_kota' => 'required',
+                    'status_administrasi' => 'required',
+                    'kode_dikti' => 'required',
+                    'provinsi_id' => 'required'
+                ];
 
             default:
                 return [];

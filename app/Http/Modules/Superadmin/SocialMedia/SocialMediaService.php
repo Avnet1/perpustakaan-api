@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class SocialMediaService
 {
-    public static $primaryKey = 'social_media_id';
+    private $primaryKey;
     protected $repository;
 
     public function __construct(SocialMediaRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterSocialMedia::getPrimaryKeyName();
     }
 
     public function fetch($where): LaravelResponseInterface
@@ -68,7 +69,7 @@ class SocialMediaService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.create'), (object) [
-                self::$primaryKey => $result[self::$primaryKey],
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -100,7 +101,13 @@ class SocialMediaService
                 unset($payload->logo);
             }
 
-            $row->update((array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->logo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.socialMedia.update'), $result);
+            }
 
             if ($hasPhoto == true) {
                 deleteFileInStorage($storageOldPath);
@@ -108,7 +115,7 @@ class SocialMediaService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -129,7 +136,7 @@ class SocialMediaService
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

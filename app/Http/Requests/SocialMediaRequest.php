@@ -22,16 +22,11 @@ class SocialMediaRequest extends FormRequest
      */
     public function rules(): array
     {
-        $routeName =  $this->route()->getName(); //storeSosmed_superadmin
-        $validationName = "";
-
-        if ($routeName) {
-            $validationName =  explode("_", $routeName)[0]; //storeSosmed
-        }
+        $validationName = $this->route()->getName(); //storeRoleSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case 'storeSosmed':
+            case config('constants.route_name.superadmin.sosmed.store'):
                 return [
                     'identitas_id' => 'required',
                     'nama_sosmed' => 'required',

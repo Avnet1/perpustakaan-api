@@ -7,19 +7,34 @@ use Illuminate\Support\Facades\DB;
 
 class SubdistrictRepository
 {
-    public static $primaryKey = 'kecamatan_id';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterKecamatan::getPrimaryKeyName();
+        $this->tableName = MasterKecamatan::getTableName();
+    }
 
     public function insert(mixed $payload)
     {
-        return MasterKecamatan::create($payload);
+        return MasterKecamatan::store($payload);
     }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+    }
+
 
     public function findById(string $id)
     {
         return MasterKecamatan::with([
             'kabupatenKota',
             'provinsi'
-        ])->whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -47,14 +62,14 @@ class SubdistrictRepository
     {
         return MasterKecamatan::whereNull('deleted_at')
             ->where($where)
-            ->where(self::$primaryKey, '!=', $id)->first();
+            ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
 
     public function delete(string $id, array $payload)
     {
-        DB::table('master_kecamatan')
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

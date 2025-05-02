@@ -7,12 +7,28 @@ use Illuminate\Support\Facades\DB;
 
 class VillageRepository
 {
-    public static $primaryKey = 'kelurahan_id';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterKelurahan::getPrimaryKeyName();
+        $this->tableName = MasterKelurahan::getTableName();
+    }
+
 
     public function insert(mixed $payload)
     {
-        return MasterKelurahan::create($payload);
+        return MasterKelurahan::store($payload);
     }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+    }
+
 
     public function findById(string $id)
     {
@@ -20,14 +36,14 @@ class VillageRepository
             'kecamatan',
             'provinsi',
             'kabupatenKota'
-        ])->whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function checkExisted(string $id, array $where)
     {
         return MasterKelurahan::whereNull('deleted_at')
             ->where($where)
-            ->where(self::$primaryKey, '!=', $id)->first();
+            ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -55,8 +71,8 @@ class VillageRepository
 
     public function delete(string $id, array $payload)
     {
-        DB::table('master_kelurahan')
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

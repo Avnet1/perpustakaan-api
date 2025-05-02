@@ -9,12 +9,13 @@ use Exception;
 
 class RegionService
 {
-    public static $primaryKey = 'kabupaten_kota_id';
+    private $primaryKey;
     protected $repository;
 
     public function __construct(RegionRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterKabupatenKota::getPrimaryKeyName();
     }
 
     public function fetch(mixed $filters): LaravelResponseInterface
@@ -86,12 +87,12 @@ class RegionService
 
             $result = $this->repository->insert((array) $payload);
 
-            if (!$result || !isset($result->kabupaten_kota_id)) {
+            if (!$result) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.region.create'),  $result);
             }
 
             return new LaravelResponseContract(true, 200,  __('validation.custom.success.region.create'), [
-                self::$primaryKey => $result->kabupaten_kota_id,
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -117,10 +118,14 @@ class RegionService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kabupaten/Kota']), $row);
             }
 
-            $row->update((array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.region.update'), $result);
+            }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -141,7 +146,7 @@ class RegionService
 
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.region.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

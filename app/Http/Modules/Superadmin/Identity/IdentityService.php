@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class IdentityService
 {
-    public static $primaryKey = 'identitas_id';
+    private $primaryKey;
     protected $repository;
 
     public function __construct(IdentityRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterIdentitas::getPrimaryKeyName();
     }
 
     public function fetch(): LaravelResponseInterface
@@ -46,6 +47,7 @@ class IdentityService
     public function store(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
+
         try {
             $row = $this->repository->checkRow();
 
@@ -65,8 +67,8 @@ class IdentityService
 
             DB::commit();
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.create'), (object) [
-                self::$primaryKey => $result[self::$primaryKey],
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.create'), [
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -98,7 +100,14 @@ class IdentityService
                 unset($payload->photo);
             }
 
-            $row->update((array) $payload);
+
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.identity.update'), $result);
+            }
 
             if ($hasPhoto == true) {
                 deleteFileInStorage($storageOldPath);
@@ -106,7 +115,7 @@ class IdentityService
 
             DB::commit();
             return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -127,7 +136,7 @@ class IdentityService
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

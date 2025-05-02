@@ -7,16 +7,32 @@ use Illuminate\Support\Facades\DB;
 
 class RegionRepository
 {
-    public static $primaryKey = 'kabupaten_kota_id';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterKabupatenKota::getPrimaryKeyName();
+        $this->tableName = MasterKabupatenKota::getTableName();
+    }
+
 
     public function insert(mixed $payload)
     {
-        return MasterKabupatenKota::create($payload);
+        return MasterKabupatenKota::store($payload);
     }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+    }
+
 
     public function findById(string $id)
     {
-        return MasterKabupatenKota::with(['provinsi'])->whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        return MasterKabupatenKota::with(['provinsi'])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -44,13 +60,13 @@ class RegionRepository
     {
         return MasterKabupatenKota::whereNull('deleted_at')
             ->where($where)
-            ->where(self::$primaryKey, '!=', $id)->first();
+            ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function delete(string $id, array $payload)
     {
-        DB::table('master_kabupaten_kota')
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

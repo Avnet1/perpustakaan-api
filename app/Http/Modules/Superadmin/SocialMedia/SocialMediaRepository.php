@@ -7,17 +7,30 @@ use Illuminate\Support\Facades\DB;
 
 class SocialMediaRepository
 {
-    public static $primaryKey = 'social_media_id';
-    public static $tableName = 'master_social_media';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterSocialMedia::getPrimaryKeyName();
+        $this->tableName = MasterSocialMedia::getTableName();
+    }
 
     public function insert(mixed $payload)
     {
-        return MasterSocialMedia::create($payload);
+        return MasterSocialMedia::store($payload);
+    }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
     }
 
     public function findById(string $id)
     {
-        return MasterSocialMedia::whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        return MasterSocialMedia::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
 
@@ -25,7 +38,7 @@ class SocialMediaRepository
     {
         return MasterSocialMedia::whereNull('deleted_at')
             ->where($where)
-            ->where(self::$primaryKey, '!=', $id)->first();
+            ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -49,8 +62,8 @@ class SocialMediaRepository
 
     public function delete(string $id, array $payload)
     {
-        DB::table(self::$tableName)
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

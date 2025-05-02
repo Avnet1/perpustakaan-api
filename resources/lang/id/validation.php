@@ -22,6 +22,13 @@ return [
     'custom' => [
         'success' => [
             'default' => [],
+            'role' => [
+                'create' => 'Data role berhasil ditambahkan',
+                'fetch' => 'Tarik data role berhasil',
+                'find' => 'Tarik data role berhasil',
+                'update' => 'Data role berhasil diubah',
+                'delete' => 'Data role berhasil dihapus',
+            ],
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
@@ -107,6 +114,11 @@ return [
                 'minCharacter' => 'Jumlah karakter :attribute minimal :number karakge',
                 'notFound' => 'Data :attribute tidak ditemukan',
                 'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem'
+            ],
+            'role' => [
+                'create' => 'Data role gagal ditambahkan',
+                'update' => 'Data role gagal diubah',
+                'delete' => 'Data role gagal dihapus',
             ],
             'auth' => [
                 'passwordInvalid' => 'Password yang diinput tidak sesuai',

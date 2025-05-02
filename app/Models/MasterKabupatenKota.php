@@ -16,6 +16,9 @@ class MasterKabupatenKota extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    // Enables timestamps for the model
+    public $timestamps = true;
+
     protected $fillable = [
         'kabupaten_kota_id',
         'provinsi_id',
@@ -32,6 +35,37 @@ class MasterKabupatenKota extends Model
         'deleted_at',
         'deleted_by',
     ];
+
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
+
+    public static function getPrimaryKeyName()
+    {
+        return (new self())->getKeyName();
+    }
+
+    public static function store(array $payload)
+    {
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            "created_at" => now(),
+            "updated_at" => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::where($pkString, $uuidString)->first();
+        }
+
+        return false;
+    }
 
     public function provinsi()
     {

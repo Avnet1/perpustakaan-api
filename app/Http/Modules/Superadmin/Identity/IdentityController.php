@@ -8,16 +8,18 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IdentityRequest;
+use App\Models\MasterIdentitas;
 
 class IdentityController extends Controller
 {
-    public static $primaryKey = 'identitas_id';
+    private $primaryKey;
     public static $pathLocation = 'identity/photo';
     protected $service;
 
     public function __construct(IdentityService $service)
     {
         $this->service = $service;
+        $this->primaryKey = MasterIdentitas::getPrimaryKeyName();
     }
 
     public function bodyValidation(Request $request): array
@@ -70,7 +72,7 @@ class IdentityController extends Controller
     /** Get Client By Id */
     public function findById(Request $request): JsonResponse
     {
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $result = $this->service->findById($id);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -79,12 +81,9 @@ class IdentityController extends Controller
     public function store(IdentityRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'photo' => null,
-            'created_at' => $today,
             'created_by' => $user->user_id,
-            'updated_at' => null
         ]);
 
         if ($request->hasFile('photo')) {
@@ -99,7 +98,7 @@ class IdentityController extends Controller
     public function update(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'photo' => null,
@@ -119,7 +118,7 @@ class IdentityController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $payload = (object) [
             'deleted_at' => Carbon::now(),
             'deleted_by' => $user->user_id,

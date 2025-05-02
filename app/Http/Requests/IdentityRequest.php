@@ -23,26 +23,23 @@ class IdentityRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //storeRoleSuperadmin
+
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'identity':
-                if ($this->method() == 'POST' && !$this->route('identitas_id')) {
-                    return [
-                        'nama_perusahaan' => 'required',
-                        'kota' => 'required',
-                        'email' => 'required',
-                        'telepon' => 'required',
-                        'website' => 'required',
-                        'alamat' => 'required',
-                        'footer' => 'required',
-                        'deskripsi' => 'required',
-                        'privacy_policy' => 'required',
-                        'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
-                    ];
-                }
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.identity.store'):
+                return [
+                    'nama_perusahaan' => 'required',
+                    'kota' => 'required',
+                    'email' => 'required',
+                    'telepon' => 'required',
+                    'website' => 'required',
+                    'alamat' => 'required',
+                    'footer' => 'required',
+                    'deskripsi' => 'required',
+                    'privacy_policy' => 'required',
+                    'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
 
             default:
                 return [];

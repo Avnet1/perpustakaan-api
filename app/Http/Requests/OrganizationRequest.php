@@ -22,32 +22,26 @@ class OrganizationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //storeRoleSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'organizations/info':
-                if ($this->method() == 'POST') {
-                    return [
-                        'universitas_id' => 'required',
-                        'provinsi_id' => 'required',
-                        'kabupaten_kota_id' => 'required',
-                        'kecamatan_id' => 'required',
-                        'kelurahan_id' => 'required',
-                        'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
-                    ];
-                }
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.organization.storeInfo'):
+                return [
+                    'universitas_id' => 'required',
+                    'provinsi_id' => 'required',
+                    'kabupaten_kota_id' => 'required',
+                    'kecamatan_id' => 'required',
+                    'kelurahan_id' => 'required',
+                    'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
 
-            case 'organizations/account':
-                if ($this->method() == 'PUT') {
-                    return [
-                        'email' => 'required',
-                        'domain_admin_url' => 'required',
-                        'domain_website_url' => 'required',
-                    ];
-                }
+            case config('constants.route_name.superadmin.organization.storeAccount'):
+                return [
+                    'email' => 'required',
+                    'domain_admin_url' => 'required',
+                    'domain_website_url' => 'required',
+                ];
 
             default:
                 return [];

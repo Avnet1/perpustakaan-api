@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubdistrictRequest;
+use App\Models\MasterKecamatan;
 
 class SubdistrictController extends Controller
 {
-    public static $primaryKey = 'kecamatan_id';
+    private $primaryKey = 'kecamatan_id';
 
     const SORT_COLUMNS = [
         'nama_kecamatan' => 'nama_kecamatan',
@@ -29,6 +30,7 @@ class SubdistrictController extends Controller
     public function __construct(SubdistrictService $service)
     {
         $this->service = $service;
+        $this->primaryKey = MasterKecamatan::getPrimaryKeyName();
     }
 
     public function bodyValidation(Request $request): array
@@ -72,7 +74,7 @@ class SubdistrictController extends Controller
     /** Get Client By Id */
     public function findById(Request $request): JsonResponse
     {
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $result = $this->service->findById($id);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -81,9 +83,7 @@ class SubdistrictController extends Controller
     public function store(SubdistrictRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'created_at' => $today,
             'created_by' => $user->user_id,
         ]);
         $result = $this->service->store($payload);
@@ -94,7 +94,7 @@ class SubdistrictController extends Controller
     public function update(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'updated_at' => $today,
@@ -109,7 +109,7 @@ class SubdistrictController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) [
             'deleted_at' => $today,

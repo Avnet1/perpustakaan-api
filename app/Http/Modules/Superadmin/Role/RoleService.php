@@ -1,35 +1,34 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Province;
+namespace App\Http\Modules\Superadmin\Role;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use App\Models\MasterProvinsi;
+use App\Models\Role;
 use Exception;
 
-class ProvinsiService
+class RoleService
 {
     private $primaryKey;
     protected $repository;
 
-    public function __construct(ProvinsiRepository $repository)
+    public function __construct(RoleRepository $repository)
     {
         $this->repository = $repository;
-        $this->primaryKey = MasterProvinsi::getPrimaryKeyName();
+        $this->primaryKey = Role::getPrimaryKeyName();
     }
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
-            $sqlQuery = MasterProvinsi::whereNull('deleted_at');
+            $sqlQuery = Role::whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("nama_provinsi", "ilike", "%{$search}%")
-                        ->orWhere("kode_provinsi", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kode_dikti", "ilike", '%' . "%{$search}%");
+                        ->where("role_name", "ilike", "%{$search}%")
+                        ->orWhere("role_slug", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -48,7 +47,7 @@ class ProvinsiService
                 ->get();
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.fetch'), $response);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.role.fetch'), $response);
         } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
@@ -60,10 +59,10 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.find'), $row);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.role.find'), $row);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -71,27 +70,28 @@ class ProvinsiService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
-        try {
-            $row = $this->repository->findByCondition([
-                'kode_provinsi' => $payload->kode_provinsi,
-            ]);
+        $row = $this->repository->findByCondition([
+            'role_name' => $payload->role_name,
+        ]);
 
-            if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Provinsi ({$row->kode_provinsi})"]), $row);
-            }
-
-            $result = $this->repository->insert((array) $payload);
-
-            if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.province.create'), $result);
-            }
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.create'), [
-                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
-            ]);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        if ($row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Role ({$payload->role_name})"]), $row);
         }
+
+        $result = $this->repository->insert((array) $payload);
+
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.role.create'), $result);
+        }
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.role.create'), (object) [
+            "{$this->primaryKey}" => $result["{$this->primaryKey}"],
+        ]);
+        // try {
+
+        // } catch (Exception $e) {
+        //     return sendErrorResponse($e);
+        // }
     }
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
@@ -100,16 +100,16 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
 
             $result = $this->repository->update($id, (array) $payload);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.province.update'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.role.update'), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.update'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.role.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
@@ -123,13 +123,12 @@ class ProvinsiService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Provinsi']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
-
 
             $this->repository->delete($id, (array) $payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.province.delete'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.role.delete'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {

@@ -9,12 +9,13 @@ use Exception;
 
 class GradeService
 {
-    public static $primaryKey = 'jenjang_id';
+    private $primaryKey;
     protected $repository;
 
     public function __construct(GradeRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterJenjang::getPrimaryKeyName();
     }
 
     public function fetch(mixed $filters): LaravelResponseInterface
@@ -94,7 +95,7 @@ class GradeService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.grade.create'), (object) [
-                self::$primaryKey => $result[self::$primaryKey],
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -128,10 +129,14 @@ class GradeService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Master jenjang']), $row);
             }
 
-            $row->update((array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.grade.update'), $result);
+            }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.grade.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -150,7 +155,7 @@ class GradeService
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.grade.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

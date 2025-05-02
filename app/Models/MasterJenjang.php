@@ -16,6 +16,7 @@ class MasterJenjang extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    public $timestamps = true;
 
     protected $fillable = [
         'jenjang_id',
@@ -30,6 +31,38 @@ class MasterJenjang extends Model
         'deleted_at',
         'deleted_by',
     ];
+
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
+
+    public static function getPrimaryKeyName()
+    {
+        return (new self())->getKeyName();
+    }
+
+    public static function store(array $payload)
+    {
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            "created_at" => now(),
+            "updated_at" => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::where($pkString, $uuidString)->first();
+        }
+
+        return false;
+    }
+
 
     protected static function boot()
     {

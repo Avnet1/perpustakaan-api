@@ -7,23 +7,38 @@ use Illuminate\Support\Facades\DB;
 
 class GradeRepository
 {
-    public static $primaryKey = 'jenjang_id';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterJenjang::getPrimaryKeyName();
+        $this->tableName = MasterJenjang::getTableName();
+    }
 
     public function insert(mixed $payload)
     {
-        return MasterJenjang::create($payload);
+        return MasterJenjang::store($payload);
     }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+    }
+
 
     public function findById(string $id)
     {
-        return MasterJenjang::whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        return MasterJenjang::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function checkExisted(string $id, array $where)
     {
         return MasterJenjang::whereNull('deleted_at')
             ->where($where)
-            ->where(self::$primaryKey, '!=', $id)->first();
+            ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -47,8 +62,8 @@ class GradeRepository
 
     public function delete(string $id, array $payload)
     {
-        DB::table('master_jenjang')
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

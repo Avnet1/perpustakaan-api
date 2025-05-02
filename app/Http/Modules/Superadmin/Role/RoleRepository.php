@@ -1,26 +1,25 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Identity;
+namespace App\Http\Modules\Superadmin\Role;
 
-use App\Models\MasterIdentitas;
+use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 
-class IdentityRepository
+class RoleRepository
 {
     private $primaryKey;
     private $tableName;
 
     public function __construct()
     {
-        $this->primaryKey = MasterIdentitas::getPrimaryKeyName();
-        $this->tableName = MasterIdentitas::getTableName();
+        $this->primaryKey = Role::getPrimaryKeyName();
+        $this->tableName = Role::getTableName();
     }
 
     public function insert(mixed $payload)
     {
-        return MasterIdentitas::store($payload);
+        return Role::store($payload);
     }
-
 
     public function update(string $id, mixed $payload)
     {
@@ -31,25 +30,20 @@ class IdentityRepository
 
     public function findById(string $id)
     {
-        return MasterIdentitas::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+        return Role::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
-    public function checkRow()
-    {
-        $result = MasterIdentitas::whereNull('deleted_at')->count();
-        return $result ? $result : 0;
-    }
 
     public function checkExisted(string $id, array $where)
     {
-        return MasterIdentitas::whereNull('deleted_at')
+        return Role::whereNull('deleted_at')
             ->where($where)
             ->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterIdentitas::whereNull('deleted_at');
+        $query = Role::whereNull('deleted_at');
 
         foreach ($condition as $key => $value) {
             if (is_array($value)) {

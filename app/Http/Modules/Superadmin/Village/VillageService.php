@@ -9,12 +9,13 @@ use Exception;
 
 class VillageService
 {
-    public static $primaryKey = 'kelurahan_id';
+    private $primaryKey;
     protected $repository;
 
     public function __construct(VillageRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterKelurahan::getPrimaryKeyName();
     }
 
     public function fetch(mixed $filters): LaravelResponseInterface
@@ -96,7 +97,7 @@ class VillageService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.create'), (object) [
-                self::$primaryKey => $result->kelurahan_id,
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -125,10 +126,15 @@ class VillageService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kelurahan']), $row);
             }
 
-            $row->update((array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.village.update'), $result);
+            }
+
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -147,7 +153,7 @@ class VillageService
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.village.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

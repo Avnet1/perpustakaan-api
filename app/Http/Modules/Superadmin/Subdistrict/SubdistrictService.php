@@ -93,7 +93,7 @@ class SubdistrictService
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.create'), (object) [
-                self::$primaryKey => $result->kecamatan_id,
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -120,10 +120,14 @@ class SubdistrictService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Kecamatan']), $row);
             }
 
-            $row->update((array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.sub_district.update'), $result);
+            }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.update'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -142,7 +146,7 @@ class SubdistrictService
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.sub_district.delete'), (object) [
-                self::$primaryKey => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

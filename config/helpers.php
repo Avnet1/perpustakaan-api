@@ -204,14 +204,12 @@ if (!function_exists('generateRandomPassword')) {
 
 /* Convert string to slug */
 if (!function_exists('formatStringToSlug')) {
-    function formatStringToSlug($string)
+    function formatStringToSlug(string $string, string $typeFormat = '-'): string
     {
         $string = strtolower($string);
         $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
-        $string = preg_replace('/[\s-]+/', '-', $string);
-        $string = trim($string, '-');
-
-        return $string;
+        $string = preg_replace('/[\s-]+/', $typeFormat, $string);
+        return trim($string, $typeFormat);
     }
 }
 

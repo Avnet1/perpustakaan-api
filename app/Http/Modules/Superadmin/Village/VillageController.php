@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VillageRequest;
+use App\Models\MasterKelurahan;
 
 class VillageController extends Controller
 {
-    public static $primaryKey = 'kelurahan_id';
+    private $primaryKey;
 
     const SORT_COLUMNS = [
         'nama_kelurahan' => 'nama_kelurahan',
@@ -30,6 +31,7 @@ class VillageController extends Controller
     public function __construct(VillageService $service)
     {
         $this->service = $service;
+        $this->primaryKey = MasterKelurahan::getPrimaryKeyName();
     }
 
     public function bodyValidation(Request $request): array
@@ -77,7 +79,7 @@ class VillageController extends Controller
     /** Get Client By Id */
     public function findById(Request $request): JsonResponse
     {
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $result = $this->service->findById($id);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -88,9 +90,7 @@ class VillageController extends Controller
         $user = getUser($request);
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'created_at' => $today,
-            'created_by' => $user->user_id,
-            'updated_at' => null
+            'created_by' => $user->user_id
         ]);
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
@@ -100,7 +100,7 @@ class VillageController extends Controller
     public function update(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'updated_at' => $today,
@@ -115,7 +115,7 @@ class VillageController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $payload = (object) [
             'deleted_at' => Carbon::now(),
             'deleted_by' => $user->user_id,

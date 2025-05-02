@@ -18,7 +18,7 @@ class Client extends Model
 
     protected $fillable = [
         'client_id',
-        'user_id',
+        'user_client_id',
         'client_code',
         'client_name',
         'client_job',
@@ -32,9 +32,9 @@ class Client extends Model
         'deleted_by',
     ];
 
-    public function user()
+    public function user_client()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(UserClient::class, 'user_client_id', 'user_client_id');
     }
 
     public function organisasi()

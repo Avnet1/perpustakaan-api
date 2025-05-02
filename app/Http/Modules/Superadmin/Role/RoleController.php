@@ -1,50 +1,38 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\Province;
+namespace App\Http\Modules\Superadmin\Role;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProvinceRequest;
-use App\Models\MasterProvinsi;
+use App\Http\Requests\RoleRequest;
+use App\Models\Role;
 
-class ProvinsiController extends Controller
+class RoleController extends Controller
 {
     private $primaryKey;
+    protected $service;
 
     const SORT_COLUMNS = [
-        'nama_provinsi' => 'nama_provinsi',
-        'kode_provinsi' => 'kode_provinsi',
-        'kode_dikti' => 'kode_dikti'
+        'role_name' => 'role_name',
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
 
-
-    protected $service;
-
-    public function __construct(ProvinsiService $service)
+    public function __construct(RoleService $service)
     {
         $this->service = $service;
-        $this->primaryKey = MasterProvinsi::getPrimaryKeyName();
+        $this->primaryKey = Role::getPrimaryKeyName();
     }
 
     public function bodyValidation(Request $request): array
     {
         $payload = [];
-
-        if ($request->has('nama_provinsi')) {
-            $payload['nama_provinsi'] = $request->input('nama_provinsi');
-        }
-
-        if ($request->has('kode_provinsi')) {
-            $payload['kode_provinsi'] = $request->input('kode_provinsi');
-        }
-
-        if ($request->has('kode_dikti')) {
-            $payload['kode_dikti'] = $request->input('kode_dikti');
+        if ($request->has('role_name')) {
+            $payload['role_name'] = $request->input('role_name');
+            $payload['role_slug'] = formatStringToSlug($payload['role_name']);
         }
 
         return $payload;
@@ -70,13 +58,14 @@ class ProvinsiController extends Controller
     }
 
     /** Create Client */
-    public function store(ProvinceRequest $request): JsonResponse
+    public function store(RoleRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
             'created_by' => $user->user_id,
-            'updated_at' => null,
         ]);
+
+
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -86,9 +75,8 @@ class ProvinsiController extends Controller
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
-        $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'updated_at' => $today,
+            'updated_at' => Carbon::now(),
             'updated_by' => $user->user_id,
         ]);
 
@@ -101,10 +89,8 @@ class ProvinsiController extends Controller
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
-        $today = Carbon::now();
-
         $payload = (object) [
-            'deleted_at' => $today,
+            'deleted_at' => Carbon::now(),
             'deleted_by' => $user->user_id,
         ];
 

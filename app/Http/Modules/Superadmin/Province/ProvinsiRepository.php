@@ -7,16 +7,30 @@ use Illuminate\Support\Facades\DB;
 
 class ProvinsiRepository
 {
-    public static $primaryKey = 'provinsi_id';
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
+    {
+        $this->primaryKey = MasterProvinsi::getPrimaryKeyName();
+        $this->tableName = MasterProvinsi::getTableName();
+    }
 
     public function insert(mixed $payload)
     {
-        return MasterProvinsi::create($payload);
+        return MasterProvinsi::store($payload);
+    }
+
+    public function update(string $id, mixed $payload)
+    {
+        return DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
     }
 
     public function findById(string $id)
     {
-        return MasterProvinsi::whereNull('deleted_at')->where(self::$primaryKey, $id)->first();
+        return MasterProvinsi::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -39,8 +53,8 @@ class ProvinsiRepository
 
     public function delete(string $id, array $payload)
     {
-        DB::table('master_provinsi')
-            ->where(self::$primaryKey, $id)
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
 }

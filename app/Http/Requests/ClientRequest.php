@@ -22,30 +22,24 @@ class ClientRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //storeRoleSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'clients/info':
-                if ($this->method() == 'POST') {
-                    return [
-                        'client_code' => 'required',
-                        'client_name' => 'required',
-                        'client_phone' => 'required',
-                        'organisasi_id' => 'required',
-                        'client_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
-                    ];
-                }
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.client.storeInfo'):
+                return [
+                    'client_code' => 'required',
+                    'client_name' => 'required',
+                    'client_phone' => 'required',
+                    'organisasi_id' => 'required',
+                    'client_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
 
-            case 'clients/account':
-                if ($this->method() == 'PUT') {
-                    return [
-                        'username' => 'required',
-                        'password' => 'required',
-                    ];
-                }
+            case config('constants.route_name.superadmin.client.storeAccount'):
+                return [
+                    'username' => 'required',
+                    'password' => 'required',
+                ];
 
             default:
                 return [];

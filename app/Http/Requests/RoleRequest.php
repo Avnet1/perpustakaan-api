@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProvinceRequest extends FormRequest
+class RoleRequest extends FormRequest
 {
 
     /**
@@ -22,17 +22,14 @@ class ProvinceRequest extends FormRequest
      */
     public function rules(): array
     {
-        $validationName = $this->route()->getName(); //authLoginSuperadmin
+        $validationName = $this->route()->getName(); //storeRoleSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case config('constants.route_name.superadmin.province.store'):
+            case config('constants.route_name.superadmin.role.store'):
                 return [
-                    'nama_provinsi' => 'required',
-                    'kode_provinsi' => 'required',
-                    'kode_dikti' => 'required',
+                    'role_name' => 'required',
                 ];
-
             default:
                 return [];
                 break;
@@ -42,9 +39,8 @@ class ProvinceRequest extends FormRequest
     public function messages()
     {
         return [
-            'nama_provinsi.required' =>  __('validation.required', ['attribute' => 'Nama Provinsi']),
-            'kode_provinsi.required' => __('validation.required', ['attribute' => 'Kode Provinsi']),
-            'kode_dikti.required' =>  __('validation.required', ['attribute' => 'Kode Dikti']),
+
+            'role_name.required' =>  __('validation.required', ['attribute' => 'Nama Role']),
         ];
     }
 }

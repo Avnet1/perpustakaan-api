@@ -15,8 +15,7 @@ class AuthRepository
             ->with([
                 'role' => function ($query) {
                     $query->select('role_id', 'role_name', 'role_slug');  // Only select relevant role fields
-                },
-                'client'
+                }
             ])
             ->first();
     }

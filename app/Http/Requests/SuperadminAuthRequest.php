@@ -23,45 +23,35 @@ class SuperadminAuthRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeName =  $this->route()->getName(); //authSuperadminLogin_superadmin
-        $validationName = "";
-
-        if ($routeName) {
-            $validationName =  explode("_", $routeName)[0]; //storeSosmed
-        }
-
-
-        // $routeUri = $route ? $route->uri() : '';
-        // $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //authLoginSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case 'authSuperadminLogin':
+            case config('constants.route_name.superadmin.auth.login'):
                 return [
                     'email' => 'required',
                     'password' => 'required|min:8',
                 ];
 
-            case 'authSuperadminForgotPassword':
+            case config('constants.route_name.superadmin.auth.forgot_password'):
                 return [
                     'email' => 'required',
                 ];
 
-            case 'authSuperadminVerifiedOtp':
+            case config('constants.route_name.superadmin.auth.verified_otp'):
                 return [
                     'email' => 'required',
                     'otp_code' => 'required'
                 ];
 
-            case 'authSuperadminResetPassword':
+            case config('constants.route_name.superadmin.auth.reset_password'):
                 return [
                     'permission_code' => 'required',
                     'new_password' => 'required',
                     'confirm_password' => 'required'
                 ];
 
-            case 'authSuperadminChangePassword':
+            case config('constants.route_name.superadmin.auth.change_password'):
                 return [
                     'old_password' => 'required',
                     'new_password' => 'required',

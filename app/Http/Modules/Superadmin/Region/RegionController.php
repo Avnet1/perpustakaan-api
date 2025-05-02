@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegionRequest;
+use App\Models\MasterKabupatenKota;
 
 class RegionController extends Controller
 {
-    public static $primaryKey = 'kabupaten_kota_id';
+    private $primaryKey;
 
     const SORT_COLUMNS = [
         'nama_kabupaten_kota' => 'nama_kabupaten_kota',
@@ -29,6 +30,7 @@ class RegionController extends Controller
     public function __construct(RegionService $service)
     {
         $this->service = $service;
+        $this->primaryKey = MasterKabupatenKota::getPrimaryKeyName();
     }
 
     public function bodyValidation(Request $request): array
@@ -72,7 +74,7 @@ class RegionController extends Controller
     /** Get Client By Id */
     public function findById(Request $request): JsonResponse
     {
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $result = $this->service->findById($id);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
@@ -81,11 +83,8 @@ class RegionController extends Controller
     public function store(RegionRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $today = Carbon::now();
         $payload =  array_merge($this->bodyValidation($request), [
-            'created_at' => $today,
             'created_by' => $user->user_id,
-            'updated_at' => null
         ]);
         $result = $this->service->store((object) $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
@@ -95,7 +94,7 @@ class RegionController extends Controller
     public function update(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
             'updated_at' => $today,
@@ -110,7 +109,7 @@ class RegionController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) [
             'deleted_at' => $today,

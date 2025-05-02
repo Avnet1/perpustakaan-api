@@ -22,19 +22,15 @@ class GradeRequest extends FormRequest
      */
     public function rules(): array
     {
-        $route = $this->route();
-        $routeUri = $route ? $route->uri() : '';
-        $routeUri = preg_replace('/^api\/v1\/superadmin\//', '', $routeUri);
+        $validationName = $this->route()->getName(); //authLoginSuperadmin
 
         // Menentukan aturan validasi berdasarkan metode HTTP
-        switch ($routeUri) {
-            case 'grades':
-                if ($this->method() == 'POST') {
-                    return [
-                        'nama_jenjang' => 'required',
-                        'urutan' => 'required',
-                    ];
-                }
+        switch ($validationName) {
+            case config('constants.route_name.superadmin.grade.store'):
+                return [
+                    'nama_jenjang' => 'required',
+                    'urutan' => 'required',
+                ];
 
             default:
                 return [];
