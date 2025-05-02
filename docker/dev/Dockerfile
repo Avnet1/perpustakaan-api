@@ -24,12 +24,9 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     vim \
     nano \
-    cron \
-    libmcrypt-dev \
-    gnupg \
-    ca-certificates \
-    lsb-release \
-    software-properties-common
+    nodejs \
+    npm \
+    && apt-get clean
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip intl opcache
@@ -41,18 +38,27 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
-# Install Swoole via PECL
-RUN pecl install swoole \
-    && docker-php-ext-enable swoole
 
-# Copy project files
+# Copy source code
 COPY . /var/www
 
-# Set proper ownership
+# Salin file .env
+RUN cp .env.example .env
+
+# Set permissions
 RUN chown -R www-data:www-data /var/www
 
-# Expose Octane port
+
+# Install Laravel dependencies
+RUN composer install
+RUN npm install && npm run build
+
+# Install dependensi frontend menggunakan npm (sebagai contoh untuk hot reload)
+RUN npm install && npm run build
+
+
+# Expose port 8000 untuk aplikasi Laravel
 EXPOSE 8000
 
 # Default container command (overridden by docker-compose)
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000", "--watch"]
+CMD ["php", "artisan", "serve" ,  "--host=0.0.0.0", "--port=8000"]

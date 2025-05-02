@@ -29,6 +29,13 @@ return [
                 'update' => 'Data role berhasil diubah',
                 'delete' => 'Data role berhasil dihapus',
             ],
+            'user' => [
+                'create' => 'Data user berhasil ditambahkan',
+                'fetch' => 'Tarik user role berhasil',
+                'find' => 'Tarik user role berhasil',
+                'update' => 'Data user berhasil diubah',
+                'delete' => 'Data user berhasil dihapus',
+            ],
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
@@ -111,7 +118,7 @@ return [
                 'required' => 'Data :attribute wajib diisi',
                 'unique' => 'Data :attribute wajib unik',
                 'exists' => 'Data :attribute sudah digunakan',
-                'minCharacter' => 'Jumlah karakter :attribute minimal :number karakge',
+                'minCharacter' => 'Jumlah karakter :attribute minimal adalah :number karakter',
                 'notFound' => 'Data :attribute tidak ditemukan',
                 'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem'
             ],
@@ -119,6 +126,11 @@ return [
                 'create' => 'Data role gagal ditambahkan',
                 'update' => 'Data role gagal diubah',
                 'delete' => 'Data role gagal dihapus',
+            ],
+            'user' => [
+                'create' => 'Data user gagal ditambahkan',
+                'update' => 'Data user gagal diubah',
+                'delete' => 'Data user gagal dihapus',
             ],
             'auth' => [
                 'passwordInvalid' => 'Password yang diinput tidak sesuai',

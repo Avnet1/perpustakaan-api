@@ -70,28 +70,27 @@ class RoleService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
-        $row = $this->repository->findByCondition([
-            'role_name' => $payload->role_name,
-        ]);
+        try {
+            $row = $this->repository->findByCondition([
+                'role_name' => $payload->role_name,
+            ]);
 
-        if ($row) {
-            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Role ({$payload->role_name})"]), $row);
+            if ($row) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Role ({$payload->role_name})"]), $row);
+            }
+
+            $result = $this->repository->insert((array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.role.create'), $result);
+            }
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.role.create'), (object) [
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
+            ]);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
-
-        $result = $this->repository->insert((array) $payload);
-
-        if (!$result) {
-            return new LaravelResponseContract(false, 400, __('validation.custom.error.role.create'), $result);
-        }
-
-        return new LaravelResponseContract(true, 200, __('validation.custom.success.role.create'), (object) [
-            "{$this->primaryKey}" => $result["{$this->primaryKey}"],
-        ]);
-        // try {
-
-        // } catch (Exception $e) {
-        //     return sendErrorResponse($e);
-        // }
     }
 
     public function update(string $id, mixed $payload): LaravelResponseInterface

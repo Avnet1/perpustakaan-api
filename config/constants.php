@@ -15,6 +15,10 @@ return [
                 "store" => "storeRoleSuperadmin",
                 "update" => "updateRoleSuperadmin"
             ],
+            "user" => [
+                "store" => "storeUserSuperadmin",
+                "update" => "updateUserSuperadmin"
+            ],
             "province" => [
                 "store" => "storeProvinceSuperadmin",
                 "update" => "updateProvinceSuperadmin"

@@ -11,9 +11,6 @@ services:
       - .:/var/www
     env_file:
       - .env
-    environment:
-      - PHP_OPCACHE_VALIDATE_TIMESTAMPS=1
-    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000 --watch
     expose:
       - "8000"
     networks:

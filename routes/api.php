@@ -16,6 +16,7 @@ use App\Http\Modules\Superadmin\Grade\GradeController as SA_GradeController;
 use App\Http\Modules\Superadmin\Identity\IdentityController as SA_IdentityController;
 use App\Http\Modules\Superadmin\SocialMedia\SocialMediaController as SA_SocialMediaController;
 use App\Http\Modules\Superadmin\Role\RoleController as SA_RoleController;
+use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -40,13 +41,22 @@ Route::prefix('v1')->group(function () {
                 Route::post('/manual-change-password',  [SA_AuthController::class, 'manualChangePassword'])->name(config('constants.route_name.superadmin.auth.change_password'));
             });
 
-            /** Master Social Media */
+            /** Master Roles */
             Route::prefix('roles')->group(function () {
                 Route::get('/', [SA_RoleController::class, 'fetch']);
                 Route::post('/', [SA_RoleController::class, 'store'])->name(config('constants.route_name.superadmin.role.store'));
                 Route::get('/{role_id}', [SA_RoleController::class, 'findById']);
                 Route::post('/{role_id}', [SA_RoleController::class, 'update'])->name(config('constants.route_name.superadmin.role.update'));
                 Route::delete('/{role_id}', [SA_RoleController::class, 'delete']);
+            });
+
+            /** Master User  */
+            Route::prefix('users')->group(function () {
+                Route::get('/', [SA_UserController::class, 'fetch']);
+                Route::post('/', [SA_UserController::class, 'store'])->name(config('constants.route_name.superadmin.user.store'));
+                Route::get('/{user_id}', [SA_UserController::class, 'findById']);
+                Route::post('/{user_id}', [SA_UserController::class, 'update'])->name(config('constants.route_name.superadmin.user.update'));
+                Route::delete('/{user_id}', [SA_UserController::class, 'delete']);
             });
 
             /** Master Provinsi */

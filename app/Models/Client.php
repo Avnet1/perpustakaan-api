@@ -16,6 +16,8 @@ class Client extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    public $timestamps = true;
+
     protected $fillable = [
         'client_id',
         'user_client_id',
@@ -31,6 +33,37 @@ class Client extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
+
+    public static function getPrimaryKeyName()
+    {
+        return (new self())->getKeyName();
+    }
+
+    public static function store(array $payload)
+    {
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            "created_at" => now(),
+            "updated_at" => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::where($pkString, $uuidString)->first();
+        }
+
+        return false;
+    }
 
     public function user_client()
     {

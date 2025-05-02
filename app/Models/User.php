@@ -22,6 +22,9 @@ class User extends Authenticatable implements JWTSubject
     public $incrementing = false;
 
     protected $keyType = 'string';
+
+    public $timestamps = true;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -34,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role_id',
         'email',
+        'photo',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -48,6 +52,38 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
     ];
+
+
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
+
+    public static function getPrimaryKeyName()
+    {
+        return (new self())->getKeyName();
+    }
+
+    public static function store(array $payload)
+    {
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            "created_at" => now(),
+            "updated_at" => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::where($pkString, $uuidString)->first();
+        }
+
+        return false;
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -79,15 +115,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
-    public function client()
-    {
-        return $this->hasOne(Client::class, 'user_id', 'user_id');
-    }
-
-    public function anggota()
-    {
-        return $this->hasOne(MasterTipeKeanggotaan::class, 'user_id', 'user_id');
-    }
 
     /**
      * Get the identifier that will be stored in the JWT.
