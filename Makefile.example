@@ -1,0 +1,34 @@
+compose-dev-file=docker-compose.dev.yml
+container-app-dev=perpustakaan_dev_api
+
+local-clear:
+    php artisan cache:clear && php artisan config:clear && php artisan route:clear
+
+local-migration-run:
+    php artisan migration
+
+local-seed-run:
+    php artisan db:seed
+
+local-run:
+    php artisan serve
+
+
+# Deploy Dev
+app-dev-deploy:
+	docker compose -f $(compose-dev-file) up -d --force-recreate --remove-orphans
+
+app-dev-deploy-watch:
+	docker compose -f $(compose-dev-file) up --force-recreate --remove-orphans
+
+app-dev-log:
+	docker logs -f $(container-app-dev)
+
+
+app-dev-setup:
+	docker-compose -f $(compose-dev-file) exec $(container-app-dev) composer install
+	docker-compose -f $(compose-dev-file) exec $(container-app-dev) php artisan storage:link
+	docker-compose -f $(compose-dev-file) exec $(container-app-dev) php artisan optimize
+
+app-dev-down:
+	docker compose -f $(compose-dev-file) down
