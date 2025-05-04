@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $table = 'users';
 
@@ -51,14 +53,14 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'deleted_at',
+        'deleted_by',
     ];
-
 
     public static function getTableName()
     {
         return (new self())->getTable();
     }
-
 
     public static function getPrimaryKeyName()
     {
@@ -72,8 +74,8 @@ class User extends Authenticatable implements JWTSubject
 
         $data = array_merge([
             "{$pkString}" => $uuidString,
-            "created_at" => now(),
-            "updated_at" => null,
+            'created_at' => now(),
+            'updated_at' => null,
         ], $payload);
 
         // Perform the insert operation
@@ -109,17 +111,13 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
-
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
-
     /**
      * Get the identifier that will be stored in the JWT.
-     *
-     * @return mixed
      */
     public function getJWTIdentifier()
     {

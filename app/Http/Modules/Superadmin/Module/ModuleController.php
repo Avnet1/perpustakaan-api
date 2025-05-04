@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\User;
+namespace App\Http\Modules\Superadmin\Module;
 
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
-use App\Models\User;
+use App\Models\MasterModule;
 
-class UserController extends Controller
+class ModuleController extends Controller
 {
     private $primaryKey;
     private $pathLocation;
@@ -18,42 +18,34 @@ class UserController extends Controller
     protected $service;
 
     const SORT_COLUMNS = [
-        'name' => 'name',
-        'email' => 'email',
-        'role_name' => 'role_name',
+        'nama_modul' => 'nama_modul',
+        'slug' => 'slug',
+        'urutan' => 'urutan',
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
 
-    public function __construct(UserService $service)
+    public function __construct(ModuleService $service)
     {
         $this->service = $service;
-        $this->primaryKey = User::getPrimaryKeyName();
-        $this->pathLocation = config('constants.path_image.user');
+        $this->primaryKey = MasterModule::getPrimaryKeyName();
+        $this->pathLocation = config('constants.path_image.module');
     }
 
     public function bodyValidation(Request $request): array
     {
         $payload = [];
-        if ($request->has('name')) {
-            $payload['name'] = $request->input('name');
+        if ($request->has('nama_modul')) {
+            $payload['nama_modul'] = $request->input('nama_modul');
         }
 
 
-        if ($request->has('email')) {
-            $payload['email'] = $request->input('email');
+        if ($request->has('slug')) {
+            $payload['slug'] = $request->input('slug');
         }
 
-        if ($request->has('password')) {
-            $payload['password'] = $request->input('password');
-        }
-
-        if ($request->has('confirm_password')) {
-            $payload['confirm_password'] = $request->input('confirm_password');
-        }
-
-        if ($request->has('role_id')) {
-            $payload['role_id'] = $request->input('role_id');
+        if ($request->has('urutan')) {
+            $payload['urutan'] = $request->input('urutan');
         }
 
         return $payload;
@@ -83,13 +75,13 @@ class UserController extends Controller
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'photo' => null,
+            'icon' => null,
             'created_by' => $user->user_id,
         ]);
 
 
-        if ($request->hasFile('photo')) {
-            $payload->photo = $request->file('photo')->store("{$this->pathLocation}", 'public');
+        if ($request->hasFile('icon')) {
+            $payload->photo = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
         $result = $this->service->store($payload);
@@ -102,13 +94,13 @@ class UserController extends Controller
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'photo' => null,
+            'icon' => null,
             'updated_at' => Carbon::now(),
             'updated_by' => $user->user_id,
         ]);
 
-        if ($request->hasFile('photo')) {
-            $payload->photo = $request->file('photo')->store("{$this->pathLocation}", 'public');
+        if ($request->hasFile('icon')) {
+            $payload->photo = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
         $result = $this->service->update($id, $payload);

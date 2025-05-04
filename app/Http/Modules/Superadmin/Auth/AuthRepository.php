@@ -7,39 +7,35 @@ use Illuminate\Support\Facades\DB;
 
 class AuthRepository
 {
-
     public function updateUser(string $id, mixed $payload)
     {
-        return DB::table("users")
-            ->where("user_id", $id)
+        return DB::table('users')
+            ->where('user_id', $id)
             ->update($payload);
     }
 
-    public function findIdentity($where)
+    public function findIdentity(mixed $condition)
     {
-        return  User::where($where)
-            ->whereNull('deleted_at')  // Ensure the user is not soft-deleted
-            ->with([
-                'role' => function ($query) {
-                    $query->select('role_id', 'role_name', 'role_slug');  // Only select relevant role fields
-                }
-            ])
+        return User::with(['role'])
+            ->whereNull('deleted_at')
+            ->where($condition)
             ->first();
     }
 
-    public function findById($id)
+    public function findById(string $id)
     {
-        return User::with(['role', 'client'])->whereNull('deleted_at')
-            ->where(["user_id", $id])
+        return User::with(['role'])
+            ->whereNull('deleted_at')
+            ->where('user_id', $id)
             ->first();
     }
 
-    public function insertOtp($payload)
+    public function insertOtp(mixed $payload)
     {
         return DB::table('password_resets')->insert($payload);
     }
 
-    public function getOtp($condition)
+    public function getOtp(mixed $condition)
     {
         return DB::table('password_resets')
             ->where($condition)
@@ -47,14 +43,14 @@ class AuthRepository
             ->first();
     }
 
-    public function deleteOtp($condition)
+    public function deleteOtp(mixed $condition)
     {
         DB::table('password_resets')
             ->where($condition)
             ->delete();
     }
 
-    public function verifiedOtp($condition, $payload)
+    public function verifiedOtp(mixed $condition, mixed $payload)
     {
         return DB::table('password_resets')
             ->where($condition)

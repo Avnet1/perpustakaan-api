@@ -36,6 +36,13 @@ return [
                 'update' => 'Data user berhasil diubah',
                 'delete' => 'Data user berhasil dihapus',
             ],
+            'module' => [
+                'create' => 'Data modul berhasil ditambahkan',
+                'fetch' => 'Tarik data modul berhasil',
+                'find' => 'Tarik data modul berhasil',
+                'update' => 'Data modul berhasil diubah',
+                'delete' => 'Data modul berhasil dihapus',
+            ],
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
@@ -132,6 +139,11 @@ return [
                 'create' => 'Data user gagal ditambahkan',
                 'update' => 'Data user gagal diubah',
                 'delete' => 'Data user gagal dihapus',
+            ],
+            'module' => [
+                'create' => 'Data modul gagal ditambahkan',
+                'update' => 'Data modul gagal diubah',
+                'delete' => 'Data modul gagal dihapus',
             ],
             'auth' => [
                 'passwordInvalid' => 'Password yang diinput tidak sesuai',

@@ -12,7 +12,7 @@ services:
     env_file:
       - .env
     expose:
-      - "8000"
+      - "9000"
     networks:
       - perpustakaan_dev_network
 

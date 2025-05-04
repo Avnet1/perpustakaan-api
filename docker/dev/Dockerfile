@@ -1,5 +1,4 @@
-# Use PHP CLI (not FPM) because Octane runs in CLI mode
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
 # Set working directory
 WORKDIR /var/www
@@ -34,31 +33,24 @@ RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip intl opcache
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Node.js (v18)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
 
-
-# Copy source code
 COPY . /var/www
 
-# Salin file .env
-RUN cp .env.example .env
+COPY . /var/www
 
-# Set permissions
 RUN chown -R www-data:www-data /var/www
 
-
-# Install Laravel dependencies
 RUN composer install
+
 RUN npm install && npm run build
 
-# Install dependensi frontend menggunakan npm (sebagai contoh untuk hot reload)
-RUN npm install && npm run build
+# Copy entrypoint.sh
+COPY ./docker/dev/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Gunakan entrypoint custom
+ENTRYPOINT ["entrypoint.sh"]
 
-# Expose port 8000 untuk aplikasi Laravel
-EXPOSE 8000
+EXPOSE 9000
 
-# Default container command (overridden by docker-compose)
-CMD ["php", "artisan", "serve" ,  "--host=0.0.0.0", "--port=8000"]
+CMD ["php-fpm"]

@@ -1,51 +1,42 @@
 <?php
 
-namespace App\Http\Modules\Superadmin\User;
+namespace App\Http\Modules\Superadmin\Module;
 
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
-use App\Models\Role;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
+use App\Models\MasterModule;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
-class UserService
+class ModuleService
 {
     private $primaryKey;
     protected $repository;
 
-    public function __construct(UserRepository $repository)
+    public function __construct(ModuleRepository $repository)
     {
         $this->repository = $repository;
-        $this->primaryKey = User::getPrimaryKeyName();
+        $this->primaryKey = MasterModule::getPrimaryKeyName();
     }
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
-            $sqlQuery = User::with(['role'])->whereNull('deleted_at');
+            $sqlQuery = MasterModule::whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("role.role_name", "ilike", "%{$search}%")
-                        ->orWhere("name", "ilike", '%' . "%{$search}%")
-                        ->orWhere("email", "ilike", '%' . "%{$search}%");
+                        ->where("nama_modul", "ilike", "%{$search}%")
+                        ->orWhere("slug", "ilike", '%' . "%{$search}%")
+                        ->orWhere("urutan", "=", $search);
                 });
             }
 
             foreach ($filters->sorting as $column => $order) {
-                if ($column == 'role_name') {
-                    $sqlQuery->orderBy(
-                        Role::select('role_name')
-                            ->whereColumn('roles.role_id', 'users.role_id'),
-                        $order
-                    );
-                } else {
-                    $sqlQuery->orderBy($column, $order);
-                }
+                $sqlQuery->orderBy($column, $order);
             }
 
 
@@ -59,7 +50,7 @@ class UserService
                 ->get();
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.fetch'), $response);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.fetch'), $response);
         } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
@@ -71,10 +62,10 @@ class UserService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.find'), $row);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.find'), $row);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -84,39 +75,44 @@ class UserService
     {
         DB::beginTransaction();
         try {
-            if (isset($payload->confirm_password)) {
-                unset($payload->confirm_password);
-            }
 
             $row = $this->repository->findByCondition([
-                'email' => $payload->email,
+                'nama_modul' => $payload->nama_modul,
             ]);
 
             if ($row) {
                 DB::rollBack();
-                deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$payload->email})"]), $row);
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama modul ({$payload->nama_modul})"]), $row);
             }
 
-            $payload->password = Hash::make($payload->password);
 
+            $row = $this->repository->findByCondition([
+                'urutan' => $payload->urutan,
+            ]);
+
+            if ($row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
+            }
 
             $result = $this->repository->insert((array) $payload);
 
             if (!$result) {
                 DB::rollBack();
-                deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.user.create'), $result);
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.create'), $result);
             }
 
             DB::commit();
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.create'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.create'), (object) [
                 "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            deleteFileInStorage($payload->photo);
+            deleteFileInStorage($payload->icon);
             return sendErrorResponse($e);
         }
     }
@@ -124,28 +120,25 @@ class UserService
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
-        $hasPhoto = true;
+        $hasicon = true;
         DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 DB::rollBack();
-                deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
-            if (isset($payload->password)) {
-                unset($payload->password);
+
+            if ($row->icon != null) {
+                $storageOldPath = $row->icon;
             }
 
-            if ($row->photo != null) {
-                $storageOldPath = $row->photo;
-            }
-
-            if ($payload->photo == null) {
-                $hasPhoto = false;
-                unset($payload->photo);
+            if ($payload->icon == null) {
+                $hasicon = false;
+                unset($payload->icon);
             }
 
 
@@ -153,22 +146,22 @@ class UserService
 
             if (!$result) {
                 DB::rollBack();
-                deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.user.update'), $result);
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
             }
 
-            if ($hasPhoto == true) {
+            if ($hasicon == true) {
                 deleteFileInStorage($storageOldPath);
             }
 
             DB::commit();
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.update'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            deleteFileInStorage($payload->photo);
+            deleteFileInStorage($payload->icon);
             return sendErrorResponse($e);
         }
     }
@@ -179,12 +172,12 @@ class UserService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.delete'), (object) [
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.delete'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {

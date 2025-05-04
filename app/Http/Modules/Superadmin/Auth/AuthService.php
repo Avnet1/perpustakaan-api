@@ -5,18 +5,15 @@ namespace App\Http\Modules\Superadmin\Auth;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Mail\PortalEmailSender;
-use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
-
-use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
-
     protected $repository;
 
     public function __construct(AuthRepository $repository)
@@ -28,11 +25,11 @@ class AuthService
     {
         try {
             $user = $this->repository->findIdentity([
-                "email" => $payload->email
+                'email' => $payload->email,
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "User"]), $user);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
             }
 
             if (!Hash::check($payload->password, $user->password)) {
@@ -65,11 +62,10 @@ class AuthService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.tokenGenerate'), $token);
             }
 
-
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.login'), (object) [
-                "access_token" => $token
+                'access_token' => $token,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
@@ -78,18 +74,17 @@ class AuthService
     {
         try {
             $user = $this->repository->findIdentity([
-                "email" => $payload['email']
+                'email' => $payload['email'],
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "User"]), $user);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
             }
-
 
             $result = $this->repository->insertOtp($payload);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.storeReset', ["attribute" => "Email dan OTP"]), null);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.storeReset', ['attribute' => 'Email dan OTP']), null);
             }
 
             $data = makeMailSender(
@@ -98,53 +93,51 @@ class AuthService
                 'emails.portals.forgot_password',
 
                 array_merge($payload, [
-                    "name" => $user->name,
-                    "username" => $user->username,
-                    "role_name" => $user->role->role_name
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'role_name' => $user->role->role_name,
                 ])
             );
 
             Mail::to($payload['email'])->send(new PortalEmailSender($data));
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.resetPassword'), ["email" => $payload['email']]);
-        } catch (Exception $e) {
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.resetPassword'), ['email' => $payload['email']]);
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
 
-
     public function verificationOtp($where): LaravelResponseInterface
     {
-
         try {
             $row = $this->repository->getOtp($where);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "Kode Otp {$where['otp_code']}"]), $where);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
             }
 
             if ($row->has_verified) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.hadVerified', ["attribute" => "Kode Otp {$where['otp_code']}"]), $where);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.hadVerified', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
             }
 
             $diffSeconds = Carbon::now()->diffInSeconds(Carbon::parse($row->created_at));
 
             if ($diffSeconds > $row->otp_time) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.expiredOtp', ["attribute" => "Kode Otp {$where['otp_code']}", "num" => "5"]), $where);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.expiredOtp', ['attribute' => "Kode Otp {$where['otp_code']}", 'num' => '5']), $where);
             }
 
-            $result = $this->repository->verifiedOtp($where, ["has_verified" => true]);
+            $result = $this->repository->verifiedOtp($where, ['has_verified' => true]);
 
             if (!$result) {
-                return new LaravelResponseContract(true, 200, __('validation.custom.error.auth.verifiedOtp', ["attribute" => "Kode Otp {$where['otp_code']}"]), $where);
+                return new LaravelResponseContract(true, 200, __('validation.custom.error.auth.verifiedOtp', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
             }
 
             $token = executeEncrypt($where);
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.verifiedOtp', ["attribute" => "Kode Otp {$where['otp_code']}"]), [
-                "permission_code" => $token
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.verifiedOtp', ['attribute' => "Kode Otp {$where['otp_code']}"]), [
+                'permission_code' => $token,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
@@ -153,8 +146,8 @@ class AuthService
     {
         $encryption = executeDecrypt($payload['permission_code']);
         $condition = [
-            "email" => $encryption['email'],
-            "otp_code" => $encryption['otp_code']
+            'email' => $encryption['email'],
+            'otp_code' => $encryption['otp_code'],
         ];
 
         try {
@@ -167,11 +160,11 @@ class AuthService
             $this->repository->deleteOtp($condition);
 
             $user = $this->repository->findIdentity([
-                "email" => $encryption['email']
+                'email' => $encryption['email'],
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "User"]), $payload);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
             }
 
             $user->password = Hash::make($payload['new_password']);
@@ -180,7 +173,7 @@ class AuthService
             $user->save();
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.changePassword'), $user);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
@@ -189,11 +182,11 @@ class AuthService
     {
         try {
             $user = $this->repository->findIdentity([
-                "user_id" => $id
+                'user_id' => $id,
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ["attribute" => "User"]), $payload);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
             }
 
             $user->password = Hash::make($payload['new_password']);
@@ -202,12 +195,10 @@ class AuthService
             $user->save();
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.changePassword'), $user);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
-
-
 
     public function refreshToken(): LaravelResponseInterface
     {
@@ -222,8 +213,9 @@ class AuthService
         try {
             // Refresh the token
             $newToken = JWTAuth::refresh($token);
+
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.refreshToken'), [
-                "access_token" => $newToken
+                'access_token' => $newToken,
             ]);
         } catch (JWTException $e) {
             return sendErrorResponse($e);
@@ -235,28 +227,28 @@ class AuthService
     {
         try {
             $result = $this->repository->findById($id);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.fetch', ["attribute" => "profil"]), $result);
-        } catch (Exception $e) {
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.fetch', ['attribute' => 'profil']), $result);
+        } catch (\Exception $e) {
             return sendErrorResponse($e);
         }
     }
 
     /** Update Profile */
-    public function updateProfile(string $id,  mixed $payload): LaravelResponseInterface
+    public function updateProfile(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
         $hasPhoto = true;
         DB::beginTransaction();
         try {
-
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
+
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
-
 
             if ($row->photo != null) {
                 $storageOldPath = $row->photo;
@@ -267,29 +259,30 @@ class AuthService
                 unset($payload->photo);
             }
 
-
             $result = $this->repository->updateUser($id, (array) $payload);
 
             if (!$result) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.update', ["attribute" => "user"]), $result);
+
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.update', ['attribute' => 'user']), $result);
             }
 
             JWTAuth::invalidate(JWTAuth::getToken());
-
 
             if ($hasPhoto == true) {
                 deleteFileInStorage($storageOldPath);
             }
 
             DB::commit();
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.update', ["attribute" => "user"]), (object) [
-                "user_id" => $id
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.update', ['attribute' => 'user']), (object) [
+                'user_id' => $id,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->photo);
+
             return sendErrorResponse($e);
         }
     }
