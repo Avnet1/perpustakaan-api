@@ -11,24 +11,27 @@ class HandleCors
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // Mendapatkan Origin dari header request
         $origin = $request->headers->get('Origin') ?? '*';
 
-        // Jika preflight (OPTIONS), langsung return response dengan header
+        // Cek apakah request adalah preflight (OPTIONS)
         if ($request->getMethod() === 'OPTIONS') {
-            return response()->noContent(204)
+            return response()->noContent(204)  // Kembalikan response 204 untuk preflight
                 ->header('Access-Control-Allow-Origin', $origin)
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With')
-                ->header('Access-Control-Allow-Credentials', 'true');
+                ->header('Access-Control-Allow-Credentials', 'true')  // Membolehkan kredensial (cookies, session)
+                ->header('Access-Control-Max-Age', 3600);  // Durasi cache preflight request
         }
 
+        // Lanjutkan request ke middleware berikutnya
         $response = $next($request);
 
-        // Tambahkan header CORS ke semua response lainnya
+        // Menambahkan header CORS pada response
         $response->headers->set('Access-Control-Allow-Origin', $origin);
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');  // Membolehkan kredensial
 
         return $response;
     }

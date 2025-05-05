@@ -21,9 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Route::middlewareGroup('api', [
-            HandleCors::class,
-            // middleware lainnya jika diperlukan
-        ]);
+        $middlewares = config('middleware.middlewares');
+        Route::middlewareGroup('api', $middlewares);
     }
 }
