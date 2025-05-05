@@ -1,18 +1,31 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'v1/*', 'sanctum/csrf-cookie'],  // Sesuaikan jika perlu
 
-    'allowed_methods' => ['*'],  // Mengizinkan semua metode HTTP
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    */
 
-    'allowed_origins' => ['*'],  // Mengizinkan semua asal, bisa diganti dengan domain spesifik
+    'paths' => [
+        'api/*',
+        'v1/*',
+        'sanctum/csrf-cookie',
+    ],
+
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+
+    'allowed_origins' => ['http://localhost:3000', 'http://192.168.20.86:3000', 'http://dev-sikeu-unimed.avnet.id'],
+
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],  // Mengizinkan semua headers
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 3600,
 
-    'supports_credentials' => false,  // Mengizinkan kredensial, jika diperlukan
+    'supports_credentials' => true, // true jika menggunakan cookie/session login atau Authorization Bearer
+
 ];
