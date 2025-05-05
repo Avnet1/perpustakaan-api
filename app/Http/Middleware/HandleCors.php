@@ -15,18 +15,20 @@ class HandleCors
      * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      */
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
         $response = $next($request);
 
-        $response->headers->set('Access-Control-Allow-Origin', 'http://192.168.20.86:3000'); // Ganti dengan domain frontend
+        $origin = $request->headers->get('Origin');
+
+        $response->headers->set('Access-Control-Allow-Origin', $origin ?? '*');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin, Accept');
+        $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
 
-        // Menangani preflight request
-        if ($request->getMethod() == "OPTIONS") {
-            return response()->json([], 200);
+        // Khusus untuk OPTIONS
+        if ($request->getMethod() === 'OPTIONS') {
+            return response()->json('{"method":"OPTIONS"}', 200, $response->headers->all());
         }
 
         return $response;
