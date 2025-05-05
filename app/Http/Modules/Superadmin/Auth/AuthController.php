@@ -51,6 +51,7 @@ class AuthController extends Controller
         $payload = [
             'email' => $request->email,
             "otp_code" => $request->otp_code,
+            'has_verified' => false
         ];
 
         $result = $this->service->verificationOtp($payload);

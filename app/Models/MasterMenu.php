@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class MasterModule extends Model
+class MasterMenu extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'master_modul';
+    protected $table = 'master_menu';
 
-    protected $primaryKey = 'modul_id';
+    protected $primaryKey = 'menu_id';
 
     public $incrementing = false;
 
@@ -23,11 +23,13 @@ class MasterModule extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'menu_id',
         'modul_id',
-        'nama_modul',
+        'nama_menu',
         'slug',
         'icon',
         'urutan',
+        'parent_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -75,15 +77,26 @@ class MasterModule extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->modul_id)) {
-                $model->modul_id = (string) Str::uuid();
+            if (empty($model->menu_id)) {
+                $model->menu_id = (string) Str::uuid();
             }
         });
     }
 
 
-    public function listMenu()
+    public function module()
     {
-        return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id');
+        return $this->belongsTo(MasterModule::class, 'modul_id', 'modul_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(MasterMenu::class, 'parent_id', 'menu_id');
+    }
+
+    // Relationship: child menus
+    public function childrens()
+    {
+        return $this->hasMany(MasterMenu::class, 'parent_id', 'menu_id');
     }
 }

@@ -18,6 +18,7 @@ use App\Http\Modules\Superadmin\SocialMedia\SocialMediaController as SA_SocialMe
 use App\Http\Modules\Superadmin\Role\RoleController as SA_RoleController;
 use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
 use App\Http\Modules\Superadmin\Module\ModuleController as SA_ModuleController;
+// use App\Http\Modules\Superadmin\Menu\MenuController as SA_MenuController;
 
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
@@ -62,7 +63,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{user_id}', [SA_UserController::class, 'delete']);
             });
 
-            /** Master User  */
+            /** Master Module  */
             Route::prefix('modules')->group(function () {
                 Route::get('/', [SA_ModuleController::class, 'fetch']);
                 Route::post('/', [SA_ModuleController::class, 'store'])->name(config('constants.route_name.superadmin.module.store'));
@@ -70,6 +71,15 @@ Route::prefix('v1')->group(function () {
                 Route::post('/{modul_id}', [SA_ModuleController::class, 'update'])->name(config('constants.route_name.superadmin.module.update'));
                 Route::delete('/{modul_id}', [SA_ModuleController::class, 'delete']);
             });
+
+
+            /** Master Menu  */
+            // Route::prefix('menu')->group(function () {
+            //     Route::post('/', [SA_MenuController::class, 'storeMenu'])->name(config('constants.route_name.superadmin.menu.storeMenu'));
+            //     Route::post('/sub-menu', [SA_MenuController::class, 'storeSubMenu'])->name(config('constants.route_name.superadmin.menu.storeSubMenu'));
+            //     Route::get('/{menu_id}', [SA_MenuController::class, 'findById']);
+            //     Route::delete('/{menu_id}', [SA_MenuController::class, 'delete']);
+            // });
 
             /** Master Provinsi */
             Route::prefix('provinces')->group(function () {

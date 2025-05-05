@@ -43,6 +43,14 @@ return [
                 'update' => 'Data modul berhasil diubah',
                 'delete' => 'Data modul berhasil dihapus',
             ],
+            'menu' => [
+                'create-menu' => 'Data menu berhasil ditambahkan',
+                'create-sub-menu' => 'Data sub menu berhasil ditambahkan',
+                'fetch' => 'Tarik data menu berhasil',
+                'find' => 'Tarik data menu berhasil',
+                'update' => 'Data menu berhasil diubah',
+                'delete' => 'Data menu berhasil dihapus',
+            ],
             'auth' => [
                 'login' => 'Login berhasil',
                 'refreshToken' => 'Refresh token berhasil',
@@ -144,6 +152,12 @@ return [
                 'create' => 'Data modul gagal ditambahkan',
                 'update' => 'Data modul gagal diubah',
                 'delete' => 'Data modul gagal dihapus',
+            ],
+            'menu' => [
+                'create-menu' => 'Data menu gagal ditambahkan',
+                'create-sub-menu' => 'Data sub menu gagal ditambahkan',
+                'update' => 'Data menu gagal diubah',
+                'delete' => 'Data menu gagal dihapus',
             ],
             'auth' => [
                 'passwordInvalid' => 'Password yang diinput tidak sesuai',

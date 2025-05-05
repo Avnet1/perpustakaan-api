@@ -23,6 +23,11 @@ return [
                 'store' => 'storeModuleSuperadmin',
                 'update' => 'updateModuleSuperadmin',
             ],
+            'menu' => [
+                'storeMenu' => 'storeMenuSuperadmin',
+                'storeSubMenu' => 'storeSubMenuSuperadmin',
+                'update' => 'updateMenuSuperadmin',
+            ],
             'province' => [
                 'store' => 'storeProvinceSuperadmin',
                 'update' => 'updateProvinceSuperadmin',
@@ -68,6 +73,7 @@ return [
 
     'path_image' => [
         "module" => 'module/icon',
+        "menu" => 'menu/icon',
         "user" => 'user/photo'
     ]
 ];

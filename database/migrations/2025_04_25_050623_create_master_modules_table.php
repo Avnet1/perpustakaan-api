@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('modul_id')->primary();
             $table->string('nama_modul')->default(null);
             $table->text('slug')->nullable()->default(null);
-            $table->longText('logo')->nullable()->default(null);
+            $table->longText('icon')->nullable()->default(null);
             $table->bigInteger('urutan')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes(); // deleted_at
