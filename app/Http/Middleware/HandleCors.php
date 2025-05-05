@@ -17,15 +17,14 @@ class HandleCors
      */
     public function handle(Request $request, Closure $next)
     {
-        // CORS headers
         $response = $next($request);
 
-        $response->headers->set('Access-Control-Allow-Origin', '*'); // Ganti '*' dengan domain yang diizinkan, atau biarkan '*' untuk menerima semua
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Tentukan metode HTTP yang diizinkan
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin, Accept'); // Tentukan headers yang diizinkan
-        $response->headers->set('Access-Control-Allow-Credentials', 'true'); // Jika kamu ingin mengizinkan kredensial
+        $response->headers->set('Access-Control-Allow-Origin', 'http://192.168.20.86:3000'); // Ganti dengan domain frontend
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin, Accept');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
 
-        // Jika request adalah preflight (OPTIONS), kembalikan respons kosong 200
+        // Menangani preflight request
         if ($request->getMethod() == "OPTIONS") {
             return response()->json([], 200);
         }
