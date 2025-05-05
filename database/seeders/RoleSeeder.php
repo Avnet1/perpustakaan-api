@@ -24,8 +24,8 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::create([
-            'role_name' => 'Member',
-            'role_slug' => 'member',
+            'role_name' => 'Developer',
+            'role_slug' => 'developer',
         ]);
     }
 }
