@@ -17,11 +17,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => [
-        'http://localhost:3000',
-        'http://192.168.20.86:3000',
-        'http://dev-sikeu-unimed.avnet.id',
-    ],
+    'allowed_origins' => ['*'],
 
     'allowed_headers' => ['*'],  // Mengizinkan semua headers
 

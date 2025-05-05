@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\HandleCors as DefaultHandleCors;
 
-Route::prefix('v1')->middleware([DefaultHandleCors::class])->group(function () {
+Route::prefix('v1')->group(function () {
 
     Route::prefix('superadmin')->group(function () {
         Route::prefix('auth')->group(function () {
