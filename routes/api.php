@@ -17,6 +17,7 @@ use App\Http\Modules\Superadmin\Identity\IdentityController as SA_IdentityContro
 use App\Http\Modules\Superadmin\SocialMedia\SocialMediaController as SA_SocialMediaController;
 use App\Http\Modules\Superadmin\Role\RoleController as SA_RoleController;
 use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
+use App\Http\Modules\Superadmin\Module\ModuleController as SA_ModuleController;
 
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
@@ -59,6 +60,15 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{user_id}', [SA_UserController::class, 'findById']);
                 Route::post('/{user_id}', [SA_UserController::class, 'update'])->name(config('constants.route_name.superadmin.user.update'));
                 Route::delete('/{user_id}', [SA_UserController::class, 'delete']);
+            });
+
+            /** Master User  */
+            Route::prefix('modules')->group(function () {
+                Route::get('/', [SA_ModuleController::class, 'fetch']);
+                Route::post('/', [SA_ModuleController::class, 'store'])->name(config('constants.route_name.superadmin.module.store'));
+                Route::get('/{modul_id}', [SA_ModuleController::class, 'findById']);
+                Route::post('/{modul_id}', [SA_ModuleController::class, 'update'])->name(config('constants.route_name.superadmin.module.update'));
+                Route::delete('/{modul_id}', [SA_ModuleController::class, 'delete']);
             });
 
             /** Master Provinsi */

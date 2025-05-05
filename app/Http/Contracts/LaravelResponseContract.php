@@ -4,7 +4,8 @@ namespace App\Http\Contracts;
 
 use App\Http\Interfaces\LaravelResponseInterface;
 
-class LaravelResponseContract implements LaravelResponseInterface {
+class LaravelResponseContract implements LaravelResponseInterface
+{
     public bool $success;  // Change private to public
     public int $code;
     public string $message;

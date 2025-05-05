@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\ModuleRequest;
 use App\Models\MasterModule;
 
 class ModuleController extends Controller
@@ -71,7 +71,7 @@ class ModuleController extends Controller
     }
 
     /** Create Client */
-    public function store(UserRequest $request): JsonResponse
+    public function store(ModuleRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [

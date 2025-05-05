@@ -77,7 +77,7 @@ class ModuleService
         try {
 
             $row = $this->repository->findByCondition([
-                'nama_modul' => $payload->nama_modul,
+                'nama_modul' => "%{$payload->nama_modul}%",
             ]);
 
             if ($row) {
@@ -120,7 +120,7 @@ class ModuleService
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
-        $hasicon = true;
+        $hasIcon = true;
         DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
@@ -132,12 +132,30 @@ class ModuleService
             }
 
 
+            $row = $this->repository->checkExisted($id,  [
+                'nama_modul' => "%{$payload->nama_modul}%",
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul}"]), $row);
+            }
+
+
+            $row = $this->repository->checkExisted($id,  [
+                'urutan' => $payload->urutan,
+            ]);
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "No. Urut/Urutan {$payload->urutan}"]), $row);
+            }
+
+
             if ($row->icon != null) {
                 $storageOldPath = $row->icon;
             }
 
             if ($payload->icon == null) {
-                $hasicon = false;
+                $hasIcon = false;
                 unset($payload->icon);
             }
 
@@ -150,7 +168,7 @@ class ModuleService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
             }
 
-            if ($hasicon == true) {
+            if ($hasIcon == true) {
                 deleteFileInStorage($storageOldPath);
             }
 

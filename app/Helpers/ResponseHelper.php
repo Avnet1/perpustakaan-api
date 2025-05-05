@@ -4,19 +4,20 @@ namespace App\Helpers;
 
 use Illuminate\Http\JsonResponse;
 
-class ResponseHelper {
+class ResponseHelper
+{
 
-    public static function sendResponseJson(bool $success, int $code, string $message, mixed $data=null):JsonResponse {
-        if($success == true) {
+    public static function sendResponseJson(bool $success, int $code, string $message, mixed $data = null): JsonResponse
+    {
+        if ($success == true) {
             return response()->json([
-                'success' => $success,
+                'status' => $success,
                 'message' => $message,
                 'data' => $data
             ], $code);
-        }
-        else {
+        } else {
             return response()->json([
-                'success' => $success,
+                'status' => $success,
                 'message' => $message,
                 'error' => $data
             ], $code);

@@ -19,6 +19,10 @@ return [
                 'store' => 'storeUserSuperadmin',
                 'update' => 'updateUserSuperadmin',
             ],
+            'module' => [
+                'store' => 'storeModuleSuperadmin',
+                'update' => 'updateModuleSuperadmin',
+            ],
             'province' => [
                 'store' => 'storeProvinceSuperadmin',
                 'update' => 'updateProvinceSuperadmin',

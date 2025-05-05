@@ -36,16 +36,28 @@ class ModuleRepository
     }
 
 
-    public function checkExisted(string $id, array $where)
+    public function checkExisted(string $id, array $condition)
     {
-        return MasterModule::whereNull('deleted_at')
-            ->where($where)
-            ->where("{$this->primaryKey}", '!=', $id)->first();
+        $query = MasterModule::whereNull('deleted_at');
+
+        foreach ($condition as $key => $value) {
+            if (is_array($value)) {
+                $query->whereIn($key, $value);
+            } elseif (is_null($value)) {
+                $query->whereNull($key);
+            } elseif (strpos($value, '%') !== false) {
+                $query->where($key, 'ilike', $value);
+            } else {
+                $query->where($key, '=', $value);
+            }
+        }
+
+        return $query->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterModule::with(['role'])->whereNull('deleted_at');
+        $query = MasterModule::whereNull('deleted_at');
 
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
