@@ -30,15 +30,19 @@ app-dev-migrate:
 app-dev-seed:
 	docker-compose -f $(compose-dev-file) exec $(container-app-dev) php artisan db:seed
 
-app-dev-setup:
+app-dev-composer:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer install
+
+app-dev-setup:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan storage:link
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan optimize
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer dump-autoload
 
 app-dev-clear:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan cache:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan route:clear
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan optimize:clear
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:cache
 
 app-dev-db-setup:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan migrate
