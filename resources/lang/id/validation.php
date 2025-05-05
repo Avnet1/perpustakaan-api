@@ -44,8 +44,8 @@ return [
                 'delete' => 'Data modul berhasil dihapus',
             ],
             'menu' => [
-                'create-menu' => 'Data menu berhasil ditambahkan',
-                'create-sub-menu' => 'Data sub menu berhasil ditambahkan',
+                'create' => 'Data menu berhasil ditambahkan',
+                'upload-icon' => 'Data icon menu berhasil diupload',
                 'fetch' => 'Tarik data menu berhasil',
                 'find' => 'Tarik data menu berhasil',
                 'update' => 'Data menu berhasil diubah',
@@ -154,8 +154,8 @@ return [
                 'delete' => 'Data modul gagal dihapus',
             ],
             'menu' => [
-                'create-menu' => 'Data menu gagal ditambahkan',
-                'create-sub-menu' => 'Data sub menu gagal ditambahkan',
+                'create' => 'Data menu gagal ditambahkan',
+                'upload-icon' => 'Data icon menu gagal diupload',
                 'update' => 'Data menu gagal diubah',
                 'delete' => 'Data menu gagal dihapus',
             ],

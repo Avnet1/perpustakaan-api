@@ -25,7 +25,8 @@ return [
             ],
             'menu' => [
                 'storeMenu' => 'storeMenuSuperadmin',
-                'storeSubMenu' => 'storeSubMenuSuperadmin',
+                'createIconMenu' => 'storeIconMenuSuperadmin',
+                'updateIconMenu' => 'updateIconMenuSuperAdmin',
                 'update' => 'updateMenuSuperadmin',
             ],
             'province' => [

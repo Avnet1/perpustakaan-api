@@ -7,7 +7,6 @@ use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Support\Facades\DB;
 use App\Models\MasterModule;
 use Exception;
-use Illuminate\Support\Facades\Hash;
 
 class MenuService
 {
@@ -35,44 +34,25 @@ class MenuService
         }
     }
 
-    public function storeMenu(mixed $payload): LaravelResponseInterface
+    public function storeIconMenu(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
         try {
-
-            $row = $this->repository->findByCondition([
-                'nama_menu' => "%{$payload->nama_menu}%",
+            $result = $this->repository->insert([
+                'image_path' => $payload->icon,
+                'created_by' => $payload->created_by
             ]);
-
-            if ($row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama modul ({$payload->nama_modul})"]), $row);
-            }
-
-
-            $row = $this->repository->findByCondition([
-                'urutan' => $payload->urutan,
-            ]);
-
-            if ($row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
-            }
-
-            $result = $this->repository->insert((array) $payload);
 
             if (!$result) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.create'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.upload-icon'), $result);
             }
 
             DB::commit();
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.create'), (object) [
-                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.upload-icon'), (object) [
+                "image_id" => $result["image_id"],
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -81,69 +61,55 @@ class MenuService
         }
     }
 
-    public function update(string $id, mixed $payload): LaravelResponseInterface
+    public function store(mixed $payload): LaravelResponseInterface
     {
-        $storageOldPath = null;
-        $hasIcon = true;
-        DB::beginTransaction();
         try {
-            $row = $this->repository->findById($id);
 
-            if (!$row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
-            }
-
-
-            $row = $this->repository->checkExisted($id,  [
-                'nama_modul' => "%{$payload->nama_modul}%",
+            $row = $this->repository->findByCondition([
+                'nama_menu' => "%{$payload->nama_menu}%",
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul}"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama menu ({$payload->nama_menu})"]), $row);
             }
 
 
-            $row = $this->repository->checkExisted($id,  [
+            $row = $this->repository->findByCondition([
                 'urutan' => $payload->urutan,
+                'parent_id' => $payload->parent_id
             ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "No. Urut/Urutan {$payload->urutan}"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
+            }
+
+            $pathIcon = null;
+
+            if (isset($payload->image_id)) {
+                $row = $this->repository->findImage($payload->image_id);
+
+                if ($row) {
+                    return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => "Image ID"]), $row);
+                }
+
+                $pathIcon = $row->image_path;
             }
 
 
-            if ($row->icon != null) {
-                $storageOldPath = $row->icon;
-            }
+            $mergePayload = array_merge((array) $payload, [
+                "icon" => $pathIcon
+            ]);
 
-            if ($payload->icon == null) {
-                $hasIcon = false;
-                unset($payload->icon);
-            }
-
-
-            $result = $this->repository->update($id, (array) $payload);
+            $result = $this->repository->insert($mergePayload);
 
             if (!$result) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.create'), $result);
             }
 
-            if ($hasIcon == true) {
-                deleteFileInStorage($storageOldPath);
-            }
-
-            DB::commit();
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), (object) [
-                "{$this->primaryKey}" => $id,
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.create'), (object) [
+                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->icon);
             return sendErrorResponse($e);
         }
     }
@@ -165,5 +131,71 @@ class MenuService
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
+    }
+
+    public function updateIconMenu(string $id, mixed $payload): LaravelResponseInterface
+    {
+        $storageOldPath = null;
+        DB::beginTransaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+            }
+
+            if ($row->icon != null) {
+                $storageOldPath = $row->icon;
+            }
+
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->icon);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.update'), $result);
+            }
+
+            deleteFileInStorage($storageOldPath);
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.update'), (object) [
+                "{$this->primaryKey}" => $id,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->icon);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function update(string $id, mixed $payload): LaravelResponseInterface
+    {
+        $row = $this->repository->findById($id);
+
+        if (!$row) {
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+        }
+
+        $row = $this->repository->checkExisted($id,  [
+            'nama_menu' => "%{$payload->nama_menu}%",
+        ]);
+
+        if ($row) {
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
+        }
+
+
+        $result = $this->repository->update($id, (array) $payload);
+
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.socialMedia.update'), $result);
+        }
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.update'), (object) [
+            "{$this->primaryKey}" => $id,
+        ]);
     }
 }

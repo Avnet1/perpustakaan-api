@@ -2,6 +2,7 @@
 
 namespace App\Http\Modules\Superadmin\Menu;
 
+use App\Models\MasterImageStorage;
 use App\Models\MasterMenu;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +22,17 @@ class MenuRepository
         return MasterMenu::store($payload);
     }
 
+
+    public function storeImage(array $payload)
+    {
+        return MasterImageStorage::insert($payload);
+    }
+
+    public function findImage(string $id)
+    {
+        return MasterImageStorage::whereNull("deleted_at")->where('image_id', $id)->first();
+    }
+
     public function update(string $id, mixed $payload)
     {
         return DB::table("{$this->tableName}")
@@ -30,9 +42,17 @@ class MenuRepository
 
     public function findById(string $id)
     {
-        return MasterMenu::whereNull('deleted_at')
-            ->where("{$this->primaryKey}", $id)
-            ->first();
+        return MasterMenu::with([
+            'module',
+            'childrens' => function ($q) {
+                $q->with([
+                    'childrens'
+                ]);
+            },
+            'parent' => function ($q) {
+                $q->whereNull('deleted_at');
+            }
+        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
 
@@ -55,19 +75,24 @@ class MenuRepository
         return $query->where("{$this->primaryKey}", '!=', $id)->first();
     }
 
-    public function findByCondition(mixed $condition)
+
+    public function findByCondition(mixed $condition, bool $relation = false)
     {
-        $query = MasterMenu::with([
-            'module',
-            'childrens' => function ($q) {
-                $q->with([
-                    'childrens'
-                ]);
-            },
-            'parent' => function ($q) {
-                $q->whereNull('deleted_at');
-            }
-        ])->whereNull('deleted_at');
+        $query = MasterMenu::whereNull('deleted_at');
+
+        if ($relation == true) {
+            $query = MasterMenu::with([
+                'module',
+                'childrens' => function ($q) {
+                    $q->with([
+                        'childrens'
+                    ]);
+                },
+                'parent' => function ($q) {
+                    $q->whereNull('deleted_at');
+                }
+            ])->whereNull('deleted_at');
+        }
 
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
