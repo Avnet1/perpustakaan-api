@@ -19,9 +19,10 @@ use App\Http\Modules\Superadmin\Role\RoleController as SA_RoleController;
 use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\HandleCors;
+// use App\Http\Middleware\HandleCors;
+use Illuminate\Http\Middleware\HandleCors as DefaultHandleCors;
 
-Route::prefix('v1')->middleware([HandleCors::class])->group(function () {
+Route::prefix('v1')->middleware([DefaultHandleCors::class])->group(function () {
 
     Route::prefix('superadmin')->group(function () {
         Route::prefix('auth')->group(function () {

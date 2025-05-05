@@ -5,7 +5,9 @@ use App\Http\Middleware\ValidateAuthTokenMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\HandleCors;
+// use Illuminate\Http\Middleware\HandleCors;
+
+use Illuminate\Http\Middleware\HandleCors as DefaultHandleCors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,7 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // $middleware->append(HandleCors::class);
-        $middleware->prependToGroup('api', HandleCors::class);
+
+        $middleware->append(DefaultHandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

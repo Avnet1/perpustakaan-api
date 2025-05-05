@@ -1,16 +1,18 @@
 <?php
 
 return [
-
     /*
-    |----------------------------------------------------------------------
+    |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
-    |----------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    |
+    | The allowed origins and headers for the requests can be defined here.
+    |
     */
 
     'paths' => [
-        'api/*',
-        'v1/*',
+        'api/*',  // Path untuk API
+        'v1/*',   // Path tambahan jika diperlukan
     ],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -18,10 +20,8 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'http://192.168.20.86:3000',
-        'http://dev-sikeu-unimed.avnet.id'
-    ],  // Harus sesuai dengan frontend yang memanggil API
-
-    'allowed_origins_patterns' => [],
+        'http://dev-sikeu-unimed.avnet.id',
+    ],
 
     'allowed_headers' => ['*'],  // Mengizinkan semua headers
 
@@ -30,5 +30,4 @@ return [
     'max_age' => 3600,  // Durasi cache untuk preflight request
 
     'supports_credentials' => true, // Membolehkan kredensial (cookies, session, atau authorization header)
-
 ];

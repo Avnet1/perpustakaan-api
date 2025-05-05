@@ -2,7 +2,8 @@
 
 return [
     'middlewares' => [
-        \App\Http\Middleware\HandleCors::class,
+        // \App\Http\Middleware\HandleCors::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
         // You can add more middlewares here if needed
     ],
 ];
