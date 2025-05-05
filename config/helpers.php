@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 
 
 if (!function_exists('executeEncrypt')) {
-    function executeEncrypt(array $payload): string
+    function executeEncrypt($payload): string
     {
         return Crypt::encrypt(json_encode($payload));
     }
