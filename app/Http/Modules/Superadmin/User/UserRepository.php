@@ -23,9 +23,16 @@ class UserRepository
 
     public function update(string $id, mixed $payload)
     {
-        return DB::table("{$this->tableName}")
+        $result =  DB::table("{$this->tableName}")
+            ->whereNull('deleted_at')
             ->where("{$this->primaryKey}", $id)
             ->update($payload);
+
+        if (!$result) {
+            return $result;
+        }
+
+        return User::with(['role'])->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findById(string $id)

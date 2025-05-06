@@ -39,6 +39,9 @@ class UserController extends Controller
             $payload['name'] = $request->input('name');
         }
 
+        if ($request->has('image_id')) {
+            $payload['image_id'] = $request->input('image_id');
+        }
 
         if ($request->has('email')) {
             $payload['email'] = $request->input('email');
@@ -59,7 +62,7 @@ class UserController extends Controller
         return $payload;
     }
 
-    /** Fetch Client (Pagination) */
+    /** Fetch User (Pagination) */
     public function fetch(Request $request): JsonResponse
     {
         $filters = (object) [
@@ -70,7 +73,7 @@ class UserController extends Controller
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    /** Get Client By Id */
+    /** Get User By Id */
     public function findById(Request $request): JsonResponse
     {
         $id = $request->route("{$this->primaryKey}");
@@ -78,8 +81,7 @@ class UserController extends Controller
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    /** Create Client */
-    public function store(UserRequest $request): JsonResponse
+    public function uploadImage(UserRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
@@ -87,35 +89,60 @@ class UserController extends Controller
             'created_by' => $user->user_id,
         ]);
 
-
         if ($request->hasFile('photo')) {
             $payload->photo = $request->file('photo')->store("{$this->pathLocation}", 'public');
         }
+
+        $result = $this->service->uploadImage($payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    /** Create User */
+    public function store(UserRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'created_by' => $user->user_id,
+        ]);
 
         $result = $this->service->store($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    /** Update Client */
-    public function update(Request $request): JsonResponse
+
+    public function changeImage(UserRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
-        $payload = (object) array_merge($this->bodyValidation($request), [
+        $payload = (object) [
             'photo' => null,
             'updated_at' => Carbon::now(),
-            'updated_by' => $user->user_id,
-        ]);
+            'updated_by' => $user->user_id
+        ];
 
         if ($request->hasFile('photo')) {
             $payload->photo = $request->file('photo')->store("{$this->pathLocation}", 'public');
         }
 
+        $result = $this->service->changeImage($id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+    /** Update User */
+    public function update(Request $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
+        ]);
         $result = $this->service->update($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    /* Soft Delete Client */
+    /* Soft Delete User */
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);

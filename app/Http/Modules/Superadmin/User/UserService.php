@@ -2,6 +2,7 @@
 
 namespace App\Http\Modules\Superadmin\User;
 
+use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\Role;
@@ -80,9 +81,33 @@ class UserService
         }
     }
 
-    public function store(mixed $payload): LaravelResponseInterface
+
+    public function uploadImage(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
+        try {
+            $result = ImageStorageHelper::storeImage([
+                'image_path' => $payload->photo,
+                'created_by' => $payload->created_by
+            ], 'icon');
+
+            if (!$result->success) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+            } else {
+                DB::commit();
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->photo);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function store(mixed $payload): LaravelResponseInterface
+    {
         try {
             if (isset($payload->confirm_password)) {
                 unset($payload->confirm_password);
@@ -93,45 +118,51 @@ class UserService
             ]);
 
             if ($row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$payload->email})"]), $row);
+            }
+
+
+            $pathIcon = null;
+
+            if (isset($payload->image_id)) {
+                $row =  ImageStorageHelper::getImage($payload->image_id, 'photo');
+
+                if (!$row->success) {
+                    return $row;
+                }
+
+                $pathIcon =  $row->data->image_path;
+                unset($payload->image_id);
             }
 
             $payload->password = Hash::make($payload->password);
 
+            $mergePayload = array_merge((array) $payload, [
+                "icon" => $pathIcon
+            ]);
 
-            $result = $this->repository->insert((array) $payload);
+
+            $result = $this->repository->insert($mergePayload);
 
             if (!$result) {
-                DB::rollBack();
-                deleteFileInStorage($payload->photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.user.create'), $result);
             }
-
-            DB::commit();
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.user.create'), (object) [
                 "{$this->primaryKey}" => $result["{$this->primaryKey}"],
             ]);
         } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->photo);
             return sendErrorResponse($e);
         }
     }
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
-        $storageOldPath = null;
-        $hasPhoto = true;
-        DB::beginTransaction();
+
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->photo);
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
@@ -139,36 +170,63 @@ class UserService
                 unset($payload->password);
             }
 
-            if ($row->photo != null) {
-                $storageOldPath = $row->photo;
-            }
+            if (isset($payload->email)) {
+                $row = $this->repository->checkExisted($id, ["email" => $payload->email]);
 
-            if ($payload->photo == null) {
-                $hasPhoto = false;
-                unset($payload->photo);
+                if ($row) {
+                    return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$row->email})"]), $row);
+                }
             }
 
 
             $result = $this->repository->update($id, (array) $payload);
 
             if (!$result) {
-                DB::rollBack();
-                deleteFileInStorage($payload->photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.user.update'), $result);
             }
 
-            if ($hasPhoto == true) {
-                deleteFileInStorage($storageOldPath);
+            $result->photo = getFileUrl($result->photo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.update'), $result);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function changeImage(string $id, mixed $payload): LaravelResponseInterface
+    {
+        $storageOldPath = null;
+        DB::beginTransaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
-            DB::commit();
+            if ($row->photo != null) {
+                $storageOldPath = $row->photo;
+            }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.update'), (object) [
-                "{$this->primaryKey}" => $id,
-            ]);
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                DB::rollBack();
+                deleteFileInStorage($payload->photo);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
+            }
+
+            deleteFileInStorage($storageOldPath);
+
+            $result->photo = getFileUrl($result->photo);
+
+            DB::commit();
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), $result);
         } catch (Exception $e) {
             DB::rollBack();
-            deleteFileInStorage($payload->photo);
+            deleteFileInStorage($payload->icon);
             return sendErrorResponse($e);
         }
     }

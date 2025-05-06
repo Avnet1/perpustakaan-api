@@ -34,6 +34,17 @@ class UserRequest extends FormRequest
                     'password' => 'required|min:8',
                     'confirm_password' => 'required|min:8',
                 ];
+
+
+            case config('constants.route_name.superadmin.user.upload-photo'):
+                return [
+                    'photo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.user.change-photo'):
+                return [
+                    'photo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
             default:
                 return [];
                 break;
@@ -50,6 +61,10 @@ class UserRequest extends FormRequest
             'password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Password', 'number' => 8]),
             'confirm_password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Konfirmasi Ulang Password', 'number' => 8]),
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
+
+
+            'photo.required' =>  __('validation.required', ['attribute' => 'Data photo']),
+            'photo.image' =>  __('validation.image', ['attribute' => 'Photo']),
 
         ];
     }

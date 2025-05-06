@@ -59,8 +59,13 @@ Route::prefix('v1')->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/', [SA_UserController::class, 'fetch']);
                 Route::post('/', [SA_UserController::class, 'store'])->name(config('constants.route_name.superadmin.user.store'));
+
+                Route::post('/upload-photo', [SA_UserController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.user.upload-photo'));
+
+                Route::post('/change-photo/{user_id}', [SA_UserController::class, 'changeImage'])->name(config('constants.route_name.superadmin.user.change-photo'));
+
                 Route::get('/{user_id}', [SA_UserController::class, 'findById']);
-                Route::post('/{user_id}', [SA_UserController::class, 'update'])->name(config('constants.route_name.superadmin.user.update'));
+                Route::put('/{user_id}', [SA_UserController::class, 'update'])->name(config('constants.route_name.superadmin.user.update'));
                 Route::delete('/{user_id}', [SA_UserController::class, 'delete']);
             });
 

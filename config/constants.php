@@ -18,6 +18,8 @@ return [
             ],
             'user' => [
                 'store' => 'storeUserSuperadmin',
+                'upload-photo' => 'uploadPhotoUserSuperadmin',
+                'change-photo' => 'changePhotoUserSuperadmin',
                 'update' => 'updateUserSuperadmin',
             ],
             'module' => [

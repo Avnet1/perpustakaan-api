@@ -249,7 +249,7 @@ class AuthService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
-            $result = $this->repository->updateUser($id, (array) $payload);
+            $result = $this->repository->update($id, (array) $payload);
 
             if (!$result) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.update', ['attribute' => 'user']), $result);
@@ -261,9 +261,9 @@ class AuthService
                 }
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.update', ['attribute' => 'user']), (object) [
-                'user_id' => $id,
-            ]);
+            $result->photo = getFileUrl($result->photo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.update', ['attribute' => 'user']), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -282,6 +282,8 @@ class AuthService
                 deleteFileInStorage($payload->photo);
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.uploadImage', ["attribute" => "file photo"]), $result);
             }
+
+            $result->photo = getFileUrl($result->photo);
 
             DB::commit();
 
