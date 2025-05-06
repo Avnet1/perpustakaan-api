@@ -61,7 +61,11 @@ class SuperadminAuthRequest extends FormRequest
             case config('constants.route_name.superadmin.auth.update_profile'):
                 return [
                     'name' => 'required',
-                    'email' => 'required',
+                ];
+
+            case config('constants.route_name.superadmin.auth.upload_photo'):
+                return [
+                    'photo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
             default:
@@ -84,6 +88,10 @@ class SuperadminAuthRequest extends FormRequest
             'permission_code.required' =>  __('validation.required', ['attribute' => 'Token/Kode Permission']),
             'new_password.required' =>  __('validation.required', ['attribute' => 'Password Baru']),
             'confirm_password.required' => __('validation.required', ['attribute' => 'Konfirmasi Password Baru']),
+
+            'photo.required' => __('validation.required', ['attribute' => 'Photo']),
+
+            'photo.image' =>  __('validation.image', ['attribute' => 'Photo']),
 
         ];
     }

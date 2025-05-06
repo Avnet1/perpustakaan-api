@@ -14,6 +14,23 @@ class AuthRepository
             ->update($payload);
     }
 
+
+    public function update(string $id, array $payload)
+    {
+        $result = DB::table('users')
+            ->whereNull('deleted_at')
+            ->where('user_id', $id)
+            ->update($payload);
+
+        if ($result) {
+            return User::where('user_id', $id)->first();
+        }
+
+        return $result;
+    }
+
+
+
     public function findIdentity(mixed $condition)
     {
         return User::with(['role'])

@@ -5,6 +5,36 @@ use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
+
+if (!function_exists('queryCheckExisted')) {
+    function queryCheckExisted($query, $pkKey, $pkValue, $condition)
+    {
+        if (count($condition) > 0) {
+            $query->where(function ($q) use ($condition) {
+                $i = 0;
+                foreach ($condition as $key => $value) {
+                    $isFirst = $i === 0;
+
+                    if (is_array($value)) {
+                        $isFirst ? $q->whereIn($key, $value) : $q->orWhereIn($key, $value);
+                    } elseif (is_null($value)) {
+                        $isFirst ? $q->whereNull($key) : $q->orWhereNull($key);
+                    } elseif (strpos($value, '%') !== false) {
+                        $isFirst ? $q->where($key, 'ilike', $value) : $q->orWhere($key, 'ilike', $value);
+                    } else {
+                        $isFirst ? $q->where($key, '=', $value) : $q->orWhere($key, '=', $value);
+                    }
+
+                    $i++;
+                }
+            });
+        }
+
+        return $query->where($pkKey, '!=', $pkValue)->first();
+    }
+}
+
 
 
 if (!function_exists('executeEncrypt')) {

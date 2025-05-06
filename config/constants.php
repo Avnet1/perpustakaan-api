@@ -10,6 +10,7 @@ return [
                 'reset_password' => 'authResetPasswordSuperadmin',
                 'change_password' => 'authChangePasswordSuperadmin',
                 'update_profile' => 'authUpdateProfileSuperadmin',
+                'upload_photo' => 'authUploadPhotoProfileSuperadmin'
             ],
             'role' => [
                 'store' => 'storeRoleSuperadmin',
@@ -21,6 +22,8 @@ return [
             ],
             'module' => [
                 'store' => 'storeModuleSuperadmin',
+                'uploadIcon' => 'uploadIconModuleSuperadmin',
+                'changeIcon' => 'changeIconModuleSuperAdmin',
                 'update' => 'updateModuleSuperadmin',
             ],
             'menu' => [

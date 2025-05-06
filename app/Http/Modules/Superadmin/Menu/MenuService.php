@@ -61,63 +61,60 @@ class MenuService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
-        try {
-            $condition = [];
+        $condition = [];
 
-            if (isset($payload->nama_menu)) {
-                $condition['nama_menu'] = "%{$payload->nama_menu}%";
-            }
-
-            if (isset($payload->parent_id)) {
-                $condition['parent_id'] = $payload->parent_id;
-            }
-
-
-            $row = $this->repository->findByCondition($condition);
-
-            if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "menu"]), $row);
-            }
-
-
-            $row = $this->repository->findByCondition([
-                'urutan' => $payload->urutan,
-                'parent_id' => $payload->parent_id
-            ]);
-
-            if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
-            }
-
-            $pathIcon = null;
-
-            if (isset($payload->image_id)) {
-                $row = $this->repository->findImage($payload->image_id);
-
-                if ($row) {
-                    return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => "Image ID"]), $row);
-                }
-
-                $pathIcon = $row->image_path;
-            }
-
-
-            $mergePayload = array_merge((array) $payload, [
-                "icon" => $pathIcon
-            ]);
-
-            $result = $this->repository->insert($mergePayload);
-
-            if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.create'), $result);
-            }
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.create'), (object) [
-                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
-            ]);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        if (isset($payload->nama_menu)) {
+            $condition['nama_menu'] = "%{$payload->nama_menu}%";
         }
+
+        if (isset($payload->parent_id)) {
+            $condition['parent_id'] = $payload->parent_id;
+        }
+
+
+        $row = $this->repository->findByCondition($condition);
+
+        if ($row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "menu"]), $row);
+        }
+
+
+        // $row = $this->repository->findByCondition([
+        //     'urutan' => $payload->urutan,
+        //     'parent_id' => $payload->parent_id
+        // ]);
+
+        // if ($row) {
+        //     return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
+        // }
+
+        $pathIcon = null;
+
+        if (isset($payload->image_id)) {
+            $row =  ImageStorageHelper::getImage($payload->image_id, 'icon');
+
+            if (!$row->success) {
+                return $row;
+            }
+
+            $pathIcon =  $row->data->image_path;
+            unset($payload->image_id);
+        }
+
+
+        $mergePayload = array_merge((array) $payload, [
+            "icon" => $pathIcon
+        ]);
+
+        $result = $this->repository->insert($mergePayload);
+
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.create'), $result);
+        }
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.create'), (object) [
+            "{$this->primaryKey}" => $result["{$this->primaryKey}"],
+        ]);
     }
 
     public function delete(string $id, mixed $payload): LaravelResponseInterface

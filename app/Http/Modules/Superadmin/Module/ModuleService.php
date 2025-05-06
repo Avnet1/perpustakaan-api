@@ -2,6 +2,7 @@
 
 namespace App\Http\Modules\Superadmin\Module;
 
+use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Support\Facades\DB;
@@ -71,45 +72,24 @@ class ModuleService
         }
     }
 
-    public function store(mixed $payload): LaravelResponseInterface
+
+    public function uploadIcon(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
         try {
+            $result = ImageStorageHelper::storeImage([
+                'image_path' => $payload->icon,
+                'created_by' => $payload->created_by
+            ], 'icon');
 
-            $row = $this->repository->findByCondition([
-                'nama_modul' => "%{$payload->nama_modul}%",
-            ]);
-
-            if ($row) {
+            if (!$result->success) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama modul ({$payload->nama_modul})"]), $row);
+            } else {
+                DB::commit();
             }
 
-
-            $row = $this->repository->findByCondition([
-                'urutan' => $payload->urutan,
-            ]);
-
-            if ($row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
-            }
-
-            $result = $this->repository->insert((array) $payload);
-
-            if (!$result) {
-                DB::rollBack();
-                deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.create'), $result);
-            }
-
-            DB::commit();
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.create'), (object) [
-                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
-            ]);
+            return $result;
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->icon);
@@ -117,10 +97,61 @@ class ModuleService
         }
     }
 
-    public function update(string $id, mixed $payload): LaravelResponseInterface
+
+
+    public function store(mixed $payload): LaravelResponseInterface
+    {
+        $row = $this->repository->findByCondition([
+            'nama_modul' => "%{$payload->nama_modul}%",
+        ]);
+
+        if ($row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama modul ({$payload->nama_modul})"]), $row);
+        }
+
+
+        $row = $this->repository->findByCondition([
+            'urutan' => $payload->urutan,
+        ]);
+
+        if ($row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
+        }
+
+        $pathIcon = null;
+
+        if (isset($payload->image_id)) {
+            $row =  ImageStorageHelper::getImage($payload->image_id, 'icon');
+
+            if (!$row->success) {
+                return $row;
+            }
+
+            $pathIcon =  $row->data->image_path;
+            unset($payload->image_id);
+        }
+
+
+        $mergePayload = array_merge((array) $payload, [
+            "icon" => $pathIcon
+        ]);
+
+
+        $result = $this->repository->insert($mergePayload);
+
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.module.create'), $result);
+        }
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.module.create'), (object) [
+            "{$this->primaryKey}" => $result["{$this->primaryKey}"],
+        ]);
+    }
+
+
+    public function changeIcon(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
-        $hasIcon = true;
         DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
@@ -131,34 +162,9 @@ class ModuleService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
-
-            $row = $this->repository->checkExisted($id,  [
-                'nama_modul' => "%{$payload->nama_modul}%",
-            ]);
-
-            if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul}"]), $row);
-            }
-
-
-            $row = $this->repository->checkExisted($id,  [
-                'urutan' => $payload->urutan,
-            ]);
-
-            if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "No. Urut/Urutan {$payload->urutan}"]), $row);
-            }
-
-
             if ($row->icon != null) {
                 $storageOldPath = $row->icon;
             }
-
-            if ($payload->icon == null) {
-                $hasIcon = false;
-                unset($payload->icon);
-            }
-
 
             $result = $this->repository->update($id, (array) $payload);
 
@@ -168,18 +174,55 @@ class ModuleService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
             }
 
-            if ($hasIcon == true) {
-                deleteFileInStorage($storageOldPath);
-            }
+            deleteFileInStorage($storageOldPath);
 
             DB::commit();
-
             return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), (object) [
                 "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->icon);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function update(string $id, mixed $payload): LaravelResponseInterface
+    {
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+            }
+
+
+            $row = queryCheckExisted(
+                $this->repository->getQuery(),
+                "{$this->primaryKey}",
+                $id,
+                [
+                    'nama_modul' => "%{$payload->nama_modul}%",
+                    'urutan' => $payload->urutan
+                ]
+            );
+
+            if ($row) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul} atau No.urut {$payload->urutan}"]), $row);
+            }
+
+
+
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.module.update'), $result);
+            }
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), (object) [
+                "{$this->primaryKey}" => $id,
+            ]);
+        } catch (Exception $e) {
             return sendErrorResponse($e);
         }
     }

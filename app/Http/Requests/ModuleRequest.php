@@ -32,7 +32,16 @@ class ModuleRequest extends FormRequest
                     'nama_modul' => 'required',
                     'slug' => 'required',
                     'urutan' => 'required',
-                    'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.module.uploadIcon'):
+                return [
+                    'icon' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.module.changeIcon'):
+                return [
+                    'icon' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
             default:
@@ -48,6 +57,7 @@ class ModuleRequest extends FormRequest
             'nama_modul.required' =>  __('validation.required', ['attribute' => 'Data nama modul']),
             'slug.required' => __('validation.required', ['attribute' => 'Data slug']),
             'urutan.required' =>  __('validation.required', ['attribute' => 'Data urutan']),
+            'icon.required' =>  __('validation.required', ['attribute' => 'Data logo/icon']),
             'icon.image' =>  __('validation.image', ['attribute' => 'Logo/Icon modul']),
         ];
     }

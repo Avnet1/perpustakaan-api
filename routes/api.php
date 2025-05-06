@@ -41,7 +41,8 @@ Route::prefix('v1')->group(function () {
 
             Route::prefix('auth')->group(function () {
                 Route::get('/profile', [SA_AuthController::class, 'fetchProfile']);
-                Route::post('/profile', [SA_AuthController::class, 'updateProfile'])->name(config('constants.route_name.superadmin.auth.update_profile'));
+                Route::put('/profile', [SA_AuthController::class, 'updateProfile'])->name(config('constants.route_name.superadmin.auth.update_profile'));
+                Route::post('/profile/upload-photo', [SA_AuthController::class, 'uploadPhoto'])->name(config('constants.route_name.superadmin.auth.upload_photo'));
                 Route::post('/manual-change-password',  [SA_AuthController::class, 'manualChangePassword'])->name(config('constants.route_name.superadmin.auth.change_password'));
             });
 
@@ -67,8 +68,13 @@ Route::prefix('v1')->group(function () {
             Route::prefix('modules')->group(function () {
                 Route::get('/', [SA_ModuleController::class, 'fetch']);
                 Route::post('/', [SA_ModuleController::class, 'store'])->name(config('constants.route_name.superadmin.module.store'));
+
+                Route::post('/upload-icon', [SA_ModuleController::class, 'uploadIcon'])->name(config('constants.route_name.superadmin.module.uploadIcon'));
+
+                Route::post('/change-icon/{modul_id}', [SA_ModuleController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.module.changeIcon'));
+
                 Route::get('/{modul_id}', [SA_ModuleController::class, 'findById']);
-                Route::post('/{modul_id}', [SA_ModuleController::class, 'update'])->name(config('constants.route_name.superadmin.module.update'));
+                Route::put('/{modul_id}', [SA_ModuleController::class, 'update'])->name(config('constants.route_name.superadmin.module.update'));
                 Route::delete('/{modul_id}', [SA_ModuleController::class, 'delete']);
             });
 

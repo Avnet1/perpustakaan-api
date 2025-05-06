@@ -35,25 +35,18 @@ class ModuleRepository
             ->first();
     }
 
-
-    public function checkExisted(string $id, array $condition)
+    /**
+     * contoh penggunaan or
+     * $condition = [
+            'name' => 'Module A',
+            'or|code' => 'MOD-001',
+        ];
+     */
+    public function getQuery()
     {
-        $query = MasterModule::whereNull('deleted_at');
-
-        foreach ($condition as $key => $value) {
-            if (is_array($value)) {
-                $query->whereIn($key, $value);
-            } elseif (is_null($value)) {
-                $query->whereNull($key);
-            } elseif (strpos($value, '%') !== false) {
-                $query->where($key, 'ilike', $value);
-            } else {
-                $query->where($key, '=', $value);
-            }
-        }
-
-        return $query->where("{$this->primaryKey}", '!=', $id)->first();
+        return MasterModule::whereNull('deleted_at');
     }
+
 
     public function findByCondition(mixed $condition)
     {

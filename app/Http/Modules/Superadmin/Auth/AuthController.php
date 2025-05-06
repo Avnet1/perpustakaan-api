@@ -20,6 +20,21 @@ class AuthController extends Controller
         $this->service = $service;
     }
 
+    public function bodyValidation(Request $request): array
+    {
+        $payload = [];
+        if ($request->has('name')) {
+            $payload['name'] = $request->input('name');
+        }
+
+
+        if ($request->has('email')) {
+            $payload['email'] = $request->input('email');
+        }
+
+        return $payload;
+    }
+
     public function login(SuperadminAuthRequest $request): JsonResponse
     {
         $payload = (object) [
@@ -96,20 +111,31 @@ class AuthController extends Controller
     public function updateProfile(SuperadminAuthRequest $request): JsonResponse
     {
         $user = getUser($request);
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
+        ]);
+
+        $result = $this->service->updateProfile($user->user_id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    public function uploadPhoto(SuperadminAuthRequest $request): JsonResponse
+    {
+        $user = getUser($request);
 
         $payload = (object) [
-            "name" =>  $request->name,
-            "email" => $request->email,
-            "updated_at" => now(),
-            "updated_by" => $user->user_id,
-            "photo" => null
+            'photo' => null,
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
         ];
 
         if ($request->hasFile('photo')) {
-            $payload->photo = $request->file('photo')->store(self::$pathLocation, 'public');
+            $payload->photo = $request->file('photo')->store("{$this->pathLocation}", 'public');
         }
 
-        $result = $this->service->updateProfile($user->user_id, $payload);
+        $result = $this->service->uploadPhoto($user->user_id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }
