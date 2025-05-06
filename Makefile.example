@@ -33,9 +33,15 @@ app-dev-seed:
 app-dev-composer:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer install
 
-app-dev-setup:
+app-dev-storage-link:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan storage:link
+
+app-dev-setup:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer dump-autoload
+
+app-dev-key-generate:
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan key:generate
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan jwt:secret
 
 app-dev-clear:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:clear
