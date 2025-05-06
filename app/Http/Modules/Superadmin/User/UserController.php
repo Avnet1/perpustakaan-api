@@ -103,6 +103,7 @@ class UserController extends Controller
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
+            'created_at' => Carbon::now(),
             'created_by' => $user->user_id,
         ]);
 

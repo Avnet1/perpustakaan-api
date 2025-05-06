@@ -81,7 +81,7 @@ class User extends Authenticatable implements JWTSubject
         // Perform the insert operation
         $inserted = self::insert($data);
         if ($inserted) {
-            return self::where($pkString, $uuidString)->first();
+            return self::with(['role'])->where($pkString, $uuidString)->first();
         }
 
         return false;

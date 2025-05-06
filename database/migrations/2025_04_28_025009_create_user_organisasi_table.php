@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_provinsi', function (Blueprint $table) {
-            $table->uuid('provinsi_id')->primary();
-            $table->string('nama_provinsi')->nullable()->default(null);
-            $table->string('kode_provinsi')->nullable()->default(null);
-            $table->string('kode_dikti')->nullable()->default(null);
+        Schema::create('user_organisasi', function (Blueprint $table) {
+            $table->uuid('user_id')->primary();
+            $table->string('name');
+            $table->string('password');
+            $table->string('email')->nullable();
+            $table->string('remember_token', 100)->nullable();
             $table->timestamps();
             $table->softDeletes(); // deleted_at
             $table->uuid('created_by')->nullable();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_provinsi');
+        Schema::dropIfExists('user_organisasi');
     }
 };

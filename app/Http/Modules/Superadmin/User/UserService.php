@@ -108,52 +108,46 @@ class UserService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
-        try {
-            if (isset($payload->confirm_password)) {
-                unset($payload->confirm_password);
-            }
-
-            $row = $this->repository->findByCondition([
-                'email' => $payload->email,
-            ]);
-
-            if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$payload->email})"]), $row);
-            }
-
-
-            $pathIcon = null;
-
-            if (isset($payload->image_id)) {
-                $row =  ImageStorageHelper::getImage($payload->image_id, 'photo');
-
-                if (!$row->success) {
-                    return $row;
-                }
-
-                $pathIcon =  $row->data->image_path;
-                unset($payload->image_id);
-            }
-
-            $payload->password = Hash::make($payload->password);
-
-            $mergePayload = array_merge((array) $payload, [
-                "icon" => $pathIcon
-            ]);
-
-
-            $result = $this->repository->insert($mergePayload);
-
-            if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.user.create'), $result);
-            }
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.create'), (object) [
-                "{$this->primaryKey}" => $result["{$this->primaryKey}"],
-            ]);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        if (isset($payload->confirm_password)) {
+            unset($payload->confirm_password);
         }
+
+        $row = $this->repository->findByCondition([
+            'email' => $payload->email,
+        ]);
+
+        if ($row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$payload->email})"]), $row);
+        }
+
+
+        $pathIcon = null;
+
+        if (isset($payload->image_id)) {
+            $row =  ImageStorageHelper::getImage($payload->image_id, 'photo');
+
+            if (!$row->success) {
+                return $row;
+            }
+
+            $pathIcon =  $row->data->image_path;
+            unset($payload->image_id);
+        }
+
+        $payload->password = Hash::make($payload->password);
+
+        $mergePayload = array_merge((array) $payload, [
+            "photo" => $pathIcon
+        ]);
+
+        $result = $this->repository->insert($mergePayload);
+
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.user.create'), $result);
+        }
+
+        $result->photo = getFileUrl($result->photo);
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.user.create'), $result);
     }
 
     public function update(string $id, mixed $payload): LaravelResponseInterface

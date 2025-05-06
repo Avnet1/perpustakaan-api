@@ -97,51 +97,6 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{menu_id}', [SA_MenuController::class, 'delete']);
             });
 
-            /** Master Provinsi */
-            Route::prefix('provinces')->group(function () {
-                Route::get('/', [SA_ProvinceController::class, 'fetch']);
-                Route::post('/', [SA_ProvinceController::class, 'store'])->name(config('constants.route_name.superadmin.province.store'));
-                Route::get('/{provinsi_id}', [SA_ProvinceController::class, 'findById']);
-                Route::put('/{provinsi_id}', [SA_ProvinceController::class, 'update'])->name(config('constants.route_name.superadmin.province.update'));
-                Route::delete('/{provinsi_id}', [SA_ProvinceController::class, 'delete']);
-            });
-
-            /** Master Kabupaten Kota */
-            Route::prefix('regions')->group(function () {
-                Route::get('/', [SA_RegionController::class, 'fetch']);
-                Route::post('/', [SA_RegionController::class, 'store'])->name(config('constants.route_name.superadmin.region.store'));
-                Route::get('/{kabupaten_kota_id}', [SA_RegionController::class, 'findById']);
-                Route::put('/{kabupaten_kota_id}', [SA_RegionController::class, 'update'])->name(config('constants.route_name.superadmin.region.update'));
-                Route::delete('/{kabupaten_kota_id}', [SA_RegionController::class, 'delete']);
-            });
-
-            /** Master Kecamatan */
-            Route::prefix('sub-districts')->group(function () {
-                Route::get('/', [SA_SubdistrictController::class, 'fetch']);
-                Route::post('/', [SA_SubdistrictController::class, 'store'])->name(config('constants.route_name.superadmin.sub_district.store'));
-                Route::get('/{kecamatan_id}', [SA_SubdistrictController::class, 'findById']);
-                Route::put('/{kecamatan_id}', [SA_SubdistrictController::class, 'update'])->name(config('constants.route_name.superadmin.sub_district.update'));
-                Route::delete('/{kecamatan_id}', [SA_SubdistrictController::class, 'delete']);
-            });
-
-            /** Master Kelurahan */
-            Route::prefix('villages')->group(function () {
-                Route::get('/', [SA_VillageController::class, 'fetch']);
-                Route::post('/', [SA_VillageController::class, 'store'])->name(config('constants.route_name.superadmin.village.store'));
-                Route::get('/{kelurahan_id}', [SA_VillageController::class, 'findById']);
-                Route::put('/{kelurahan_id}', [SA_VillageController::class, 'update'])->name(config('constants.route_name.superadmin.village.update'));
-                Route::delete('/{kelurahan_id}', [SA_VillageController::class, 'delete']);
-            });
-
-
-            /** Master Jenjang */
-            Route::prefix('grades')->group(function () {
-                Route::get('/', [SA_GradeController::class, 'fetch']);
-                Route::post('/', [SA_GradeController::class, 'store'])->name(config('constants.route_name.superadmin.grade.store'));
-                Route::get('/{jenjang_id}', [SA_GradeController::class, 'findById']);
-                Route::put('/{jenjang_id}', [SA_GradeController::class, 'update'])->name(config('constants.route_name.superadmin.grade.update'));
-                Route::delete('/{jenjang_id}', [SA_GradeController::class, 'delete']);
-            });
 
             /** Master Identitas */
             Route::prefix('identity')->group(function () {

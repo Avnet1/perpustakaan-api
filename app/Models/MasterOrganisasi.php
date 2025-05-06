@@ -18,56 +18,63 @@ class MasterOrganisasi extends Model
 
     protected $fillable = [
         'organisasi_id',
-        'universitas_id',
-        'provinsi_id',
-        'kabupaten_kota_id',
-        'kecamatan_id',
-        'kelurahan_id',
-        'postal_code',
+        'kode_member',
+        'nama_organisasi',
+        'provinsi',
+        'kabupaten_kota',
+        'kecamatan',
+        'kelurahan_desa',
+        'kode_pos',
         'email',
-        'address',
+        'alamat',
         'logo',
         'domain_admin_url',
         'domain_website_url',
-        'license_code',
-        'end_active_at',
         'db_user',
         'db_pass',
         'db_name',
+        'password',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
 
-    public function client()
+    protected $hidden = [
+        'password',
+        'deleted_at',
+        'deleted_by',
+    ];
+
+    public static function getTableName()
     {
-        return $this->hasOne(Client::class, 'organisasi_id', 'organisasi_id');
+        return (new self())->getTable();
     }
 
-    public function universitas()
+    public static function getPrimaryKeyName()
     {
-        return $this->belongsTo(MasterUniversitas::class, 'universitas_id', 'universitas_id');
+        return (new self())->getKeyName();
     }
 
-    public function provinsi()
+    public static function store(array $payload)
     {
-        return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'provinsi_id');
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            'created_at' => now(),
+            'updated_at' => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::with(['role'])->where($pkString, $uuidString)->first();
+        }
+
+        return false;
     }
 
-    public function kabupatenKota()
-    {
-        return $this->belongsTo(MasterKabupatenKota::class, 'kabupaten_kota_id', 'kabupaten_kota_id');
-    }
-
-    public function kecamatan()
-    {
-        return $this->belongsTo(MasterKecamatan::class, 'kecamatan_id', 'kecamatan_id');
-    }
-
-    public function kelurahan()
-    {
-        return $this->belongsTo(MasterKelurahan::class, 'kelurahan_id', 'kelurahan_id');
-    }
 
     protected static function boot()
     {

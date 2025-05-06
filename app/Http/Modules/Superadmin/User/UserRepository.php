@@ -16,7 +16,7 @@ class UserRepository
         $this->tableName = User::getTableName();
     }
 
-    public function insert(mixed $payload)
+    public function insert(array $payload)
     {
         return User::store($payload);
     }

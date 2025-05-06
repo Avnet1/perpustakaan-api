@@ -15,9 +15,9 @@ class UserClient extends Authenticatable implements JWTSubject
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
-    protected $table = 'user_client';
+    protected $table = 'user_organisasi';
 
-    protected $primaryKey = 'user_client_id';
+    protected $primaryKey = 'user_id';
 
     public $incrementing = false;
 
@@ -28,11 +28,11 @@ class UserClient extends Authenticatable implements JWTSubject
      * @var list<string>
      */
     protected $fillable = [
-        'user_client_id',
+        'user_id',
         'name',
-        'username',
         'password',
         'email',
+        'remember_token',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -44,7 +44,10 @@ class UserClient extends Authenticatable implements JWTSubject
      * @var list<string>
      */
     protected $hidden = [
+        'remember_token',
         'password',
+        'deleted_at',
+        'deleted_by'
     ];
 
     /**
@@ -59,26 +62,51 @@ class UserClient extends Authenticatable implements JWTSubject
         ];
     }
 
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
+    public static function getPrimaryKeyName()
+    {
+        return (new self())->getKeyName();
+    }
+
+    public static function store(array $payload)
+    {
+        $pkString = self::getPrimaryKeyName();
+        $uuidString = (string) Str::uuid();
+
+        $data = array_merge([
+            "{$pkString}" => $uuidString,
+            'created_at' => now(),
+            'updated_at' => null,
+        ], $payload);
+
+        // Perform the insert operation
+        $inserted = self::insert($data);
+        if ($inserted) {
+            return self::with(['organisasi'])->where($pkString, $uuidString)->first();
+        }
+
+        return false;
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->user_client_id)) {
-                $model->user_client_id = (string) Str::uuid();
+            if (empty($model->user_id)) {
+                $model->user_id = (string) Str::uuid();
             }
         });
     }
 
 
-    public function client()
+    public function organisasi()
     {
-        return $this->hasOne(Client::class, 'user_client_id', 'user_client_id');
-    }
-
-    public function anggota()
-    {
-        return $this->hasOne(MasterTipeKeanggotaan::class, 'user_client_id', 'user_client_id');
+        return $this->hasOne(MasterOrganisasi::class, 'user_id', 'user_id');
     }
 
     /**
