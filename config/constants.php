@@ -24,9 +24,9 @@ return [
                 'update' => 'updateModuleSuperadmin',
             ],
             'menu' => [
-                'storeMenu' => 'storeMenuSuperadmin',
-                'createIconMenu' => 'storeIconMenuSuperadmin',
-                'updateIconMenu' => 'updateIconMenuSuperAdmin',
+                'store' => 'storeMenuSuperadmin',
+                'uploadIcon' => 'uploadIconMenuSuperadmin',
+                'changeIcon' => 'changeIconMenuSuperAdmin',
                 'update' => 'updateMenuSuperadmin',
             ],
             'province' => [

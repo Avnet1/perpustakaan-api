@@ -21,7 +21,10 @@ return [
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
     'custom' => [
         'success' => [
-            'default' => [],
+            'default' => [
+                'uploadImage' => 'Upload :attribute berhasil',
+                'findImage' => 'Data :attribut berhasil ditemukan'
+            ],
             'role' => [
                 'create' => 'Data role berhasil ditambahkan',
                 'fetch' => 'Tarik data role berhasil',
@@ -136,7 +139,8 @@ return [
                 'exists' => 'Data :attribute sudah digunakan',
                 'minCharacter' => 'Jumlah karakter :attribute minimal adalah :number karakter',
                 'notFound' => 'Data :attribute tidak ditemukan',
-                'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem'
+                'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem',
+                'uploadImage' => 'Upload :attribute gagal'
             ],
             'role' => [
                 'create' => 'Data role gagal ditambahkan',

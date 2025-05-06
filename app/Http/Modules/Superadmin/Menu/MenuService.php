@@ -2,6 +2,7 @@
 
 namespace App\Http\Modules\Superadmin\Menu;
 
+use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Support\Facades\DB;
@@ -34,26 +35,23 @@ class MenuService
         }
     }
 
-    public function storeIconMenu(mixed $payload): LaravelResponseInterface
+    public function uploadIcon(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
         try {
-            $result = $this->repository->insert([
+            $result = ImageStorageHelper::storeImage([
                 'image_path' => $payload->icon,
                 'created_by' => $payload->created_by
-            ]);
+            ], 'icon');
 
-            if (!$result) {
+            if (!$result->success) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.menu.upload-icon'), $result);
+            } else {
+                DB::commit();
             }
 
-            DB::commit();
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.upload-icon'), (object) [
-                "image_id" => $result["image_id"],
-            ]);
+            return $result;
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->icon);
@@ -64,13 +62,21 @@ class MenuService
     public function store(mixed $payload): LaravelResponseInterface
     {
         try {
+            $condition = [];
 
-            $row = $this->repository->findByCondition([
-                'nama_menu' => "%{$payload->nama_menu}%",
-            ]);
+            if (isset($payload->nama_menu)) {
+                $condition['nama_menu'] = "%{$payload->nama_menu}%";
+            }
+
+            if (isset($payload->parent_id)) {
+                $condition['parent_id'] = $payload->parent_id;
+            }
+
+
+            $row = $this->repository->findByCondition($condition);
 
             if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Nama menu ({$payload->nama_menu})"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "menu"]), $row);
             }
 
 
@@ -133,7 +139,7 @@ class MenuService
         }
     }
 
-    public function updateIconMenu(string $id, mixed $payload): LaravelResponseInterface
+    public function changeIcon(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
         DB::beginTransaction();

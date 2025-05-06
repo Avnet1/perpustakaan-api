@@ -64,7 +64,7 @@ class MenuController extends Controller
     }
 
     /** Create Menu */
-    public function storeIconMenu(MenuRequest $request): JsonResponse
+    public function uploadIcon(MenuRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
@@ -76,7 +76,7 @@ class MenuController extends Controller
             $payload->icon = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
-        $result = $this->service->storeIconMenu($payload);
+        $result = $this->service->uploadIcon($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -91,7 +91,7 @@ class MenuController extends Controller
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    public function updateIconMenu(MenuRequest $request): JsonResponse
+    public function changeIcon(MenuRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
@@ -105,7 +105,7 @@ class MenuController extends Controller
             $payload->icon = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
-        $result = $this->service->updateIconMenu($id, $payload);
+        $result = $this->service->changeIcon($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 

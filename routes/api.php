@@ -75,11 +75,11 @@ Route::prefix('v1')->group(function () {
 
             /** Master Menu  */
             Route::prefix('menu')->group(function () {
-                Route::post('/', [SA_MenuController::class, 'store'])->name(config('constants.route_name.superadmin.menu.storeMenu'));
+                Route::post('/', [SA_MenuController::class, 'store'])->name(config('constants.route_name.superadmin.menu.store'));
 
-                Route::post('/upload-icon', [SA_MenuController::class, 'storeIconMenu'])->name(config('constants.route_name.superadmin.menu.createIconMenu'));
+                Route::post('/upload-icon', [SA_MenuController::class, 'uploadIcon'])->name(config('constants.route_name.superadmin.menu.uploadIcon'));
 
-                Route::post('/change-icon/{menu_id}', [SA_MenuController::class, 'updateIconMenu'])->name(config('constants.route_name.superadmin.menu.updateIconMenu'));
+                Route::post('/change-icon/{menu_id}', [SA_MenuController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.menu.changeIcon'));
 
                 Route::put('/{menu_id}', [SA_MenuController::class, 'update'])->name(config('constants.route_name.superadmin.menu.update'));
                 Route::get('/{menu_id}', [SA_MenuController::class, 'findById']);

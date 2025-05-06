@@ -27,7 +27,7 @@ class MenuRequest extends FormRequest
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case config('constants.route_name.superadmin.menu.storeMenu'):
+            case config('constants.route_name.superadmin.menu.store'):
                 return [
                     'modul_id' => 'required',
                     'nama_modul' => 'required',
@@ -35,12 +35,12 @@ class MenuRequest extends FormRequest
                     'urutan' => 'required',
                 ];
 
-            case config('constants.route_name.superadmin.menu.createIconMenu'):
+            case config('constants.route_name.superadmin.menu.uploadIcon'):
                 return [
                     'icon' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
-            case config('constants.route_name.superadmin.menu.updateIconMenu'):
+            case config('constants.route_name.superadmin.menu.changeIcon'):
                 return [
                     'icon' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
