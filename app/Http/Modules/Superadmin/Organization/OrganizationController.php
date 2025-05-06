@@ -26,37 +26,41 @@ class OrganizationController extends Controller
     {
         $payload = [];
 
-        if ($request->has('universitas_id')) {
-            $payload['universitas_id'] = $request->input('universitas_id');
+        if ($request->has('kode_member')) {
+            $payload['kode_member'] = $request->input('kode_member');
         }
 
-        if ($request->has('provinsi_id')) {
-            $payload['provinsi_id'] = $request->input('provinsi_id');
+        if ($request->has('nama_organisasi')) {
+            $payload['nama_organisasi'] = $request->input('nama_organisasi');
         }
 
-        if ($request->has('kabupaten_kota_id')) {
-            $payload['kabupaten_kota_id'] = $request->input('kabupaten_kota_id');
+        if ($request->has('provinsi')) {
+            $payload['provinsi'] = $request->input('provinsi');
         }
 
-        if ($request->has('kecamatan_id')) {
-            $payload['kecamatan_id'] = $request->input('kecamatan_id');
+        if ($request->has('kabupaten_kota')) {
+            $payload['kabupaten_kota'] = $request->input('kabupaten_kota');
         }
 
 
-        if ($request->has('kelurahan_id')) {
-            $payload['kelurahan_id'] = $request->input('kelurahan_id');
+        if ($request->has('kecamatan')) {
+            $payload['kecamatan'] = $request->input('kecamatan');
         }
 
-        if ($request->has('postal_code')) {
-            $payload['postal_code'] = $request->input('postal_code');
+        if ($request->has('kelurahan_desa')) {
+            $payload['kelurahan_desa'] = $request->input('kelurahan_desa');
+        }
+
+        if ($request->has('kode_pos')) {
+            $payload['kode_pos'] = $request->input('kode_pos');
         }
 
         if ($request->has('email')) {
             $payload['email'] = $request->input('email');
         }
 
-        if ($request->has('address')) {
-            $payload['address'] = $request->input('address');
+        if ($request->has('alamat')) {
+            $payload['alamat'] = $request->input('alamat');
         }
 
         if ($request->has('domain_admin_url')) {
@@ -67,11 +71,13 @@ class OrganizationController extends Controller
             $payload['domain_website_url'] = $request->input('domain_website_url');
         }
 
-        if ($request->has('end_active_at')) {
-            $payload['end_active_at'] = $request->input('end_active_at');
+        if ($request->has('password')) {
+            $payload['password'] = $request->input('password');
         }
 
-
+        if ($request->has('status')) {
+            $payload['status'] = $request->input('status');
+        }
         return $payload;
     }
 

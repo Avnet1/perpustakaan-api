@@ -121,6 +121,11 @@ Route::prefix('v1')->group(function () {
             /** Master Organisasi */
             Route::prefix('organizations')->group(function () {
                 Route::get('/', [SA_OrganizationController::class, 'fetch']);
+
+                Route::post('/upload-logo', [SA_OrganizationController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.organization.upload-logo'));
+
+                Route::post('/change-logo/{organisasi_id}', [SA_MenuController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.organization.change-logo'));
+
                 Route::put('/{organisasi_id}', [SA_OrganizationController::class, 'update'])->name(config('constants.route_name.superadmin.organization.update'));
                 Route::post('/info', [SA_OrganizationController::class, 'storeInfo'])->name(config('constants.route_name.superadmin.organization.storeInfo'));
                 Route::put('/account/{organisasi_id}', [SA_OrganizationController::class, 'storeAccount'])->name(config('constants.route_name.superadmin.organization.storeAccount'));

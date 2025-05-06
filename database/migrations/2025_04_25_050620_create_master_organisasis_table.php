@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable()->default(null);
             $table->text('domain_admin_url')->nullable()->default(null);
             $table->text('domain_website_url')->nullable()->default(null);
+            $table->boolean('status')->nullable()->default(false);
             $table->string('db_user')->default('admin');
             $table->string('db_pass')->default(null);
             $table->string('db_name')->default('db_master');

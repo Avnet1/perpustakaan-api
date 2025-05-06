@@ -23,6 +23,9 @@ class IdentityService
     {
         try {
             $result = MasterIdentitas::whereNull('deleted_at')->first();
+
+            $result->photo = getFileUrl($result->photo);
+
             return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.fetch'), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -32,13 +35,15 @@ class IdentityService
     public function findById(string $id): LaravelResponseInterface
     {
         try {
-            $row = $this->repository->findById($id);
+            $result = $this->repository->findById($id);
 
-            if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+            if (!$result) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.find'), $row);
+            $result->photo = getFileUrl($result->photo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.find'), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
