@@ -24,7 +24,7 @@ class TokenValidateMiddleware
             return ResponseHelper::sendResponseJson(false, 401, __('validation.custom.error.auth.tokenInvalid'), $e);
         }
 
-        \setUser($request, $user);
+        setUser($request, $user);
         return $next($request);
     }
 }
