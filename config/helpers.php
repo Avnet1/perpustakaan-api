@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
+if (!function_exists('getFileUrl')) {
+    function getFileUrl($item)
+    {
+        return asset('storage/' . $item);
+    }
+}
+
 if (!function_exists('queryCheckExisted')) {
     function queryCheckExisted($query, $pkKey, $pkValue, $condition)
     {

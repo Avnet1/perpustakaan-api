@@ -229,6 +229,10 @@ class AuthService
         try {
             $result = $this->repository->findById($id);
 
+            if ($result->photo != null) {
+                $result->photo = getFileUrl($result->photo);
+            }
+
             return new LaravelResponseContract(true, 200, __('validation.custom.success.auth.fetch', ['attribute' => 'profil']), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);

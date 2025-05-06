@@ -13,11 +13,12 @@ class AuthController extends Controller
 {
 
     protected $service;
-    public static $pathLocation = 'user/photo';
+    private $pathLocation;
 
     public function __construct(AuthService $service)
     {
         $this->service = $service;
+        $this->pathLocation  = 'user/photo';
     }
 
     public function bodyValidation(Request $request): array
