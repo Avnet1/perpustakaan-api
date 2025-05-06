@@ -6,41 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class MasterOrganisasi extends Model
+class OrganizationModuleAccess extends Model
 {
 
     use SoftDeletes;
 
-    protected $table = 'master_organisasi';
-    protected $primaryKey = 'organisasi_id';
+    protected $table = 'organization_module_access';
+    protected $primaryKey = 'modul_access_id';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
         'organisasi_id',
-        'kode_member',
-        'nama_organisasi',
-        'provinsi',
-        'kabupaten_kota',
-        'kecamatan',
-        'kelurahan_desa',
-        'kode_pos',
-        'email',
-        'alamat',
-        'logo',
-        'domain_admin_url',
-        'domain_website_url',
-        'db_user',
-        'db_pass',
-        'db_name',
-        'password',
+        'modul_id',
+        'start_service',
+        'end_service',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
 
+
     protected $hidden = [
-        'password',
         'deleted_at',
         'deleted_by',
     ];
@@ -81,8 +68,8 @@ class MasterOrganisasi extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->organisasi_id)) {
-                $model->organisasi_id = (string) Str::uuid();
+            if (empty($model->modul_access_id)) {
+                $model->modul_access_id = (string) Str::uuid();
             }
         });
     }

@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Log;
 if (!function_exists('getFileUrl')) {
     function getFileUrl($item)
     {
-        return asset('storage/' . $item);
+        if ($item != null) {
+            return asset('storage/' . $item);
+        }
+
+        return $item;
     }
 }
 
 if (!function_exists('queryCheckExisted')) {
-    function queryCheckExisted($query, $pkKey, $pkValue, $condition)
+    function queryCheckExisted($query, $condition, $pkKey = null, $pkValue = null)
     {
         if (count($condition) > 0) {
             $query->where(function ($q) use ($condition) {
@@ -36,6 +40,10 @@ if (!function_exists('queryCheckExisted')) {
                     $i++;
                 }
             });
+        }
+
+        if ($pkKey == null) {
+            return $query->first();
         }
 
         return $query->where($pkKey, '!=', $pkValue)->first();

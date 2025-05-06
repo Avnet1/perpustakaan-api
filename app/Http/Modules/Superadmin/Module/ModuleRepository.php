@@ -35,13 +35,6 @@ class ModuleRepository
             ->first();
     }
 
-    /**
-     * contoh penggunaan or
-     * $condition = [
-            'name' => 'Module A',
-            'or|code' => 'MOD-001',
-        ];
-     */
     public function getQuery()
     {
         return MasterModule::whereNull('deleted_at');

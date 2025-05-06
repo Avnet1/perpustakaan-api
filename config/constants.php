@@ -63,9 +63,13 @@ return [
                 'update' => 'updateSosmedSuperadmin',
             ],
             'organization' => [
-                'storeInfo' => 'storeInfoOrganizationSuperadmin',
-                'storeAccount' => 'storeAccountOrganizationSuperadmin',
+                'store-info' => 'storeInfoOrganizationSuperadmin',
+                'store-account' => 'storeAccountOrganizationSuperadmin',
+                'change-image' => 'changeImageOrganizationSuperadmin',
+                'upload-image' => 'uploadImageOrganizationSuperadmin',
                 'update' => 'updateOrganizationSuperadmin',
+                'approve' => 'approveOrganizationSuperadmin',
+                'assign-module' => 'assignModuleToOrganizationSuperadmin'
             ],
 
             'client' => [
@@ -80,6 +84,7 @@ return [
     'path_image' => [
         "module" => 'module/icon',
         "menu" => 'menu/icon',
-        "user" => 'user/photo'
+        "user" => 'user/photo',
+        "organization" => 'organization/logo'
     ]
 ];

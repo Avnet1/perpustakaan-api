@@ -26,22 +26,47 @@ class OrganizationRequest extends FormRequest
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case config('constants.route_name.superadmin.organization.storeInfo'):
+            case config('constants.route_name.superadmin.organization.upload-image'):
                 return [
-                    'universitas_id' => 'required',
-                    'provinsi_id' => 'required',
-                    'kabupaten_kota_id' => 'required',
-                    'kecamatan_id' => 'required',
-                    'kelurahan_id' => 'required',
-                    'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
-            case config('constants.route_name.superadmin.organization.storeAccount'):
+            case config('constants.route_name.superadmin.organization.store-info'):
                 return [
-                    'email' => 'required',
+                    'kode_member' => 'required|unique:master_organisasi,kode_member',
+                    'nama_organisasi' => 'required',
+                    'provinsi' => 'required',
+                    'kabupaten_kota' => 'required',
+                    'kecamatan' => 'required',
+                    'kelurahan_desa' => 'required',
+                    'kode_pos' => 'required',
+                    'alamat' => 'required',
+                ];
+
+            case config('constants.route_name.superadmin.organization.change-image'):
+                return [
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.organization.update'):
+                return [
+                    'kode_member' => 'unique:master_organisasi,kode_member,except,organisasi_id',
+                ];
+
+            case config('constants.route_name.superadmin.organization.store-account'):
+                return [
+                    'email' => 'required|unique:master_organisasi,email',
                     'domain_admin_url' => 'required',
                     'domain_website_url' => 'required',
+                    'password' => 'required',
                 ];
+
+            case config('constants.route_name.superadmin.organization.assign-module'):
+                return [
+                    'list_modules' => 'required',
+                    'status' => 'required',
+                ];
+
 
             default:
                 return [];
@@ -52,15 +77,35 @@ class OrganizationRequest extends FormRequest
     public function messages()
     {
         return [
-            'universitas_id.required' =>  __('validation.required', ['attribute' => 'Data Universitas']),
-            'provinsi_id.required' => __('validation.required', ['attribute' => 'Data Provinsi']),
-            'kabupaten_kota_id.required' =>  __('validation.required', ['attribute' => 'Data Kabupaten/Kota']),
-            'kecamatan_id.required' => __('validation.required', ['attribute' => 'Data Kecamatan']),
-            'kelurahan_id.required' =>  __('validation.required', ['attribute' => 'Data Kelurahna']),
-            'email.required' => __('validation.required', ['attribute' => 'Data Email']),
-            'domain_admin_url.required' =>  __('validation.required', ['attribute' => 'Data URL Admin Perpustakaan']),
-            'domain_website_url.required' => __('validation.required', ['attribute' => 'Data URL Website Perpustakaan']),
-            'logo.image' =>  __('validation.image', ['attribute' => 'Logo Organisasi']),
+            'kode_member.required' =>  __('validation.required', ['attribute' => 'Kode member']),
+
+            'nama_organisasi.required' => __('validation.required', ['attribute' => 'Nama organisasi']),
+
+            'provinsi.required' =>  __('validation.required', ['attribute' => 'Provinsi']),
+
+            'kabupaten_kota.required' => __('validation.required', ['attribute' => 'Kabupaten/Kota']),
+
+            'kecamatan.required' =>  __('validation.required', ['attribute' => 'Kecamatan']),
+
+            'kelurahan_desa.required' => __('validation.required', ['attribute' => 'Kelurahan/Desa']),
+
+            'kode_pos.required' =>  __('validation.required', ['attribute' => 'Kode Pos']),
+
+
+            'alamat.required' => __('validation.required', ['attribute' => 'Alamat']),
+
+
+            'email.required' =>  __('validation.required', ['attribute' => 'Email']),
+
+
+            'password.required' => __('validation.required', ['attribute' => 'Password']),
+
+            'domain_admin_url.required' => __('validation.required', ['attribute' => 'Domain admin URL']),
+
+            'domain_website_url.required' => __('validation.required', ['attribute' => 'Website URL']),
+
+            'logo.required' =>  __('validation.required', ['attribute' => 'Logo']),
+            'logo.image' =>  __('validation.image', ['attribute' => 'Logo']),
         ];
     }
 }

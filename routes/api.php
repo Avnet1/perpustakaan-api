@@ -122,25 +122,24 @@ Route::prefix('v1')->group(function () {
             Route::prefix('organizations')->group(function () {
                 Route::get('/', [SA_OrganizationController::class, 'fetch']);
 
-                Route::post('/upload-logo', [SA_OrganizationController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.organization.upload-logo'));
+                Route::post('/upload-logo', [SA_OrganizationController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.organization.upload-image'));
 
-                Route::post('/change-logo/{organisasi_id}', [SA_MenuController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.organization.change-logo'));
+                Route::post('/info', [SA_OrganizationController::class, 'storeInfo'])->name(config('constants.route_name.superadmin.organization.store-info'));
+
+                Route::post('/change-logo/{organisasi_id}', [SA_MenuController::class, 'changeImage'])->name(config('constants.route_name.superadmin.organization.change-image'));
+
 
                 Route::put('/{organisasi_id}', [SA_OrganizationController::class, 'update'])->name(config('constants.route_name.superadmin.organization.update'));
-                Route::post('/info', [SA_OrganizationController::class, 'storeInfo'])->name(config('constants.route_name.superadmin.organization.storeInfo'));
-                Route::put('/account/{organisasi_id}', [SA_OrganizationController::class, 'storeAccount'])->name(config('constants.route_name.superadmin.organization.storeAccount'));
-                Route::get('/{organisasi_id}', [SA_OrganizationController::class, 'findById']);
-                Route::delete('/{organisasi_id}', [SA_OrganizationController::class, 'delete']);
-            });
 
-            /** Master Client */
-            Route::prefix('clients')->group(function () {
-                Route::get('/', [SA_ClientController::class, 'fetch']);
-                Route::post('/info', [SA_ClientController::class, 'storeInfo'])->name(config('constants.route_name.superadmin.client.storeInfo'));
-                Route::put('/account/{client_id}', [SA_ClientController::class, 'storeAccount'])->name(config('constants.route_name.superadmin.client.storeAccount'));
-                Route::get('/{client_id}', [SA_ClientController::class, 'findById']);
-                Route::put('/{client_id}', [SA_ClientController::class, 'update'])->name(config('constants.route_name.superadmin.client.update'));
-                Route::delete('/{client_id}', [SA_ClientController::class, 'delete']);
+                Route::put('/account/{organisasi_id}', [SA_OrganizationController::class, 'storeAccount'])->name(config('constants.route_name.superadmin.organization.store-account'));
+
+                Route::get('/{organisasi_id}', [SA_OrganizationController::class, 'findById']);
+
+                Route::get('/approved/{organisasi_id}', [SA_OrganizationController::class, 'approve']);
+
+                Route::put('/assign-to-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
+
+                Route::delete('/{organisasi_id}', [SA_OrganizationController::class, 'delete']);
             });
         });
     });

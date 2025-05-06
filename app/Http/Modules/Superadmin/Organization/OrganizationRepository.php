@@ -8,9 +8,37 @@ use Illuminate\Support\Facades\Log;
 
 class OrganizationRepository
 {
-    public function insert(mixed $payload)
+    private $primaryKey;
+    private $tableName;
+
+    public function __construct()
     {
-        return MasterOrganisasi::create($payload);
+        $this->primaryKey = MasterOrganisasi::getPrimaryKeyName();
+        $this->tableName = MasterOrganisasi::getTableName();
+    }
+
+    public function getQuery()
+    {
+        return MasterOrganisasi::whereNull('deleted_at');
+    }
+
+    public function insert(array $payload)
+    {
+        return MasterOrganisasi::store($payload);
+    }
+
+    public function update(string $id, array $payload)
+    {
+        $result = DB::table("{$this->tableName}")
+            ->whereNull('deleted_at')
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+
+        if (!$result) {
+            return $result;
+        }
+
+        return MasterOrganisasi::where("{$this->primaryKey}", $id)->first();
     }
 
     public function findById(string $id)
@@ -20,9 +48,7 @@ class OrganizationRepository
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterOrganisasi::with([
-            'universitas'
-        ])->query()->whereNull('deleted_at');
+        $query = MasterOrganisasi::query()->whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);

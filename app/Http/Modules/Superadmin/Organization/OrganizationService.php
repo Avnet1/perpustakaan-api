@@ -2,62 +2,44 @@
 
 namespace App\Http\Modules\Superadmin\Organization;
 
+use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterOrganisasi;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 
 class OrganizationService
 {
+    private $primaryKey;
     protected $repository;
 
     public function __construct(OrganizationRepository $repository)
     {
         $this->repository = $repository;
+        $this->primaryKey = MasterOrganisasi::getPrimaryKeyName();
     }
 
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         try {
-            $sqlQuery = MasterOrganisasi::with([
-                'universitas' => function ($q) {
-                    $q->with(['jenisUniversitas'])->select('universitas_id', 'nama_universitas', 'singkatan', 'jenisUniversitas.nama_jenis');
-                },
-                'provinsi' => function ($q) {
-                    $q->select('provinsi_id', 'nama_provinsi', 'kode_provinsi', 'kode_dikti');
-                },
-                'kabupatenKota' => function ($q) {
-                    $q->select('kabupaten_kota_id', 'nama_kabupaten_kota', 'status_administrasi', 'kode_kabupaten_kota', 'kode_dikti');
-                },
-                'kecamatan' => function ($q) {
-                    $q->select(
-                        'kecamatan_id',
-                        'nama_kecamatan',
-                        'kode_kecamatan',
-                        'kode_dikti'
-                    );
-                },
-                'kelurahan' => function ($q) {
-                    $q->select('kelurahan_id', 'nama_kelurahan',  'kode_kelurahan', 'kode_dikti');
-                },
-
-            ])->whereNull('deleted_at');
+            $sqlQuery = MasterOrganisasi::whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("universitas.nama_universitas", "ilike", "%{$search}%")
-                        ->orWhere("provinsi.nama_provinsi", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kabupatenKota.nama_kabupaten_kota", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kecamatan.nama_kecamatan", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kelurahan.nama_kelurahan", "ilike", '%' . "%{$search}%")
-                        ->orWhere("postal_code", "ilike", '%' . "%{$search}%")
-                        ->orWhere("email", "ilike", '%' . "%{$search}%")
-                        ->orWhere("address", "ilike", '%' . "%{$search}%");
+                        ->where("kode_member", "ilike", "%{$search}%")
+                        ->orWhere("nama_organisasi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("provinsi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kabupaten_kota", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kecamatan", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kelurahan_desa", "ilike", '%' . "%{$search}%")
+                        ->orWhere("alamat", "ilike", '%' . "%{$search}%")
+                        ->orWhere("email", "ilike", '%' . "%{$search}%");
                 });
             }
 
@@ -97,32 +79,113 @@ class OrganizationService
         }
     }
 
-    public function storeInfo(mixed $payload): LaravelResponseInterface
+    public function uploadImage(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
         try {
-            $row = $this->repository->findByCondition([
-                'universitas_id' => $payload->client_code,
-            ]);
+            $result = ImageStorageHelper::storeImage([
+                'image_path' => $payload->logo,
+                'created_by' => $payload->created_by
+            ], 'logo');
 
-            if ($row) {
+            if (!$result->success) {
                 DB::rollBack();
                 deleteFileInStorage($payload->logo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Organisasi ({$row->universitas->nama_universitas})"]), $row);
+            } else {
+                DB::commit();
             }
 
-            $result = $this->repository->insert($payload);
+            return $result;
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->logo);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function storeInfo(mixed $payload): LaravelResponseInterface
+    {
+        try {
+
+            $row = queryCheckExisted(
+                $this->repository->getQuery(),
+                [
+                    'kode_member' => $payload->kode_member,
+                    'nama_organisasi' => "%{$payload->kode_member}%",
+                ]
+            );
+
+            if ($row) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Member ({$payload->kode_member}) atau Nama organisasi {$payload->kode_member}"]), $row);
+            }
+
+            $pathFile = null;
+
+            if (isset($payload->image_id)) {
+                $row =  ImageStorageHelper::getImage($payload->image_id, 'logo');
+
+                if (!$row->success) {
+                    return $row;
+                }
+
+                $pathFile =  $row->data->image_path;
+                unset($payload->image_id);
+            }
+
+
+            $mergePayload = array_merge((array) $payload, [
+                "logo" => $pathFile
+            ]);
+
+
+
+            $result = $this->repository->insert($mergePayload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.create'), $result);
+            }
+
+            $result->logo = getFileUrl($result->logo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.create'), $result);
+        } catch (Exception $e) {
+            DB::rollBack();
+            deleteFileInStorage($payload->logo);
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function changeImage(string $id, mixed $payload): LaravelResponseInterface
+    {
+        $storageOldPath = null;
+        DB::beginTransaction();
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                DB::rollBack();
+                deleteFileInStorage($payload->logo);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Organisasi']), $row);
+            }
+
+            if ($row->logo != null) {
+                $storageOldPath = $row->logo;
+            }
+
+            $result = $this->repository->update($id, (array) $payload);
 
             if (!$result) {
                 DB::rollBack();
                 deleteFileInStorage($payload->logo);
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.create'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.update'), $result);
             }
 
+            deleteFileInStorage($storageOldPath);
+
+            $result->logo = getFileUrl($result->logo);
+
             DB::commit();
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.create'), (object) [
-                'id' => $result->organisasi_id,
-            ]);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), $result);
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->logo);
@@ -132,24 +195,42 @@ class OrganizationService
 
     public function storeAccount(string $id, mixed $payload): LaravelResponseInterface
     {
-        DB::beginTransaction();
         try {
+
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                DB::rollBack();
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
+            $row = queryCheckExisted(
+                $this->repository->getQuery(),
+                [
+                    'email' => $payload->email,
+                ],
+                "{$this->primaryKey}",
+                $id
+            );
 
-            $row->update($payload);
+            if ($row) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$payload->email})"]), $row);
+            }
 
-            DB::commit();
+            if (isset($payload->password)) {
+                $payload->password = Hash::make($payload->password);
+            }
+
+
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.update'), $result);
+            }
+
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
-                'id' => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
-            DB::rollBack();
             return sendErrorResponse($e);
         }
     }

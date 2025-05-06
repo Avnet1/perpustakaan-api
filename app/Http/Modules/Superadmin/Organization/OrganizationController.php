@@ -8,23 +8,51 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrganizationRequest;
+use App\Models\MasterOrganisasi;
 
 class OrganizationController extends Controller
 {
-    public static $primaryKey = 'organisasi_id';
-    public static $pathLocation = 'organization/logo';
+
+    private $primaryKey;
+    private $pathLocation;
 
 
     protected $service;
 
+    const SORT_COLUMNS = [
+        'kode_member' => 'kode_member',
+        'nama_organisasi' => 'nama_organisasi',
+        'provinsi' => 'provinsi',
+        'kabupaten_kota' => 'kabupaten_kota',
+        'alamat' => 'alamat',
+    ];
+
+    const DEFAULT_SORT = ['created_at', 'ASC'];
+
     public function __construct(OrganizationService $service)
     {
         $this->service = $service;
+
+        $this->primaryKey = MasterOrganisasi::getPrimaryKeyName();
+        $this->pathLocation = config('constants.path_image.organization');
     }
 
     public function bodyValidation(Request $request): array
     {
         $payload = [];
+
+        if ($request->has('image_id')) {
+            $payload['image_id'] = $request->input('image_id');
+        }
+
+        if ($request->has('status')) {
+            $payload['status'] = $request->input('status');
+        }
+
+        if ($request->has('list_modules')) {
+            $payload['list_modules'] = $request->input('list_modules');
+        }
+
 
         if ($request->has('kode_member')) {
             $payload['kode_member'] = $request->input('kode_member');
@@ -86,7 +114,7 @@ class OrganizationController extends Controller
     {
         $filters = (object) [
             "paging" => defineRequestPaginateArgs($request),
-            "sorting" => defineRequestOrder($request)
+            "sorting" => defineRequestOrder($request, self::DEFAULT_SORT, self::SORT_COLUMNS)
         ];
         $result = $this->service->fetch($filters);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
@@ -95,8 +123,24 @@ class OrganizationController extends Controller
     /** Get Client By Id */
     public function findById(Request $request): JsonResponse
     {
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $result = $this->service->findById($id);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+    public function uploadImage(OrganizationRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'logo' => null,
+            'created_by' => $user->user_id,
+        ]);
+
+        if ($request->hasFile('logo')) {
+            $payload->logo = $request->file('logo')->store("{$this->pathLocation}", 'public');
+        }
+
+        $result = $this->service->uploadImage($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -104,17 +148,30 @@ class OrganizationController extends Controller
     public function storeInfo(OrganizationRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'logo' => null,
-            'created_at' => $today,
+            'created_at' => Carbon::now(),
             'created_by' => $user->user_id,
         ]);
+        $result = $this->service->storeInfo($payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    public function changeImage(OrganizationRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $payload = (object) [
+            'logo' => null,
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id
+        ];
 
         if ($request->hasFile('logo')) {
-            $payload->logo = $request->file('logo')->storeInfo(self::$pathLocation, 'public');
+            $payload->logo = $request->file('logo')->store("{$this->pathLocation}", 'public');
         }
-        $result = $this->service->store($payload);
+
+        $result = $this->service->changeImage($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -122,10 +179,9 @@ class OrganizationController extends Controller
     public function storeAccount(OrganizationRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
-        $today = Carbon::now();
+        $id = $request->route("{$this->primaryKey}");
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'updated_at' => $today,
+            'updated_at' => Carbon::now(),
             'updated_by' => $user->user_id,
         ]);
         $result = $this->service->storeAccount($id, $payload);
@@ -156,7 +212,7 @@ class OrganizationController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $payload = (object) [
             'deleted_at' => Carbon::now(),
             'deleted_by' => $user->user_id,

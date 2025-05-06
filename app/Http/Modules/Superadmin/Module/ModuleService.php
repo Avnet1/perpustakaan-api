@@ -118,7 +118,7 @@ class ModuleService
             return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
         }
 
-        $pathIcon = null;
+        $pathFile = null;
 
         if (isset($payload->image_id)) {
             $row =  ImageStorageHelper::getImage($payload->image_id, 'icon');
@@ -127,13 +127,13 @@ class ModuleService
                 return $row;
             }
 
-            $pathIcon =  $row->data->image_path;
+            $pathFile =  $row->data->image_path;
             unset($payload->image_id);
         }
 
 
         $mergePayload = array_merge((array) $payload, [
-            "icon" => $pathIcon
+            "icon" => $pathFile
         ]);
 
 
@@ -199,12 +199,12 @@ class ModuleService
 
             $row = queryCheckExisted(
                 $this->repository->getQuery(),
-                "{$this->primaryKey}",
-                $id,
                 [
                     'nama_modul' => "%{$payload->nama_modul}%",
                     'urutan' => $payload->urutan
-                ]
+                ],
+                "{$this->primaryKey}",
+                $id,
             );
 
             if ($row) {

@@ -20,7 +20,8 @@ class ImageStorageHelper
         }
 
         return new LaravelResponseContract(true, 200, __('validation.custom.success.default.uploadImage', ["attribute" => "file {$typeName}"]), (object) [
-            "{$primaryKey}" => $result["{$primaryKey}"]
+            "{$primaryKey}" => $result["{$primaryKey}"],
+            "{$typeName}" => getFileUrl($result->image_path),
         ]);
     }
 
