@@ -80,7 +80,7 @@ class ModuleController extends Controller
     }
 
     /** Create Menu */
-    public function uploadIcon(ModuleRequest $request): JsonResponse
+    public function uploadImage(ModuleRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
@@ -92,7 +92,7 @@ class ModuleController extends Controller
             $payload->icon = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
-        $result = $this->service->uploadIcon($payload);
+        $result = $this->service->uploadImage($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
@@ -107,7 +107,7 @@ class ModuleController extends Controller
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 
-    public function changeIcon(ModuleRequest $request): JsonResponse
+    public function changeImage(ModuleRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");
@@ -121,7 +121,7 @@ class ModuleController extends Controller
             $payload->icon = $request->file('icon')->store("{$this->pathLocation}", 'public');
         }
 
-        $result = $this->service->changeIcon($id, $payload);
+        $result = $this->service->changeImage($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 

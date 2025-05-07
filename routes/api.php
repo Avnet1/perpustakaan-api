@@ -69,9 +69,9 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [SA_ModuleController::class, 'fetch']);
                 Route::post('/', [SA_ModuleController::class, 'store'])->name(config('constants.route_name.superadmin.module.store'));
 
-                Route::post('/upload-icon', [SA_ModuleController::class, 'uploadIcon'])->name(config('constants.route_name.superadmin.module.uploadIcon'));
+                Route::post('/upload-icon', [SA_ModuleController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.module.uploadIcon'));
 
-                Route::post('/change-icon/{modul_id}', [SA_ModuleController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.module.changeIcon'));
+                Route::post('/change-icon/{modul_id}', [SA_ModuleController::class, 'changeImage'])->name(config('constants.route_name.superadmin.module.changeIcon'));
 
                 Route::get('/{modul_id}', [SA_ModuleController::class, 'findById']);
                 Route::put('/{modul_id}', [SA_ModuleController::class, 'update'])->name(config('constants.route_name.superadmin.module.update'));
@@ -83,9 +83,9 @@ Route::prefix('v1')->group(function () {
             Route::prefix('menu')->group(function () {
                 Route::post('/', [SA_MenuController::class, 'store'])->name(config('constants.route_name.superadmin.menu.store'));
 
-                Route::post('/upload-icon', [SA_MenuController::class, 'uploadIcon'])->name(config('constants.route_name.superadmin.menu.uploadIcon'));
+                Route::post('/upload-icon', [SA_MenuController::class, 'uploadImage'])->name(config('constants.route_name.superadmin.menu.uploadIcon'));
 
-                Route::post('/change-icon/{menu_id}', [SA_MenuController::class, 'changeIcon'])->name(config('constants.route_name.superadmin.menu.changeIcon'));
+                Route::post('/change-icon/{menu_id}', [SA_MenuController::class, 'changeImage'])->name(config('constants.route_name.superadmin.menu.changeIcon'));
 
                 Route::put('/{menu_id}', [SA_MenuController::class, 'update'])->name(config('constants.route_name.superadmin.menu.update'));
                 Route::get('/{menu_id}', [SA_MenuController::class, 'findById']);

@@ -37,7 +37,11 @@ class ModuleRepository
 
     public function findById(string $id)
     {
-        return MasterModule::whereNull('deleted_at')
+        return MasterModule::with([
+            'listMenu',
+            'listMenu.childrens'
+        ])
+            ->whereNull('deleted_at')
             ->where("{$this->primaryKey}", $id)
             ->first();
     }

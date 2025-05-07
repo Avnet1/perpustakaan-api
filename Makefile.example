@@ -1,8 +1,13 @@
 compose-dev-file=docker-compose.dev.yml
 container-app-dev=perpustakaan_dev_api
+container-app-dev-supervisor=perpustakaan_dev_rabbitmq_supervisor
 
 local-clear:
-	php artisan cache:clear && php artisan config:clear && php artisan route:clear
+	php artisan cache:clear
+	php artisan config:clear
+	php artisan route:clear
+	php artisan view:clear
+	php artisan config:cache
 
 local-migration-run:
 	php artisan migration
@@ -15,6 +20,22 @@ local-run:
 
 
 # Deploy Dev
+app-dev-log-supervisord:
+	docker logs -f $(container-app-dev-supervisor)
+
+app-dev-show-log-supervisord:
+	docker exec -it $(container-app-dev-supervisor) tail -f /var/log/supervisor/rabbitmq-supervisor.out.log
+
+app-dev-start-worker:
+	docker exec -it $(container-app-dev-supervisor) supervisorctl start rabbitmq-supervisor
+
+app-dev-restart-worker:
+	docker exec -it $(container-app-dev-supervisor) supervisorctl restart rabbitmq-supervisor
+
+app-dev-stop-worker:
+	docker exec -it $(container-app-dev-supervisor) supervisorctl stop rabbitmq-supervisor
+
+
 app-dev-deploy:
 	docker compose -f $(compose-dev-file) up -d --force-recreate --remove-orphans
 
@@ -24,31 +45,20 @@ app-dev-deploy-watch:
 app-dev-log:
 	docker logs -f $(container-app-dev)
 
-app-dev-migrate:
-	docker-compose -f $(compose-dev-file) exec $(container-app-dev) php artisan migrate
-
-app-dev-seed:
-	docker-compose -f $(compose-dev-file) exec $(container-app-dev) php artisan db:seed
-
-app-dev-composer:
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer install
-
-app-dev-storage-link:
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan storage:link
-
 app-dev-setup:
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer dump-autoload
-
-app-dev-key-generate:
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan key:generate
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan jwt:secret
-
-app-dev-clear:
+    docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan route:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan cache:clear
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan route:clear
-	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan optimize:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:cache
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan key:generate
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan jwt:secret
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) composer dump-autoload
+
+app-dev-permission-storage:
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) chmod -R 775 storage
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) chown -R www-data:www-data storage
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) chmod -R 775 storage bootstrap/cache
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) chown -R www-data:www-data storage bootstrap/cache
 
 app-dev-db-setup:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan migrate
@@ -59,6 +69,3 @@ app-dev-down:
 
 app-dev-sh:
 	docker exec -it $(container-app-dev) sh
-
-app-dev-net:
-	docker exec -it  $(container-app-dev) netstat -tulpn | grep 8000

@@ -97,6 +97,11 @@ class MasterMenu extends Model
     // Relationship: child menus
     public function childrens()
     {
-        return $this->hasMany(MasterMenu::class, 'parent_id', 'menu_id');
+        $url = asset('storage');
+        return $this->hasMany(MasterMenu::class, 'parent_id', 'menu_id')->with([
+            'childrens' => function ($q) use ($url) {
+                $q->with(['childrens'])->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon")->orderBy('urutan', 'asc');
+            }
+        ]);
     }
 }

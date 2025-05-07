@@ -7,7 +7,7 @@ WORKDIR /var/www
 LABEL maintainer="Ruben Alpredo Tampubolon"
 LABEL author="CV Indosistem"
 
-# Install system dependencies
+# Install system dependencies and supervisor
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
     nano \
     nodejs \
     npm \
+    supervisor \
     && apt-get clean
 
 RUN echo "upload_max_filesize=10M" > /usr/local/etc/php/conf.d/uploads.ini \
@@ -49,9 +50,13 @@ RUN npm install && npm run build
 COPY ./docker/dev/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Copy supervisor configuration file
+COPY ./docker/dev/supervisord.conf /etc/supervisor/supervisord.conf
+
 # Gunakan entrypoint custom
 ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+# CMD is changed to supervisor to run php-fpm and your worker process
+CMD ["/usr/bin/supervisord"]

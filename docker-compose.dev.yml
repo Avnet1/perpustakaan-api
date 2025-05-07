@@ -9,6 +9,8 @@ services:
     working_dir: /var/www
     volumes:
       - .:/var/www
+    depends_on:
+      - perpustakaan_dev_rabbitmq
     env_file:
       - .env
     expose:
@@ -27,6 +29,38 @@ services:
       - ./docker/dev/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - perpustakaan_dev_api
+    networks:
+      - perpustakaan_dev_network
+
+  perpustakaan_dev_rabbitmq:
+    image: rabbitmq:3.13.7-management-alpine
+    container_name: perpustakaan_dev_rabbitmq
+    restart: always
+    ports:
+      - '5677:5672'
+      - '15677:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=hessrL2Pc9PFs0TV5YrfYovQ
+    networks:
+      - perpustakaan_dev_network
+
+  # Supervisor
+  perpustakaan_dev_rabbitmq_supervisor:
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    container_name: perpustakaan_dev_rabbitmq_supervisor
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    depends_on:
+      - perpustakaan_dev_rabbitmq
+      - perpustakaan_dev_api
+    env_file:
+      - .env
+    command: ["php", "artisan", "rabbitmq:supervisor"]
     networks:
       - perpustakaan_dev_network
 

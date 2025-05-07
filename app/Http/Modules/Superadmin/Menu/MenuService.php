@@ -6,6 +6,7 @@ use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterMenu;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -35,27 +36,36 @@ class MenuService
         }
     }
 
-    public function uploadIcon(mixed $payload): LaravelResponseInterface
+    public function uploadImage(mixed $payload): LaravelResponseInterface
     {
-        DB::beginTransaction();
-        try {
-            $result = ImageStorageHelper::storeImage([
-                'image_path' => $payload->icon,
-                'created_by' => $payload->created_by
-            ], 'icon');
+        if (isset($payload->menu_id)) {
+            $id = $payload->menu_id;
+            $payload->updated_at = Carbon::now();
+            $payload->updated_by = $payload->created_by;
+            unset($payload->modul_id);
+            unset($payload->created_by);
+            return self::changeImage($id, $payload);
+        } else {
+            DB::beginTransaction();
+            try {
+                $result = ImageStorageHelper::storeImage([
+                    'image_path' => $payload->icon,
+                    'created_by' => $payload->created_by
+                ], 'icon');
 
-            if (!$result->success) {
+                if (!$result->success) {
+                    DB::rollBack();
+                    deleteFileInStorage($payload->icon);
+                } else {
+                    DB::commit();
+                }
+
+                return $result;
+            } catch (Exception $e) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-            } else {
-                DB::commit();
+                return sendErrorResponse($e);
             }
-
-            return $result;
-        } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->icon);
-            return sendErrorResponse($e);
         }
     }
 
@@ -136,7 +146,7 @@ class MenuService
         }
     }
 
-    public function changeIcon(string $id, mixed $payload): LaravelResponseInterface
+    public function changeImage(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
         DB::beginTransaction();
@@ -182,13 +192,13 @@ class MenuService
             return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
         }
 
-        $row = $this->repository->checkExisted($id,  [
-            'nama_menu' => "%{$payload->nama_menu}%",
-        ]);
+        // $row = $this->repository->checkExisted($id,  [
+        //     'nama_menu' => "%{$payload->nama_menu}%",
+        // ]);
 
-        if ($row) {
-            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
-        }
+        // if ($row) {
+        //     return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
+        // }
 
 
         $result = $this->repository->update($id, (array) $payload);

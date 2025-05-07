@@ -27,7 +27,8 @@ class ModuleService
         $url = asset('storage');
 
         try {
-            $sqlQuery = MasterModule::whereNull('deleted_at')->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
+            $sqlQuery = MasterModule::whereNull('deleted_at')
+                ->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
@@ -78,7 +79,7 @@ class ModuleService
     }
 
 
-    public function uploadIcon(mixed $payload): LaravelResponseInterface
+    public function uploadImage(mixed $payload): LaravelResponseInterface
     {
         if (isset($payload->modul_id)) {
             $id = $payload->modul_id;
@@ -86,7 +87,7 @@ class ModuleService
             $payload->updated_by = $payload->created_by;
             unset($payload->modul_id);
             unset($payload->created_by);
-            return self::changeIcon($id, $payload);
+            return self::changeImage($id, $payload);
         } else {
             DB::beginTransaction();
             try {
@@ -163,7 +164,7 @@ class ModuleService
     }
 
 
-    public function changeIcon(string $id, mixed $payload): LaravelResponseInterface
+    public function changeImage(string $id, mixed $payload): LaravelResponseInterface
     {
         $storageOldPath = null;
         DB::beginTransaction();

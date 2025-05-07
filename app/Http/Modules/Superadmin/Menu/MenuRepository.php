@@ -22,17 +22,6 @@ class MenuRepository
         return MasterMenu::store($payload);
     }
 
-
-    public function storeImage(array $payload)
-    {
-        return MasterImageStorage::insert($payload);
-    }
-
-    public function findImage(string $id)
-    {
-        return MasterImageStorage::whereNull("deleted_at")->where('image_id', $id)->first();
-    }
-
     public function update(string $id, mixed $payload)
     {
         $result = DB::table("{$this->tableName}")
