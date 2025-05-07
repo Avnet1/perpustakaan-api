@@ -105,6 +105,7 @@ class OrganizationService
 
     public function storeInfo(mixed $payload): LaravelResponseInterface
     {
+
         try {
 
             $row = queryCheckExisted(
@@ -118,6 +119,7 @@ class OrganizationService
             if ($row) {
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Member ({$payload->kode_member}) atau Nama organisasi {$payload->kode_member}"]), $row);
             }
+
 
             $pathFile = null;
 
@@ -137,8 +139,6 @@ class OrganizationService
                 "logo" => $pathFile
             ]);
 
-
-
             $result = $this->repository->insert($mergePayload);
 
             if (!$result) {
@@ -149,8 +149,6 @@ class OrganizationService
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.create'), $result);
         } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->logo);
             return sendErrorResponse($e);
         }
     }

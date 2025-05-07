@@ -29,10 +29,14 @@ return new class extends Migration
             $table->text('domain_admin_url')->nullable()->default(null);
             $table->text('domain_website_url')->nullable()->default(null);
             $table->boolean('status')->nullable()->default(false);
-            $table->string('db_user')->default('admin');
-            $table->string('db_pass')->default(null);
-            $table->string('db_name')->default('db_master');
+            $table->string('db_user')->nullable()->default(null);
+            $table->string('db_pass')->nullable()->default(null);
+            $table->string('db_name')->nullable()->default(null);
             $table->timestamps();
+            $table->softDeletes(); // deleted_at
+            $table->uuid('created_by')->nullable();
+            $table->uuid('updated_by')->nullable();
+            $table->uuid('deleted_by')->nullable();
         });
     }
 

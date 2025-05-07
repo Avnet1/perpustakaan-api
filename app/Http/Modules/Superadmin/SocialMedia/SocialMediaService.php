@@ -21,8 +21,14 @@ class SocialMediaService
 
     public function fetch($where): LaravelResponseInterface
     {
+        $url = asset('storage');
         try {
-            $results = MasterSocialMedia::whereNull('deleted_at')->where($where)->get();
+            $results = MasterSocialMedia::with(['identitas'])->whereNull('deleted_at')->where($where)
+                ->get()
+                ->map(function ($item) {
+                    $item->logo = getFileUrl($item->logo);
+                    return $item;
+                });
             return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.fetch'), $results);
         } catch (Exception $e) {
             return sendErrorResponse($e);
@@ -32,13 +38,15 @@ class SocialMediaService
     public function findById(string $id): LaravelResponseInterface
     {
         try {
-            $row = $this->repository->findById($id);
+            $result = $this->repository->findById($id);
 
-            if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $row);
+            if (!$result) {
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.find'), $row);
+            $result->logo = getFileUrl($result->logo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.find'), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -47,6 +55,7 @@ class SocialMediaService
     public function store(mixed $payload): LaravelResponseInterface
     {
         DB::beginTransaction();
+
         try {
             $row = $this->repository->findByCondition([
                 'identitas_id' => $payload->identitas_id,
