@@ -26,9 +26,7 @@ class OrganizeAccessModuleService
     {
         try {
 
-            if ($payload->list_modules)
-
-                $row = $this->repository->findById($id);
+            for
 
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);

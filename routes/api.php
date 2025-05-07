@@ -132,15 +132,13 @@ Route::prefix('v1')->group(function () {
 
                 Route::get('/approved/{organisasi_id}', [SA_OrganizationController::class, 'approve']);
 
-                Route::put('/assign-to-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
-
                 Route::delete('/{organisasi_id}', [SA_OrganizationController::class, 'delete']);
             });
 
 
             /** Organization Access To Modules */
-            Route::prefix('organization-to-modules')->group(function () {
-                Route::post('/assign-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
+            Route::prefix('organization-modules')->group(function () {
+                Route::post('/assign-to-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
             });
         });
     });

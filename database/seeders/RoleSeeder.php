@@ -13,19 +13,29 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create([
-            'role_name' => 'Super Admin',
-            'role_slug' => 'superadmin',
-        ]);
+        $data = [
+            [
+                'role_name' => 'Super Admin',
+                'role_slug' => 'superadmin',
+            ],
+            [
+                'role_name' => 'Admin',
+                'role_slug' => 'admin',
+            ],
+            [
+                'role_name' => 'Developer',
+                'role_slug' => 'developer',
+            ]
+        ];
 
-        Role::create([
-            'role_name' => 'Admin',
-            'role_slug' => 'admin',
-        ]);
+        for ($i = 0; $i < count($data); $i++) {
+            $element = $data[$i];
 
-        Role::create([
-            'role_name' => 'Developer',
-            'role_slug' => 'developer',
-        ]);
+            $result = Role::whereNull('deleted_at')->where('role_slug', $element['role_slug'])->first();
+
+            if (!$result) {
+                Role::create($element);
+            }
+        }
     }
 }

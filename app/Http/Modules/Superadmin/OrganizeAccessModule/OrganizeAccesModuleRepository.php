@@ -22,9 +22,9 @@ class OrganizeAccessModuleRepository
         return OrganizationModuleAccess::whereNull('deleted_at');
     }
 
-    public function insert(array $payload)
+    public function bulkInsert(array $payload)
     {
-        return OrganizationModuleAccess::store($payload);
+        return DB::table("{$this->tableName}")->insert($payload);
     }
 
     public function update(string $id, array $payload)

@@ -17,12 +17,15 @@ class UserSeeder extends Seeder
     {
         $role = Role::where("role_slug", "superadmin")->first();
 
-        User::create([
-            'name' => 'Indosistem',
-            'username' => 'indosistem',
-            'password' => Hash::make('password123'),
-            'role_id' => $role->role_id,
-            'email' => 'admin@indosistem.com',
-        ]);
+        $user = User::whereNull('deleted_at')->where('email', 'admin@indosistem.com')->first();
+        if (!$user) {
+            User::create([
+                'name' => 'Indosistem',
+                'username' => 'indosistem',
+                'password' => Hash::make('password123'),
+                'role_id' => $role->role_id,
+                'email' => 'admin@indosistem.com',
+            ]);
+        }
     }
 }

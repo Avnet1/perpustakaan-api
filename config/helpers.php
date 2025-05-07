@@ -18,6 +18,30 @@ if (!function_exists('getFileUrl')) {
     }
 }
 
+
+if (!function_exists('generateCodAccess')) {
+    function generateCodAccess(): string
+    {
+        $segments = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $segment = '';
+            for ($j = 0; $j < 4; $j++) {
+                $random = rand(0, 2); // 0: digit, 1: uppercase, 2: uppercase
+                if ($random === 0) {
+                    $segment .= rand(0, 9);
+                } else {
+                    $segment .= chr(rand(65, 90)); // ASCII A-Z
+                }
+            }
+            $segments[] = $segment;
+        }
+
+        return implode('-', $segments); // e.g., AZ12-KK24-1231-BBBC
+    }
+}
+
+
 if (!function_exists('queryCheckExisted')) {
     function queryCheckExisted($query, $condition, $pkKey = null, $pkValue = null)
     {
