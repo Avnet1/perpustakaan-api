@@ -21,6 +21,8 @@ class OrganizationModuleAccess extends Model
         'modul_id',
         'start_service',
         'end_service',
+        'access_code',
+        'is_active',
         'created_by',
         'updated_by',
         'deleted_by',

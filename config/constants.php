@@ -85,6 +85,7 @@ return [
         "module" => 'module/icon',
         "menu" => 'menu/icon',
         "user" => 'user/photo',
-        "organization" => 'organization/logo'
+        "organization" => 'organization/logo',
+        "social-media" => 'social_media/logo'
     ]
 ];

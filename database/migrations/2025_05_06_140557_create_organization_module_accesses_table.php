@@ -17,6 +17,8 @@ return new class extends Migration
             $table->uuid('modul_id')->nullable()->default(null);
             $table->date('start_service')->nullable()->default(null);
             $table->date('end_service')->nullable()->default(null);
+            $table->string('access_code')->nullable()->default(null);
+            $table->boolean('is_active')->nullable()->default(false);
             $table->timestamps();
             $table->softDeletes(); // deleted_at
             $table->uuid('created_by')->nullable();

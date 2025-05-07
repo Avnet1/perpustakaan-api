@@ -13,13 +13,14 @@ use App\Models\MasterSocialMedia;
 class SocialMediaController extends Controller
 {
     private $primaryKey;
-    public static $pathLocation = 'social_media/logo';
+    private $pathLocation;
     protected $service;
 
     public function __construct(SocialMediaService $service)
     {
         $this->service = $service;
         $this->primaryKey = MasterSocialMedia::getPrimaryKeyName();
+        $this->pathLocation = config('constants.path_image.social-media');
     }
 
     public function bodyValidation(Request $request): array
@@ -66,7 +67,7 @@ class SocialMediaController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $payload->logo = $request->file('logo')->store(self::$pathLocation, 'public');
+            $payload->logo = $request->file('logo')->store("{$this->pathLocation}", 'public');
         }
 
         $result = $this->service->store($payload);
@@ -86,7 +87,7 @@ class SocialMediaController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $payload->logo = $request->file('logo')->store(self::$pathLocation, 'public');
+            $payload->logo = $request->file('logo')->store("{$this->pathLocation}", 'public');
         }
 
         $result = $this->service->update($id, $payload);
