@@ -24,7 +24,10 @@ class IdentityService
         try {
             $result = MasterIdentitas::whereNull('deleted_at')->first();
 
-            $result->photo = getFileUrl($result->photo);
+            if ($result) {
+                $result->photo = getFileUrl($result->photo);
+            }
+
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.identity.fetch'), $result);
         } catch (Exception $e) {
