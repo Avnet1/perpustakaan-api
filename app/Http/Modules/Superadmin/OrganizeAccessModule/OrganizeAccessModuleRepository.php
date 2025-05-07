@@ -50,7 +50,15 @@ class OrganizeAccessModuleRepository
 
     public function findById(string $id)
     {
-        return OrganizationModuleAccess::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+        $url = asset('storage');
+        return OrganizationModuleAccess::with([
+            'module' => function ($q) use ($url) {
+                $q->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
+            },
+            'organization' => function ($q) use ($url) {
+                $q->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo");
+            },
+        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)

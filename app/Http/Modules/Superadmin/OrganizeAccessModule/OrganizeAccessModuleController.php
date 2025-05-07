@@ -97,4 +97,12 @@ class OrganizeAccessModuleController extends Controller
         $result = $this->service->updateAccessModule($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
+
+
+    public function findAccessModule(OrganizeAccessModuleRequest $request): JsonResponse
+    {
+        $id = $request->route("{$this->primaryKey}");
+        $result = $this->service->findAccessModule($id);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
 }
