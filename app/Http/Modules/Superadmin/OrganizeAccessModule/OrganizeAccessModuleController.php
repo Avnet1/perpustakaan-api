@@ -33,14 +33,15 @@ class OrganizeAccessModuleController extends Controller
 
 
         if ($request->has('start_service')) {
-            $payload['kode_member'] = $request->input('kode_member');
+            $payload['start_service'] = $request->input('start_service');
         }
 
         if ($request->has('end_service')) {
-            $payload['nama_organisasi'] = $request->input('nama_organisasi');
+            $payload['end_service'] = $request->input('end_service');
         }
         return $payload;
     }
+
 
     /** Create Informasi Organisasi */
     public function assignToModules(OrganizeAccessModuleRequest $request): JsonResponse
@@ -66,6 +67,34 @@ class OrganizeAccessModuleController extends Controller
         ];
 
         $result = $this->service->deleteAccessModule($id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    public function changeStatus(OrganizeAccessModuleRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $payload = array_merge($this->bodyValidation($request), [
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
+        ]);
+
+        $result = $this->service->changeStatus($id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    public function updateAccessModule(OrganizeAccessModuleRequest $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $payload = (object) array_merge($this->bodyValidation($request), [
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
+        ]);
+
+        $result = $this->service->updateAccessModule($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }

@@ -138,7 +138,9 @@ return [
             ],
             'organizeModule' => [
                 "assign" => "Data modul berhasil ditambahkan ke organisasi",
+                "update" => "Data access modul berhasil diubah",
                 'delete' => 'Data modul berhasil dihapus dari organisasi',
+                "fetchModul" => 'Tarik data akses modul berhasil'
             ]
         ],
         'error' => [
@@ -238,7 +240,9 @@ return [
             ],
             'organizeModule' => [
                 "assign" => "Data modul gagal ditambahkan ke organisasi",
+                "update" => "Data access modul gagal diubah",
                 'delete' => 'Data modul gagal dihapus dari organisasi',
+                'create' => ':attribute gagal ditambahkan'
             ]
         ],
     ],

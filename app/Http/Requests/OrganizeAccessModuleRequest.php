@@ -31,6 +31,10 @@ class OrganizeAccessModuleRequest extends FormRequest
                     'list_modules' => 'required|array|min:1',
                 ];
 
+            case config('constants.route_name.superadmin.organization_modules.change_status'):
+                return [
+                    'is_active' => 'required'
+                ];
 
             default:
                 return [];
@@ -42,6 +46,7 @@ class OrganizeAccessModuleRequest extends FormRequest
     {
         return [
             'list_modules.required' =>  __('validation.required', ['attribute' => 'List Modul']),
+            'is_active.required' =>  __('validation.required', ['attribute' => 'Status Aktivasi']),
             'list_modules.array' => __('validation.array', ['attribute' => 'List Modul',]),
             'list_modules.min' => __('validation.min.array', ['attribute' => 'List Modul', 'min' => '1']),
         ];

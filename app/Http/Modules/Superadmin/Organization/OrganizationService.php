@@ -65,17 +65,17 @@ class OrganizationService
 
     public function findById(string $id): LaravelResponseInterface
     {
-        try {
-            $row = $this->repository->findById($id);
-
-            if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
-            }
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.find'), $row);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        $row = $this->repository->findById($id);
+        if (!$row) {
+            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
         }
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.find'), $row);
+        // try {
+
+        // } catch (Exception $e) {
+        //     return sendErrorResponse($e);
+        // }
     }
 
     public function uploadImage(mixed $payload): LaravelResponseInterface

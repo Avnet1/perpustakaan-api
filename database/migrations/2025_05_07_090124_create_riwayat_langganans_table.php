@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('organization_module_access', function (Blueprint $table) {
-            $table->uuid('modul_access_id')->primary();
-            $table->uuid('organisasi_id')->nullable()->default(null);
-            $table->uuid('modul_id')->nullable()->default(null);
+        Schema::create('riwayat_langganan', function (Blueprint $table) {
+            $table->uuid('riwayat_id')->primary();
+            $table->uuid('modul_access_id')->nullable()->default(null);
             $table->date('start_service')->nullable()->default(null);
             $table->date('end_service')->nullable()->default(null);
-            $table->string('access_code')->nullable()->default(null);
-            $table->boolean('is_active')->nullable()->default(false);
             $table->timestamps();
             $table->softDeletes(); // deleted_at
             $table->uuid('created_by')->nullable();
@@ -26,14 +23,9 @@ return new class extends Migration
             $table->uuid('deleted_by')->nullable();
 
 
-            $table->foreign('modul_id')
-                ->references('modul_id')
-                ->on('master_modul')
-                ->onDelete('set null');
-
-            $table->foreign('organisasi_id')
-                ->references('organisasi_id')
-                ->on('master_organisasi')
+            $table->foreign('modul_access_id')
+                ->references('modul_access_id')
+                ->on('organization_module_access')
                 ->onDelete('set null');
         });
     }
@@ -43,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('organization_module_access');
+        Schema::dropIfExists('riwayat_langganan');
     }
 };

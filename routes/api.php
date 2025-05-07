@@ -140,7 +140,9 @@ Route::prefix('v1')->group(function () {
             Route::prefix('organization-modules')->group(function () {
                 Route::post('/assign-to-modules/{organisasi_id}', [SA_OrganizeAccessModuleController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization_modules.assign_module'));
 
-                Route::get('//{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'deleteAccessModule']);
+                Route::put('/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'updateAccessModule'])->name(config('constants.route_name.superadmin.organization_modules.update'));
+
+                Route::put('/change-status/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'changeStatus'])->name(config('constants.route_name.superadmin.organization_modules.change_status'));
                 Route::delete('/delete-module/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'deleteAccessModule']);
             });
         });

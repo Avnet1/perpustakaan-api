@@ -72,7 +72,9 @@ return [
             ],
 
             'organization_modules' => [
-                'assign_module' => 'assignModuleToOrganizationSuperadmin'
+                'assign_module' => 'assignModuleToOrganizationSuperadmin',
+                'change_status' => 'changeStatusAssignModuleToOrganizationSuperadmin',
+                'update' => 'updateAssignModuleToOrganizationSuperadmin'
             ],
 
             'client' => [

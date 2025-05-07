@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class OrganizationModuleAccess extends Model
+class OrganizationModuleAccess extends Pivot
 {
 
     use SoftDeletes;
@@ -74,5 +75,20 @@ class OrganizationModuleAccess extends Model
                 $model->modul_access_id = (string) Str::uuid();
             }
         });
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(MasterOrganisasi::class, 'organisasi_id');
+    }
+
+    public function module()
+    {
+        return $this->belongsTo(MasterModule::class, 'modul_id');
+    }
+
+    public function riwayat_langganan()
+    {
+        return $this->hasMany(MasterModule::class, 'modul_access_id', 'modul_access_id');
     }
 }

@@ -86,4 +86,18 @@ class MasterModule extends Model
     {
         return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id');
     }
+
+
+    public function moduleAccesses()
+    {
+        return $this->hasMany(OrganizationModuleAccess::class, 'modul_id');
+    }
+
+    public function organizations()
+    {
+        return $this->belongsToMany(MasterOrganisasi::class, 'organization_module_access', 'modul_id', 'organisasi_id')
+            ->withPivot(['start_service', 'end_service', 'access_code', 'is_active', 'access_code'])
+            ->withTimestamps()
+            ->using(OrganizationModuleAccess::class);
+    }
 }

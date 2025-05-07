@@ -6,41 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class MasterOrganisasi extends Model
+class RiwayatLangganan extends Model
 {
 
     use SoftDeletes;
 
-    protected $table = 'master_organisasi';
-    protected $primaryKey = 'organisasi_id';
+    protected $table = 'riwayat_langganan';
+    protected $primaryKey = 'riwayat_id';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'organisasi_id',
-        'kode_member',
-        'nama_organisasi',
-        'provinsi',
-        'kabupaten_kota',
-        'kecamatan',
-        'kelurahan_desa',
-        'kode_pos',
-        'email',
-        'alamat',
-        'logo',
-        'domain_admin_url',
-        'domain_website_url',
-        'db_user',
-        'db_pass',
-        'db_name',
-        'password',
+        'riwayat_id',
+        'modul_access_id',
+        'start_service',
+        'end_service',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
 
+
     protected $hidden = [
-        'password',
         'deleted_at',
         'deleted_by',
     ];
@@ -75,28 +62,20 @@ class MasterOrganisasi extends Model
         return false;
     }
 
-    public function moduleAccesses()
-    {
-        return $this->hasMany(OrganizationModuleAccess::class, 'organisasi_id');
-    }
-
-    public function modules()
-    {
-        return $this->belongsToMany(MasterModule::class, 'organization_module_access', 'organisasi_id', 'modul_id')
-            ->withPivot(['start_service', 'end_service', 'access_code', 'is_active', 'access_code'])
-            ->withTimestamps()
-            ->using(OrganizationModuleAccess::class);
-    }
-
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->organisasi_id)) {
-                $model->organisasi_id = (string) Str::uuid();
+            if (empty($model->modul_access_id)) {
+                $model->modul_access_id = (string) Str::uuid();
             }
         });
+    }
+
+    public function access_module()
+    {
+        return $this->belongsTo(OrganizationModuleAccess::class, 'modul_access_id', 'modul_access_id');
     }
 }

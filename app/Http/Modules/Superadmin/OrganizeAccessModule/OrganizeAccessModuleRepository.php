@@ -3,6 +3,7 @@
 namespace App\Http\Modules\Superadmin\OrganizeAccessModule;
 
 use App\Models\OrganizationModuleAccess;
+use App\Models\RiwayatLangganan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,12 @@ class OrganizeAccessModuleRepository
         return DB::table("{$this->tableName}")->insert($payload);
     }
 
+    public function bulkHistory(array $payload)
+    {
+        $tableName = RiwayatLangganan::getTableName();
+        return DB::table("{$tableName}")->insert($payload);
+    }
+
     public function update(string $id, array $payload)
     {
         $result = DB::table("{$this->tableName}")
@@ -43,7 +50,7 @@ class OrganizeAccessModuleRepository
 
     public function findById(string $id)
     {
-        return OrganizationModuleAccess::whereNull('deleted_at')->where('organisasi_id', $id)->first();
+        return OrganizationModuleAccess::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findByCondition(mixed $condition)
@@ -70,5 +77,10 @@ class OrganizeAccessModuleRepository
             ->whereNull('deleted_at')
             ->where("{$this->primaryKey}", $id)
             ->update($payload);
+    }
+
+    public function storeHistory(array $payload)
+    {
+        return RiwayatLangganan::store($payload);
     }
 }
