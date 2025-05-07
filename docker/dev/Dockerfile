@@ -27,6 +27,9 @@ RUN apt-get update && apt-get install -y \
     npm \
     && apt-get clean
 
+RUN echo "upload_max_filesize=10M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size=12M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip intl opcache
 
