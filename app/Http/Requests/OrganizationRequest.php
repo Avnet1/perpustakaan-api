@@ -59,12 +59,13 @@ class OrganizationRequest extends FormRequest
                     'domain_admin_url' => 'required',
                     'domain_website_url' => 'required',
                     'password' => 'required',
+                    'status' => 'required',
                 ];
 
             case config('constants.route_name.superadmin.organization.assign-module'):
                 return [
                     'list_modules' => 'required',
-                    'status' => 'required',
+
                 ];
 
 
