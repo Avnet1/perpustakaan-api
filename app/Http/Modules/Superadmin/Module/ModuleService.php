@@ -7,6 +7,7 @@ use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use Illuminate\Support\Facades\DB;
 use App\Models\MasterModule;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -79,25 +80,34 @@ class ModuleService
 
     public function uploadIcon(mixed $payload): LaravelResponseInterface
     {
-        DB::beginTransaction();
-        try {
-            $result = ImageStorageHelper::storeImage([
-                'image_path' => $payload->icon,
-                'created_by' => $payload->created_by
-            ], 'icon');
+        if (isset($payload->modul_id)) {
+            $id = $payload->modul_id;
+            $payload->updated_at = Carbon::now();
+            $payload->updated_by = $payload->created_by;
+            unset($payload->modul_id);
+            unset($payload->created_by);
+            return self::changeIcon($id, $payload);
+        } else {
+            DB::beginTransaction();
+            try {
+                $result = ImageStorageHelper::storeImage([
+                    'image_path' => $payload->icon,
+                    'created_by' => $payload->created_by
+                ], 'icon');
 
-            if (!$result->success) {
+                if (!$result->success) {
+                    DB::rollBack();
+                    deleteFileInStorage($payload->icon);
+                } else {
+                    DB::commit();
+                }
+
+                return $result;
+            } catch (Exception $e) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-            } else {
-                DB::commit();
+                return sendErrorResponse($e);
             }
-
-            return $result;
-        } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->icon);
-            return sendErrorResponse($e);
         }
     }
 

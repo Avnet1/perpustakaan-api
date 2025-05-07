@@ -40,6 +40,11 @@ class ModuleController extends Controller
         }
 
 
+        if ($request->has("{$this->primaryKey}")) {
+            $payload["{$this->primaryKey}"] = $request->input("{$this->primaryKey}");
+        }
+
+
         if ($request->has('slug')) {
             $payload['slug'] = $request->input('slug');
         }
