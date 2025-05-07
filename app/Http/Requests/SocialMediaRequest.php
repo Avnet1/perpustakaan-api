@@ -32,7 +32,7 @@ class SocialMediaRequest extends FormRequest
                     'identitas_id' => 'required',
                     'nama_sosmed' => 'required',
                     'link_sosmed' => 'required',
-                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:1120'
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
             case config('constants.route_name.superadmin.sosmed.update'):
