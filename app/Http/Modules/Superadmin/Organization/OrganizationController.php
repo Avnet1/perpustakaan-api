@@ -193,16 +193,10 @@ class OrganizationController extends Controller
     {
         $user = getUser($request);
         $id = $request->route(self::$primaryKey);
-        $today = Carbon::now();
         $payload = (object) array_merge($this->bodyValidation($request), [
-            'logo' => null,
-            'updated_at' => $today,
+            'updated_at' => Carbon::now(),
             'updated_by' => $user->user_id,
         ]);
-
-        if ($request->hasFile('logo')) {
-            $payload->client_photo = $request->file('logo')->store(self::$pathLocation, 'public');
-        }
 
         $result = $this->service->update($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);

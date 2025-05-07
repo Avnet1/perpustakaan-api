@@ -64,6 +64,13 @@ class OrganizationRepository
         return $query->first();
     }
 
+    public function delete(string $id, array $payload)
+    {
+        DB::table("{$this->tableName}")
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
+    }
+
     public function autoCreateDB(string $dbUser, string $dbPass, string $dbName)
     {
         try {

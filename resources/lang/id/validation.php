@@ -18,6 +18,10 @@ return [
         'array' => ':attribute maksimal memiliki :max item.',
         'file' => ':attribute maksimal :max kilobytes.',
     ],
+    'array' => ':attribute harus berupa array.',
+    'min' => [
+        'array' => ':attribute minimal harus memiliki :min item.',
+    ],
     'email' => 'Format :attribute tidak valid.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
     'custom' => [

@@ -7,7 +7,6 @@ use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterOrganisasi;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -235,41 +234,21 @@ class OrganizationService
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
-        $storageOldPath = null;
-        $hasPhoto = true;
-        DB::beginTransaction();
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                DB::rollBack();
-                deleteFileInStorage($payload->logo);
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
-            if ($row->logo != null) {
-                $storageOldPath = $row->logo;
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.organization.update'), $result);
             }
 
-            if ($payload->logo == null) {
-                $hasPhoto = false;
-                unset($payload->logo);
-            }
-
-            $row->update($payload);
-
-            if ($hasPhoto == true) {
-                deleteFileInStorage($storageOldPath);
-            }
-
-
-            DB::commit();
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), (object) [
-                'id' => $id,
-            ]);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.update'), $result);
         } catch (Exception $e) {
-            DB::rollBack();
-            Storage::disk('public')->delete($payload->logo);
             return sendErrorResponse($e);
         }
     }
@@ -283,10 +262,10 @@ class OrganizationService
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Pelanggan']), $row);
             }
 
-            $row->update($payload);
+            $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.delete'), (object) [
-                'id' => $id,
+                "{$this->primaryKey}" => $id,
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);

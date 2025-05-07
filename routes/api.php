@@ -6,19 +6,14 @@ use App\Http\Middleware\TokenValidateMiddleware;
 /** Superadmin Controller */
 
 use App\Http\Modules\Superadmin\Auth\AuthController as SA_AuthController;
-use App\Http\Modules\Superadmin\Client\ClientController as SA_ClientController;
 use App\Http\Modules\Superadmin\Organization\OrganizationController as SA_OrganizationController;
-use App\Http\Modules\Superadmin\Province\ProvinsiController as SA_ProvinceController;
-use App\Http\Modules\Superadmin\Region\RegionController as SA_RegionController;
-use App\Http\Modules\Superadmin\Subdistrict\SubdistrictController as SA_SubdistrictController;
-use App\Http\Modules\Superadmin\Village\VillageController as SA_VillageController;
-use App\Http\Modules\Superadmin\Grade\GradeController as SA_GradeController;
 use App\Http\Modules\Superadmin\Identity\IdentityController as SA_IdentityController;
 use App\Http\Modules\Superadmin\SocialMedia\SocialMediaController as SA_SocialMediaController;
 use App\Http\Modules\Superadmin\Role\RoleController as SA_RoleController;
 use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
 use App\Http\Modules\Superadmin\Module\ModuleController as SA_ModuleController;
 use App\Http\Modules\Superadmin\Menu\MenuController as SA_MenuController;
+use App\Http\Modules\Superadmin\OrganizeAccessModule\OrganizeAccessModuleController as SA_OrganizeAccessModuleController;
 
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
@@ -140,6 +135,12 @@ Route::prefix('v1')->group(function () {
                 Route::put('/assign-to-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
 
                 Route::delete('/{organisasi_id}', [SA_OrganizationController::class, 'delete']);
+            });
+
+
+            /** Organization Access To Modules */
+            Route::prefix('organization-to-modules')->group(function () {
+                Route::post('/assign-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
             });
         });
     });

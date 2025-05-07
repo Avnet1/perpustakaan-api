@@ -107,8 +107,8 @@ class OrganizationRequest extends FormRequest
 
             'logo.required' =>  __('validation.required', ['attribute' => 'Logo']),
             'logo.image' =>  __('validation.image', ['attribute' => 'Logo']),
-            'logo.max' =>  __('validation.image', ['attribute' => 'Logo', 'max' => '5120']),
-            'logo.mimes' =>  __('validation.image', ['attribute' => 'Logo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+            'logo.max' =>  __('validation.max.file', ['attribute' => 'Logo', 'max' => '5120']),
+            'logo.mimes' =>  __('validation.mimes', ['attribute' => 'Logo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }

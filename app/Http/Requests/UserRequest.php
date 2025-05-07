@@ -63,8 +63,8 @@ class UserRequest extends FormRequest
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
             'photo.required' =>  __('validation.required', ['attribute' => 'Photo']),
             'photo.image' =>  __('validation.image', ['attribute' => 'Photo']),
-            'photo.max' =>  __('validation.image', ['attribute' => 'Photo', 'max' => '5120']),
-            'photo.mimes' =>  __('validation.image', ['attribute' => 'Photo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+            'photo.max' =>  __('validation.max.file', ['attribute' => 'Photo', 'max' => '5120']),
+            'photo.mimes' =>  __('validation.mimes', ['attribute' => 'Photo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
 
 
 

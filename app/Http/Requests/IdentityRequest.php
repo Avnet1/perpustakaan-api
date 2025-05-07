@@ -68,8 +68,8 @@ class IdentityRequest extends FormRequest
 
             'photo.required' =>  __('validation.required', ['attribute' => 'Logo Perusahaan']),
             'photo.image' =>  __('validation.image', ['attribute' => 'Logo Perusahaan']),
-            'photo.max' =>  __('validation.image', ['attribute' => 'Logo Perusahaan', 'max' => '5120']),
-            'photo.mimes' =>  __('validation.image', ['attribute' => 'Logo Perusahaan', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+            'photo.max' =>  __('validation.max.file', ['attribute' => 'Logo Perusahaan', 'max' => '5120']),
+            'photo.mimes' =>  __('validation.mimes', ['attribute' => 'Logo Perusahaan', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }

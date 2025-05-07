@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OrganizeAccessModuleRequest;
 use App\Models\OrganizationModuleAccess;
 
 class OrganizeAccessModuleController extends Controller
@@ -88,7 +89,7 @@ class OrganizeAccessModuleController extends Controller
     }
 
     /** Create Informasi Organisasi */
-    public function assignToModules(Request $request): JsonResponse
+    public function assignToModules(OrganizeAccessModuleRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");

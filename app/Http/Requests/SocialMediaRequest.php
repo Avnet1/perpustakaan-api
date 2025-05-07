@@ -52,8 +52,8 @@ class SocialMediaRequest extends FormRequest
             'link_sosmed.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
             'logo.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
             'logo.image' =>  __('validation.image', ['attribute' => 'Logo social media']),
-            'logo.max' =>  __('validation.image', ['attribute' => 'Logo social media', 'max' => '5120']),
-            'logo.mimes' =>  __('validation.image', ['attribute' => 'Logo social media', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+            'logo.max' =>  __('validation.max.file', ['attribute' => 'Logo social media', 'max' => '5120']),
+            'logo.mimes' =>  __('validation.mimes', ['attribute' => 'Logo social media', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }

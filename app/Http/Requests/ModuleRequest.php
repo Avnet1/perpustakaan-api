@@ -59,8 +59,8 @@ class ModuleRequest extends FormRequest
             'urutan.required' =>  __('validation.required', ['attribute' => 'Data urutan']),
             'icon.required' =>  __('validation.required', ['attribute' => 'Logo/icon']),
             'icon.image' =>  __('validation.image', ['attribute' => 'Logo/Icon']),
-            'icon.max' =>  __('validation.image', ['attribute' => 'Logo/Icon', 'max' => '5120']),
-            'icon.mimes' =>  __('validation.image', ['attribute' => 'Logo/Icon', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+            'icon.max' =>  __('validation.max.file', ['attribute' => 'Logo/Icon', 'max' => '5120']),
+            'icon.mimes' =>  __('validation.mimes', ['attribute' => 'Logo/Icon', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }
