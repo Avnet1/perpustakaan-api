@@ -58,7 +58,7 @@ class SocialMediaController extends Controller
     }
 
     /** Create Client */
-    public function store(Request $request): JsonResponse
+    public function store(SocialMediaRequest $request): JsonResponse
     {
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
@@ -75,7 +75,7 @@ class SocialMediaController extends Controller
     }
 
     /** Update Client */
-    public function update(Request $request): JsonResponse
+    public function update(SocialMediaRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");

@@ -61,10 +61,12 @@ class UserRequest extends FormRequest
             'password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Password', 'number' => 8]),
             'confirm_password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Konfirmasi Ulang Password', 'number' => 8]),
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
-
-
-            'photo.required' =>  __('validation.required', ['attribute' => 'Data photo']),
+            'photo.required' =>  __('validation.required', ['attribute' => 'Photo']),
             'photo.image' =>  __('validation.image', ['attribute' => 'Photo']),
+            'photo.max' =>  __('validation.image', ['attribute' => 'Photo', 'max' => '5120']),
+            'photo.mimes' =>  __('validation.image', ['attribute' => 'Photo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
+
+
 
         ];
     }

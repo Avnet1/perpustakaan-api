@@ -95,7 +95,7 @@ class IdentityController extends Controller
     }
 
     /** Update Client */
-    public function update(Request $request): JsonResponse
+    public function update(IdentityRequest $request): JsonResponse
     {
         $user = getUser($request);
         $id = $request->route("{$this->primaryKey}");

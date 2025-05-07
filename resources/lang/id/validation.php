@@ -5,6 +5,7 @@ return [
     'unique' => ':attribute sudah digunakan.',
     'exists' => ':attribute tidak ditemukan.',
     'image' => ':attribute wajib file image',
+    'mimes' => ':attribute harus berupa file dengan format: :values.',
     'min' => [
         'string' => ':attribute minimal harus :min karakter.',
         'numeric' => ':attribute minimal :min.',

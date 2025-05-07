@@ -83,15 +83,14 @@ class SuperadminAuthRequest extends FormRequest
             'email.required' =>  __('validation.required', ['attribute' => 'Email']),
             'email.exists' =>  __('validation.exists', ['attribute' => 'Email']),
             'password.min' => __('validation.custom.error.default.minCharacter', ['attribute' => 'Password', 'number' => 8]),
-
             'old_password.required' =>  __('validation.required', ['attribute' => 'Password Lama']),
             'permission_code.required' =>  __('validation.required', ['attribute' => 'Token/Kode Permission']),
             'new_password.required' =>  __('validation.required', ['attribute' => 'Password Baru']),
             'confirm_password.required' => __('validation.required', ['attribute' => 'Konfirmasi Password Baru']),
-
             'photo.required' => __('validation.required', ['attribute' => 'Photo']),
-
             'photo.image' =>  __('validation.image', ['attribute' => 'Photo']),
+            'icon.max' =>  __('validation.image', ['attribute' => 'Photo', 'max' => '5120']),
+            'icon.mimes' =>  __('validation.image', ['attribute' => 'Photo', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
 
         ];
     }

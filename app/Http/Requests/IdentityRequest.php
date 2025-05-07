@@ -38,6 +38,11 @@ class IdentityRequest extends FormRequest
                     'footer' => 'required',
                     'deskripsi' => 'required',
                     'privacy_policy' => 'required',
+                    'photo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.identity.update'):
+                return [
                     'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
 
@@ -60,7 +65,11 @@ class IdentityRequest extends FormRequest
             'footer.required' =>  __('validation.required', ['attribute' => 'Data Footer']),
             'deskripsi.required' => __('validation.required', ['attribute' => 'Data Deskripsi']),
             'privacy_policy.required' =>  __('validation.required', ['attribute' => 'Data Privacy Policy']),
+
+            'photo.required' =>  __('validation.required', ['attribute' => 'Logo Perusahaan']),
             'photo.image' =>  __('validation.image', ['attribute' => 'Logo Perusahaan']),
+            'photo.max' =>  __('validation.image', ['attribute' => 'Logo Perusahaan', 'max' => '5120']),
+            'photo.mimes' =>  __('validation.image', ['attribute' => 'Logo Perusahaan', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }

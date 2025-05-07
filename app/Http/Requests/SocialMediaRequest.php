@@ -31,6 +31,11 @@ class SocialMediaRequest extends FormRequest
                     'identitas_id' => 'required',
                     'nama_sosmed' => 'required',
                     'link_sosmed' => 'required',
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                ];
+
+            case config('constants.route_name.superadmin.sosmed.update'):
+                return [
                     'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
                 ];
             default:
@@ -42,11 +47,13 @@ class SocialMediaRequest extends FormRequest
     public function messages()
     {
         return [
-
             'identitas_id.required' =>  __('validation.required', ['attribute' => 'Data identitas']),
             'nama_sosmed.required' => __('validation.required', ['attribute' => 'Data nama social media']),
             'link_sosmed.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
+            'logo.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
             'logo.image' =>  __('validation.image', ['attribute' => 'Logo social media']),
+            'logo.max' =>  __('validation.image', ['attribute' => 'Logo social media', 'max' => '5120']),
+            'logo.mimes' =>  __('validation.image', ['attribute' => 'Logo social media', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }

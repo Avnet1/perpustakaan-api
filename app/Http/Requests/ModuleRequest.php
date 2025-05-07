@@ -57,8 +57,10 @@ class ModuleRequest extends FormRequest
             'nama_modul.required' =>  __('validation.required', ['attribute' => 'Data nama modul']),
             'slug.required' => __('validation.required', ['attribute' => 'Data slug']),
             'urutan.required' =>  __('validation.required', ['attribute' => 'Data urutan']),
-            'icon.required' =>  __('validation.required', ['attribute' => 'Data logo/icon']),
-            'icon.image' =>  __('validation.image', ['attribute' => 'Logo/Icon modul']),
+            'icon.required' =>  __('validation.required', ['attribute' => 'Logo/icon']),
+            'icon.image' =>  __('validation.image', ['attribute' => 'Logo/Icon']),
+            'icon.max' =>  __('validation.image', ['attribute' => 'Logo/Icon', 'max' => '5120']),
+            'icon.mimes' =>  __('validation.image', ['attribute' => 'Logo/Icon', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),
         ];
     }
 }
