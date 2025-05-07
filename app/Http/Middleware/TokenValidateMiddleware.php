@@ -19,7 +19,10 @@ class TokenValidateMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            if (!$token = JWTAuth::getToken()) {
+                return ResponseHelper::sendResponseJson(false, 401, 'Token tidak ditemukan.');
+            }
+            $user = JWTAuth::authenticate($token);
         } catch (JWTException $e) {
             return ResponseHelper::sendResponseJson(false, 401, __('validation.custom.error.auth.tokenInvalid'), $e);
         }

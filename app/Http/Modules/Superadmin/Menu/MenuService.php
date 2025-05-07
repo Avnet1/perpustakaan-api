@@ -5,8 +5,8 @@ namespace App\Http\Modules\Superadmin\Menu;
 use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
+use App\Models\MasterMenu;
 use Illuminate\Support\Facades\DB;
-use App\Models\MasterModule;
 use Exception;
 
 class MenuService
@@ -17,7 +17,7 @@ class MenuService
     public function __construct(MenuRepository $repository)
     {
         $this->repository = $repository;
-        $this->primaryKey = MasterModule::getPrimaryKeyName();
+        $this->primaryKey = MasterMenu::getPrimaryKeyName();
     }
 
     public function findById(string $id): LaravelResponseInterface
@@ -123,7 +123,7 @@ class MenuService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);
@@ -163,10 +163,10 @@ class MenuService
 
             deleteFileInStorage($storageOldPath);
 
+            $result->icon = getFileUrl($result->icon);
+
             DB::commit();
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.update'), (object) [
-                "{$this->primaryKey}" => $id,
-            ]);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.update'), $result);
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->icon);
@@ -197,8 +197,8 @@ class MenuService
             return new LaravelResponseContract(false, 400, __('validation.custom.error.socialMedia.update'), $result);
         }
 
-        return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.update'), (object) [
-            "{$this->primaryKey}" => $id,
-        ]);
+        $result->icon = getFileUrl($result->icon);
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.socialMedia.update'), $result);
     }
 }

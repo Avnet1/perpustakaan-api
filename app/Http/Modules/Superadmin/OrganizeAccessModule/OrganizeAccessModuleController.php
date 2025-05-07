@@ -20,11 +20,10 @@ class OrganizeAccessModuleController extends Controller
     public function __construct(OrganizeAccessModuleService $service)
     {
         $this->service = $service;
-
         $this->primaryKey = OrganizationModuleAccess::getPrimaryKeyName();
     }
 
-    public function bodyValidation(Request $request): array
+    public function bodyValidation(OrganizeAccessModuleRequest $request): array
     {
         $payload = [];
 
@@ -47,20 +46,26 @@ class OrganizeAccessModuleController extends Controller
     public function assignToModules(OrganizeAccessModuleRequest $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route("{$this->primaryKey}");
-
-        $bodyData = $this->bodyValidation($request);
-        $payload = [
-            'access_code' => null,
+        $id = $request->route("organisasi_id");
+        $payload = array_merge($this->bodyValidation($request), [
             'created_at' => Carbon::now(),
             'created_by' => $user->user_id,
-        ];
-        $payload = array_map(function ($module) use ($payload) {
-            $payload['access_code'] = generateCodAccess();
-            return array_merge($module, $payload);
-        }, $bodyData['list_modules']);
-
+        ]);
         $result = $this->service->assignToModules($id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
+
+
+    public function deleteAccessModule(Request $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $payload = (object) [
+            'deleted_at' => Carbon::now(),
+            'deleted_by' => $user->user_id,
+        ];
+
+        $result = $this->service->deleteAccessModule($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
 }

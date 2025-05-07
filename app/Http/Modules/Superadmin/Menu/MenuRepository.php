@@ -35,9 +35,16 @@ class MenuRepository
 
     public function update(string $id, mixed $payload)
     {
-        return DB::table("{$this->tableName}")
+        $result = DB::table("{$this->tableName}")
+            ->whereNull("deleted_at")
             ->where("{$this->primaryKey}", $id)
             ->update($payload);
+
+        if (!$result) {
+            return $result;
+        }
+
+        return MasterMenu::where("{$this->primaryKey}", $id)->first();
     }
 
     public function findById(string $id)
@@ -112,6 +119,7 @@ class MenuRepository
     public function delete(string $id, array $payload)
     {
         DB::table("{$this->tableName}")
+            ->whereNull("deleted_at")
             ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }

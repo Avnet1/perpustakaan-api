@@ -69,7 +69,10 @@ return [
                 'upload-image' => 'uploadImageOrganizationSuperadmin',
                 'update' => 'updateOrganizationSuperadmin',
                 'approve' => 'approveOrganizationSuperadmin',
-                'assign-module' => 'assignModuleToOrganizationSuperadmin'
+            ],
+
+            'organization_modules' => [
+                'assign_module' => 'assignModuleToOrganizationSuperadmin'
             ],
 
             'client' => [

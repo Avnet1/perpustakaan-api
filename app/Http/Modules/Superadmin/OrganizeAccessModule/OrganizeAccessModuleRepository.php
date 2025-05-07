@@ -38,7 +38,7 @@ class OrganizeAccessModuleRepository
             return $result;
         }
 
-        return OrganizationModuleAccess::where("{$this->primaryKey}", $id)->first();
+        return OrganizationModuleAccess::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findById(string $id)
@@ -48,7 +48,7 @@ class OrganizeAccessModuleRepository
 
     public function findByCondition(mixed $condition)
     {
-        $query = OrganizationModuleAccess::query()->whereNull('deleted_at');
+        $query = OrganizationModuleAccess::whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);
@@ -64,17 +64,11 @@ class OrganizeAccessModuleRepository
         return $query->first();
     }
 
-    public function autoCreateDB(string $dbUser, string $dbPass, string $dbName)
+    public function delete(string $id, array $payload)
     {
-        try {
-            DB::statement("CREATE DATABASE IF NOT EXISTS {$dbName}");
-            DB::statement("CREATE ROLE {$dbUser} LOGIN PASSWORD '{$dbPass}'");
-
-            Log::info("Database Tenant dengan User: {$dbUser}; Password: {$dbPass} dan Name: {$dbName} berhasil ditambahkan");
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        DB::table("{$this->tableName}")
+            ->whereNull('deleted_at')
+            ->where("{$this->primaryKey}", $id)
+            ->update($payload);
     }
 }

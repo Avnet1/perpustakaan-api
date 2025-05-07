@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class SocialMediaRequest extends FormRequest
 {
@@ -31,7 +32,7 @@ class SocialMediaRequest extends FormRequest
                     'identitas_id' => 'required',
                     'nama_sosmed' => 'required',
                     'link_sosmed' => 'required',
-                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120'
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:1120'
                 ];
 
             case config('constants.route_name.superadmin.sosmed.update'):
@@ -46,11 +47,13 @@ class SocialMediaRequest extends FormRequest
 
     public function messages()
     {
+        Log::info('VALIDATION RULE DIPANGGIL');
+
         return [
             'identitas_id.required' =>  __('validation.required', ['attribute' => 'Data identitas']),
             'nama_sosmed.required' => __('validation.required', ['attribute' => 'Data nama social media']),
             'link_sosmed.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
-            'logo.required' =>  __('validation.required', ['attribute' => 'Data link social media']),
+            'logo.required' =>  __('validation.required', ['attribute' => 'Logo social media']),
             'logo.image' =>  __('validation.image', ['attribute' => 'Logo social media']),
             'logo.max' =>  __('validation.max.file', ['attribute' => 'Logo social media', 'max' => '5120']),
             'logo.mimes' =>  __('validation.mimes', ['attribute' => 'Logo social media', 'value' => '(jpeg,png,jpg,webp,svg,gif)']),

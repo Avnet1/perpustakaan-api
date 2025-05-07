@@ -5,7 +5,7 @@ return [
     'unique' => ':attribute sudah digunakan.',
     'exists' => ':attribute tidak ditemukan.',
     'image' => ':attribute wajib file image',
-    'mimes' => ':attribute harus berupa file dengan format: :values.',
+    'mimes' => ':attribute harus berupa file dengan format: :value.',
     'min' => [
         'string' => ':attribute minimal harus :min karakter.',
         'numeric' => ':attribute minimal :min.',
@@ -135,6 +135,10 @@ return [
                 "store" => "Data GMD berhasil ditambahkan",
                 "update" => "Data GMD berhasil diubah",
                 "delete" => "Data GMD berhasil dihapus"
+            ],
+            'organizeModule' => [
+                "assign" => "Data modul berhasil ditambahkan ke organisasi",
+                'delete' => 'Data modul berhasil dihapus dari organisasi',
             ]
         ],
         'error' => [
@@ -231,6 +235,10 @@ return [
                 "store" => "Data GMD gagal ditambahkan",
                 "update" => "Data GMD gagal diubah",
                 "delete" => "Data GMD gagal dihapus"
+            ],
+            'organizeModule' => [
+                "assign" => "Data modul gagal ditambahkan ke organisasi",
+                'delete' => 'Data modul gagal dihapus dari organisasi',
             ]
         ],
     ],

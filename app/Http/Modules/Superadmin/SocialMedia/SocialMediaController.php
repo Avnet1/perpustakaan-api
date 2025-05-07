@@ -9,6 +9,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SocialMediaRequest;
 use App\Models\MasterSocialMedia;
+use Illuminate\Support\Facades\Log;
 
 class SocialMediaController extends Controller
 {
@@ -60,6 +61,7 @@ class SocialMediaController extends Controller
     /** Create Client */
     public function store(SocialMediaRequest $request): JsonResponse
     {
+        Log::info('Data yang diterima:', $request->all());
         $user = getUser($request);
         $payload = (object) array_merge($this->bodyValidation($request), [
             'logo' => null,

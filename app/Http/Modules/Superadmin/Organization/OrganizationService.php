@@ -259,7 +259,7 @@ class OrganizationService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Pelanggan']), $row);
+                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

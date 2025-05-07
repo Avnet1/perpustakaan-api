@@ -16,6 +16,7 @@ class MenuController extends Controller
     private $pathLocation;
     protected $service;
 
+
     public function __construct(MenuService $service)
     {
         $this->service = $service;

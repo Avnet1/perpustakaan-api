@@ -138,7 +138,9 @@ Route::prefix('v1')->group(function () {
 
             /** Organization Access To Modules */
             Route::prefix('organization-modules')->group(function () {
-                Route::post('/assign-to-modules/{organisasi_id}', [SA_OrganizationController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization.assign-module'));
+                Route::post('/assign-to-modules/{organisasi_id}', [SA_OrganizeAccessModuleController::class, 'assignToModules'])->name(config('constants.route_name.superadmin.organization_modules.assign_module'));
+
+                Route::delete('/delete-module/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'deleteAccessModule']);
             });
         });
     });

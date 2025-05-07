@@ -26,7 +26,7 @@ class OrganizeAccessModuleRequest extends FormRequest
 
         // Menentukan aturan validasi berdasarkan metode HTTP
         switch ($validationName) {
-            case config('constants.route_name.superadmin.organization.assign-module'):
+            case config('constants.route_name.superadmin.organization_modules.assign_module'):
                 return [
                     'list_modules' => 'required|array|min:1',
                 ];

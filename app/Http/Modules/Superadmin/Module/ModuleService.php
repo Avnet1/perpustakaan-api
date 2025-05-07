@@ -23,8 +23,10 @@ class ModuleService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
+        $url = asset('storage');
+
         try {
-            $sqlQuery = MasterModule::whereNull('deleted_at');
+            $sqlQuery = MasterModule::whereNull('deleted_at')->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
@@ -65,6 +67,8 @@ class ModuleService
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
+
+            $row->icon = getFileUrl($row->icon);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.module.find'), $row);
         } catch (Exception $e) {
@@ -176,10 +180,10 @@ class ModuleService
 
             deleteFileInStorage($storageOldPath);
 
+            $result->icon = getFileUrl($result->icon);
             DB::commit();
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), (object) [
-                "{$this->primaryKey}" => $id,
-            ]);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.module.update'), $result);
         } catch (Exception $e) {
             DB::rollBack();
             deleteFileInStorage($payload->icon);

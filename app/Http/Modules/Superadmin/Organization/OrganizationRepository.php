@@ -38,7 +38,7 @@ class OrganizationRepository
             return $result;
         }
 
-        return MasterOrganisasi::where("{$this->primaryKey}", $id)->first();
+        return MasterOrganisasi::whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
     }
 
     public function findById(string $id)
@@ -48,7 +48,7 @@ class OrganizationRepository
 
     public function findByCondition(mixed $condition)
     {
-        $query = MasterOrganisasi::query()->whereNull('deleted_at');
+        $query = MasterOrganisasi::whereNull('deleted_at');
         foreach ($condition as $key => $value) {
             if (is_array($value)) {
                 $query->whereIn($key, $value);
@@ -67,6 +67,7 @@ class OrganizationRepository
     public function delete(string $id, array $payload)
     {
         DB::table("{$this->tableName}")
+            ->whereNull('deleted_at')
             ->where("{$this->primaryKey}", $id)
             ->update($payload);
     }
