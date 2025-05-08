@@ -51,8 +51,8 @@ app-dev-clear:
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan cache:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan route:clear
-    docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan view:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan optimize:clear
+	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan view:clear
 	docker compose -f $(compose-dev-file) exec $(container-app-dev) php artisan config:cache
 
 app-dev-db-setup:
