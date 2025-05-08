@@ -81,7 +81,10 @@ class MasterOrganisasi extends Model
 
     public function moduleAccesses()
     {
-        return $this->hasMany(OrganizationModuleAccess::class, 'organisasi_id');
+        return $this->hasMany(OrganizationModuleAccess::class, 'organisasi_id')
+            ->join('master_modul', 'organization_module_access.modul_id', '=', 'master_modul.modul_id')
+            ->orderBy('master_modul.urutan', 'asc')
+            ->select('organization_module_access.*');
     }
 
     public function modules()
@@ -89,7 +92,7 @@ class MasterOrganisasi extends Model
         return $this->belongsToMany(MasterModule::class, 'organization_module_access', 'organisasi_id', 'modul_id')
             ->withPivot(['start_service', 'end_service', 'access_code', 'is_active', 'access_code'])
             ->withTimestamps()
-            ->using(OrganizationModuleAccess::class);
+            ->using(OrganizationModuleAccess::class)->orderBy('urutan', 'asc');
     }
 
 

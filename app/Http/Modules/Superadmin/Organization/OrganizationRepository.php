@@ -48,16 +48,8 @@ class OrganizationRepository
 
     public function findById(string $id)
     {
-        $url = asset('storage');
-
         return MasterOrganisasi::with([
-            'moduleAccesses' => function ($q) use ($url) {
-                $q->with([
-                    'module' => function ($rq) use ($url) {
-                        $rq->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
-                    }
-                ]);
-            }
+            'moduleAccesses.module'
         ])->whereNull('deleted_at')
             ->where("{$this->primaryKey}", $id)->first()->makeHidden(['db_pass']);
     }

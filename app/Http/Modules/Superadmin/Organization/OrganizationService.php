@@ -70,19 +70,19 @@ class OrganizationService
 
     public function findById(string $id): LaravelResponseInterface
     {
-
-        try {
-            $result = $this->repository->findById($id);
-            if (!$result) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $result);
-            }
-
-            $result->logo = getFileUrl($result->logo);
-
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.find'), $result);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        $result = $this->repository->findById($id);
+        if (!$result) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $result);
         }
+
+        $result->logo = getFileUrl($result->logo);
+
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.find'), $result);
+        // try {
+
+        // } catch (Exception $e) {
+        //     return sendErrorResponse($e);
+        // }
     }
 
     public function uploadImage(mixed $payload): LaravelResponseInterface
@@ -315,8 +315,8 @@ class OrganizationService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), $result);
             }
 
-            $rabbitMQ = new RabbitMQPublisherService();
-            $rabbitMQ->publisher($result, config('constants.message_broker.exchange.organization'), config('constants.message_broker.queue.organization'));
+            // $rabbitMQ = new RabbitMQPublisherService();
+            // $rabbitMQ->publisher($result, config('constants.message_broker.exchange.organization'), config('constants.message_broker.queue.organization'));
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), (object) [
                 "{$this->primaryKey}" => $id,

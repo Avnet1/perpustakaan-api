@@ -82,6 +82,12 @@ class MasterModule extends Model
     }
 
 
+    public function scopeWithFormattedIcon($query, $url)
+    {
+        return $query->selectRaw("*, CASE WHEN icon IS NULL THEN NULL ELSE CONCAT('$url/', icon) END AS icon");
+    }
+
+
     public function listMenu()
     {
         return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id');

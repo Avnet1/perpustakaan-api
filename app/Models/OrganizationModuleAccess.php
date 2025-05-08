@@ -84,7 +84,8 @@ class OrganizationModuleAccess extends Pivot
 
     public function module()
     {
-        return $this->belongsTo(MasterModule::class, 'modul_id');
+        $url = asset('storage');
+        return $this->belongsTo(MasterModule::class, 'modul_id')->withFormattedIcon($url);
     }
 
     public function riwayat_langganan()
