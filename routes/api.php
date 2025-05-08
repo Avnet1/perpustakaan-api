@@ -15,6 +15,7 @@ use App\Http\Modules\Superadmin\User\UserController as SA_UserController;
 use App\Http\Modules\Superadmin\Module\ModuleController as SA_ModuleController;
 use App\Http\Modules\Superadmin\Menu\MenuController as SA_MenuController;
 use App\Http\Modules\Superadmin\OrganizeAccessModule\OrganizeAccessModuleController as SA_OrganizeAccessModuleController;
+use App\Http\Modules\Superadmin\Histories\HistoryController as SA_HistoryController;
 
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
@@ -143,10 +144,16 @@ Route::prefix('v1')->group(function () {
 
                 Route::get('/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'findAccessModule']);
 
+
+
                 Route::put('/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'updateAccessModule'])->name(config('constants.route_name.superadmin.organization_modules.update'));
 
                 Route::put('/change-status/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'changeStatus'])->name(config('constants.route_name.superadmin.organization_modules.change_status'));
                 Route::delete('/delete-module/{modul_access_id}', [SA_OrganizeAccessModuleController::class, 'deleteAccessModule']);
+            });
+
+            Route::prefix('histories')->group(function () {
+                Route::get('/subscription', [SA_HistoryController::class, 'fetchRiwayatLangganan']);
             });
         });
     });

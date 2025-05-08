@@ -111,6 +111,9 @@ return [
                 'update' => 'Data organisasi berhasil diubah',
                 'delete' => 'Data organisasi berhasil dihapus',
             ],
+            'histories' => [
+                'fetchHistoryClient' => 'Data riwayat pelanggan berhasil ditarik',
+            ],
             'client' => [
                 'create' => 'Data pelanggan berhasil ditambahkan',
                 'fetch' => 'Tarik data pelanggan berhasil',
