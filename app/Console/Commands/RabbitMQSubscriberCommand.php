@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\RabbitMQWorker;
+use App\Services\RabbitMQSubscriberService;
 use Illuminate\Console\Command;
 
 class RabbitMQSubscriberCommand extends Command
@@ -12,23 +12,29 @@ class RabbitMQSubscriberCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'rabbitmq:subscribe';
+    protected $signature = 'rabbitmq:consume {exchange} {queue}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Subscribe To RabbitMQ With List Exchanges And Queues';
+    protected $description = 'Subscribe A Specific RabbitMQ With List Exchange And Queue';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $workers = RabbitMQWorker::all();
+        $exchange = $this->argument('exchange');
+        $queue = $this->argument('queue');
 
-        if (!$workers) {
-        }
+        $subscriber = new RabbitMQSubscriberService();
+        $subscriber->subscriber($exchange, $queue, function ($exchange, $queue, $messageContent) {
+            // Logika pemrosesan message
+            logger("Processing message from {$queue}: {$messageContent}");
+
+            // ... Tambahkan logika bisnis sesuai kebutuhan
+        });
     }
 }

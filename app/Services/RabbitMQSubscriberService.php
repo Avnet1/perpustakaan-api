@@ -4,9 +4,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 
-class RabbitMQPublisher
+class RabbitMQSubscriberService
 {
     protected $connection;
     protected $channel;
@@ -22,32 +21,6 @@ class RabbitMQPublisher
         );
 
         $this->channel = $this->connection->channel();
-    }
-
-    public function publisher(array $data, string $exchange, string $queue, string $routingKey = ''): void
-    {
-        try {
-            // Declare exchange
-            $this->channel->exchange_declare($exchange, 'fanout', false, true, false);
-
-            // Declare queue
-            $this->channel->queue_declare($queue, false, true, false, false);
-
-            // Bind queue to exchange with routing key
-            $this->channel->queue_bind($queue, $exchange, $routingKey);
-
-            // Create message
-            $message = new AMQPMessage(json_encode($data), [
-                'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT
-            ]);
-
-            // routing key kosong karena fanout
-            $this->channel->basic_publish($message, $exchange, $routingKey);
-
-            Log::info("Success published to exchange '{$exchange}' and queue '{$queue}'");
-        } catch (\Throwable $e) {
-            Log::error("Error publishing to exchange '{$exchange}' and queue '{$queue}': " . $e->getMessage());
-        }
     }
 
     public function subscriber(string $exchange, string $queue, callable $callback): void
@@ -70,7 +43,7 @@ class RabbitMQPublisher
 
                         $this->channel->ack($msg);
                     } catch (\Throwable $e) {
-                        Log::error("Error processing message from queue '{$queue}': " . $e->getMessage());
+                        Log::error("Error consume message from queue '{$queue}': " . $e->getMessage());
                         // Optional: dead-lettering or requeueing
                     }
                 }
@@ -84,7 +57,6 @@ class RabbitMQPublisher
             Log::error("Error subscribing to queue '{$queue}' on exchange '{$exchange}': " . $e->getMessage());
         }
     }
-
 
     public function __destruct()
     {

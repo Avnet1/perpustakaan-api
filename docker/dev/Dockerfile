@@ -32,7 +32,7 @@ RUN echo "upload_max_filesize=10M" > /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size=12M" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip intl opcache
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip intl opcache sockets
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
