@@ -153,6 +153,7 @@ class OrganizationController extends Controller
             'created_at' => Carbon::now(),
             'created_by' => $user->user_id,
         ]);
+
         $result = $this->service->storeInfo($payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }

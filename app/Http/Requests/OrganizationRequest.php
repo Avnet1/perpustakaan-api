@@ -33,7 +33,7 @@ class OrganizationRequest extends FormRequest
 
             case config('constants.route_name.superadmin.organization.store-info'):
                 return [
-                    'kode_member' => 'required|unique:master_organisasi,kode_member',
+                    'kode_member' => 'required',
                     'nama_organisasi' => 'required',
                     'provinsi' => 'required',
                     'kabupaten_kota' => 'required',
