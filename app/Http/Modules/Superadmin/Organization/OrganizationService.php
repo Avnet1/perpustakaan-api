@@ -24,43 +24,49 @@ class OrganizationService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
-        try {
-            $sqlQuery = MasterOrganisasi::whereNull('deleted_at');
+        $url = asset('storage');
 
-            if ($filters?->paging?->search) {
-                $search = $filters->paging->search;
-                $sqlQuery->where(function ($builder) use ($search) {
-                    $builder
-                        ->where("kode_member", "ilike", "%{$search}%")
-                        ->orWhere("nama_organisasi", "ilike", '%' . "%{$search}%")
-                        ->orWhere("provinsi", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kabupaten_kota", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kecamatan", "ilike", '%' . "%{$search}%")
-                        ->orWhere("kelurahan_desa", "ilike", '%' . "%{$search}%")
-                        ->orWhere("alamat", "ilike", '%' . "%{$search}%")
-                        ->orWhere("email", "ilike", '%' . "%{$search}%");
-                });
-            }
+        $sqlQuery = MasterOrganisasi::whereNull('deleted_at')->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo")
+            ->withCount(['modules as total_layanan']);
 
-            foreach ($filters->sorting as $column => $order) {
-                $sqlQuery->orderBy($column, $order);
-            }
-
-
-            $sqlQueryCount = $sqlQuery;
-            $sqlQueryRows = $sqlQuery;
-
-            $totalRows = $sqlQueryCount->count();
-            $rows =  $sqlQueryRows
-                ->skip($filters->paging->skip)
-                ->take($filters->paging->limit)
-                ->get();
-
-            $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.fetch'), $response);
-        } catch (Exception $e) {
-            return sendErrorResponse($e);
+        if ($filters?->paging?->search) {
+            $search = $filters->paging->search;
+            $sqlQuery->where(function ($builder) use ($search) {
+                $builder
+                    ->where("kode_member", "ilike", "%{$search}%")
+                    ->orWhere("nama_organisasi", "ilike", '%' . "%{$search}%")
+                    ->orWhere("provinsi", "ilike", '%' . "%{$search}%")
+                    ->orWhere("kabupaten_kota", "ilike", '%' . "%{$search}%")
+                    ->orWhere("kecamatan", "ilike", '%' . "%{$search}%")
+                    ->orWhere("kelurahan_desa", "ilike", '%' . "%{$search}%")
+                    ->orWhere("alamat", "ilike", '%' . "%{$search}%")
+                    ->orWhere("email", "ilike", '%' . "%{$search}%");
+            });
         }
+
+        foreach ($filters->sorting as $column => $order) {
+            $sqlQuery->orderBy($column, $order);
+        }
+
+
+        $sqlQueryCount = $sqlQuery;
+        $sqlQueryRows = $sqlQuery;
+
+        $totalRows = $sqlQueryCount->count();
+        $rows =  $sqlQueryRows
+            ->skip($filters->paging->skip)
+            ->take($filters->paging->limit)
+            ->get()
+            ->makeHidden(['db_user', 'db_pass', 'db_name']);
+
+        $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.fetch'), $response);
+
+        // try {
+
+        // } catch (Exception $e) {
+        //     return sendErrorResponse($e);
+        // }
     }
 
     public function findById(string $id): LaravelResponseInterface

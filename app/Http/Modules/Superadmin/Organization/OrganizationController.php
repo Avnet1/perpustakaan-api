@@ -25,6 +25,7 @@ class OrganizationController extends Controller
         'provinsi' => 'provinsi',
         'kabupaten_kota' => 'kabupaten_kota',
         'alamat' => 'alamat',
+        'total_layanan' => 'total_layanan'
     ];
 
     const DEFAULT_SORT = ['created_at', 'ASC'];
