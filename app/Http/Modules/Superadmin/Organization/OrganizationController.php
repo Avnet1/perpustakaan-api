@@ -193,7 +193,7 @@ class OrganizationController extends Controller
     public function update(Request $request): JsonResponse
     {
         $user = getUser($request);
-        $id = $request->route(self::$primaryKey);
+        $id = $request->route("{$this->primaryKey}");
         $payload = (object) array_merge($this->bodyValidation($request), [
             'updated_at' => Carbon::now(),
             'updated_by' => $user->user_id,

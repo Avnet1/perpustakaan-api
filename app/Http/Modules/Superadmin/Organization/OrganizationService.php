@@ -242,11 +242,29 @@ class OrganizationService
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
+
         try {
             $row = $this->repository->findById($id);
 
             if (!$row) {
                 return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
+            }
+
+            $pathFile = null;
+
+            if (isset($payload->image_id)) {
+                $row =  ImageStorageHelper::getImage($payload->image_id, 'logo');
+
+                if (!$row->success) {
+                    return $row;
+                }
+
+                $pathFile =  $row->data->image_path;
+                unset($payload->image_id);
+
+                $payload = array_merge((array) $payload, [
+                    "logo" => $pathFile
+                ]);
             }
 
             $result = $this->repository->update($id, (array) $payload);
