@@ -124,7 +124,7 @@ Route::prefix('v1')->group(function () {
 
                 Route::post('/info', [SA_OrganizationController::class, 'storeInfo'])->name(config('constants.route_name.superadmin.organization.store-info'));
 
-                Route::post('/change-logo/{organisasi_id}', [SA_MenuController::class, 'changeImage'])->name(config('constants.route_name.superadmin.organization.change-image'));
+                Route::post('/change-logo/{organisasi_id}', [SA_OrganizationController::class, 'changeImage'])->name(config('constants.route_name.superadmin.organization.change-image'));
 
 
                 Route::put('/{organisasi_id}', [SA_OrganizationController::class, 'update'])->name(config('constants.route_name.superadmin.organization.update'));
