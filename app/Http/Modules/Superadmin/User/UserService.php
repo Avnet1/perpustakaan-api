@@ -164,7 +164,6 @@ class UserService
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
-
         try {
             $row = $this->repository->findById($id);
 
@@ -172,8 +171,12 @@ class UserService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
+            if (isset($payload->confirm_password)) {
+                unset($payload->confirm_password);
+            }
+
             if (isset($payload->password)) {
-                unset($payload->password);
+                $payload->password = Hash::make($payload->password);
             }
 
             if (isset($payload->email)) {
