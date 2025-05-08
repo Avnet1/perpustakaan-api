@@ -48,17 +48,19 @@ class OrganizationRepository
 
     public function findById(string $id)
     {
+        $url = asset('storage');
 
         return MasterOrganisasi::with([
-            'moduleAccesses' => function ($q) {
+            'moduleAccesses' => function ($q) use ($url) {
                 $q->with([
-                    'module' => function ($rq) {
-                        $url = asset('storage');
+                    'module' => function ($rq) use ($url) {
                         $rq->selectRaw("*, (case when icon is null then null else CONCAT('$url/', icon) end) as icon");
                     }
                 ]);
             }
-        ])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+        ])->whereNull('deleted_at')
+            ->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo")
+            ->where("{$this->primaryKey}", $id)->first()->makeHidden(['db_pass']);
     }
 
     public function findByCondition(mixed $condition)

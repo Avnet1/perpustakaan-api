@@ -16,6 +16,7 @@ use App\Http\Modules\Superadmin\Module\ModuleController as SA_ModuleController;
 use App\Http\Modules\Superadmin\Menu\MenuController as SA_MenuController;
 use App\Http\Modules\Superadmin\OrganizeAccessModule\OrganizeAccessModuleController as SA_OrganizeAccessModuleController;
 use App\Http\Modules\Superadmin\Histories\HistoryController as SA_HistoryController;
+use App\Http\Modules\Superadmin\Dashboard\DashboardController as SA_DashboardController;
 
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\HandleCors;
@@ -154,6 +155,12 @@ Route::prefix('v1')->group(function () {
 
             Route::prefix('histories')->group(function () {
                 Route::get('/subscription', [SA_HistoryController::class, 'fetchRiwayatLangganan']);
+            });
+
+
+            Route::prefix('dashboard')->group(function () {
+                Route::get('/tab-info', [SA_DashboardController::class, 'fetchTabInfo']);
+                Route::get('/list-organization', [SA_DashboardController::class, 'fetchListOrganization']);
             });
         });
     });

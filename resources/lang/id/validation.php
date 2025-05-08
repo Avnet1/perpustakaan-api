@@ -114,6 +114,10 @@ return [
             'histories' => [
                 'fetchHistoryClient' => 'Data riwayat pelanggan berhasil ditarik',
             ],
+            'dashboard' => [
+                'fetchDashboardInfo' => 'Tarik data informasi dashboard berhasil',
+                'fetchListOrganization' => 'Tarik data list organisasi berhasil'
+            ],
             'client' => [
                 'create' => 'Data pelanggan berhasil ditambahkan',
                 'fetch' => 'Tarik data pelanggan berhasil',
