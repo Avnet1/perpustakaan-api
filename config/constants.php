@@ -92,5 +92,14 @@ return [
         "user" => 'user/photo',
         "organization" => 'organization/logo',
         "social-media" => 'social_media/logo'
+    ],
+
+    'message_broker' => [
+        'queue' => [
+            'organization' => 'queue_organization'
+        ],
+        'exchange' => [
+            'organization' => 'exchange_organization'
+        ]
     ]
 ];

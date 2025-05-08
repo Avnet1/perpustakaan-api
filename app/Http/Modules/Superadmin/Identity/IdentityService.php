@@ -41,7 +41,7 @@ class IdentityService
             $result = $this->repository->findById($id);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $result);
             }
 
             $result->photo = getFileUrl($result->photo);
@@ -96,7 +96,7 @@ class IdentityService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
             }
 
             if ($row->photo != null) {
@@ -114,7 +114,7 @@ class IdentityService
             if (!$result) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.identity.update'), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.identity.update'), $result);
             }
 
             if ($hasPhoto == true) {
@@ -138,7 +138,7 @@ class IdentityService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Identitas']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

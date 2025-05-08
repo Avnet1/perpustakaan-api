@@ -41,7 +41,7 @@ class SocialMediaService
             $result = $this->repository->findById($id);
 
             if (!$result) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $result);
             }
 
             $result->logo = getFileUrl($result->logo);
@@ -98,7 +98,7 @@ class SocialMediaService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->logo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $row);
             }
 
             if ($row->logo != null) {
@@ -139,7 +139,7 @@ class SocialMediaService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Social media']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

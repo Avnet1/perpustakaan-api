@@ -72,7 +72,7 @@ class UserService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.user.find'), $row);
@@ -157,7 +157,7 @@ class UserService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
             if (isset($payload->password)) {
@@ -197,7 +197,7 @@ class UserService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
             if ($row->photo != null) {
@@ -231,7 +231,7 @@ class UserService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

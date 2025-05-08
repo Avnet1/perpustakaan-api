@@ -59,7 +59,7 @@ class RoleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.role.find'), $row);
@@ -99,7 +99,7 @@ class RoleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
 
             $result = $this->repository->update($id, (array) $payload);
@@ -122,7 +122,7 @@ class RoleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Role']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

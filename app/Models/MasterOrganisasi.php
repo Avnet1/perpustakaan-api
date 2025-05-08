@@ -40,6 +40,7 @@ class MasterOrganisasi extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'order_number'
     ];
 
     protected $hidden = [

@@ -103,7 +103,7 @@ class OrganizeAccessModuleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Access Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Access Modul']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

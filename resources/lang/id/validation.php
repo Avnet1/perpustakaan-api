@@ -28,7 +28,8 @@ return [
         'success' => [
             'default' => [
                 'uploadImage' => 'Upload :attribute berhasil',
-                'findImage' => 'Data :attribut berhasil ditemukan'
+                'findImage' => 'Data :attribut berhasil ditemukan',
+                'approved' => ':attribute berhasil disetujui'
             ],
             'role' => [
                 'create' => 'Data role berhasil ditambahkan',
@@ -151,7 +152,9 @@ return [
                 'minCharacter' => 'Jumlah karakter :attribute minimal adalah :number karakter',
                 'notFound' => 'Data :attribute tidak ditemukan',
                 'existedRow' => 'Data :attribute duplikat. Data :attribute sudah terdaftar di sistem',
-                'uploadImage' => 'Upload :attribute gagal'
+                'uploadImage' => 'Upload :attribute gagal',
+                'existApproved' => ':attribute telah disetujui',
+                'approved' => ':attribute gagal disetujui'
             ],
             'role' => [
                 'create' => 'Data role gagal ditambahkan',

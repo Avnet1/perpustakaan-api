@@ -27,7 +27,7 @@ class MenuService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
             }
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.menu.find'), $row);
@@ -133,7 +133,7 @@ class MenuService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);
@@ -156,7 +156,7 @@ class MenuService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
             }
 
             if ($row->icon != null) {
@@ -189,7 +189,7 @@ class MenuService
         $row = $this->repository->findById($id);
 
         if (!$row) {
-            return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
         }
 
         // $row = $this->repository->checkExisted($id,  [
@@ -197,7 +197,7 @@ class MenuService
         // ]);
 
         // if ($row) {
-        //     return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
+        //     return new LaravelResponseContract(false, 400, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
         // }
 
 

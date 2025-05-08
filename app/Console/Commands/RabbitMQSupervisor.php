@@ -38,13 +38,13 @@ class RabbitMQSupervisor extends Command
             $exchange = $worker->exchange;
             $queue = $worker->queue;
 
-            $process = new Process(['php', 'artisan', 'rabbitmq:work', $exchange, $queue]);
+            $process = new Process(['php', 'artisan', 'rabbitmq:subscribe', $exchange, $queue]);
             $process->start();
 
-            $this->info("Started worker for [{$exchange}] -> [{$queue}]");
+            $this->info("Started subscriber for [{$exchange}] -> [{$queue}]");
         }
 
-        $this->info("All workers started. Running as master...");
+        $this->info("All subscribers started. Running as master...");
 
         // Optional: keep the master process alive
         while (true) {

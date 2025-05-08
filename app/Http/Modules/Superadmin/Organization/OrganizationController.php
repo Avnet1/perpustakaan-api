@@ -223,7 +223,11 @@ class OrganizationController extends Controller
         $id = $request->route("{$this->primaryKey}");
         $today = Carbon::now();
         $payload = (object) [
+            'db_user' => 'admin',
+            'db_pass' => generateUniqueCode(10),
+            'db_name' => null,
             'is_approved' => true,
+            'order_number' => null,
             'approved_at' => $today,
             'approved_by' => $user->user_id,
             'updated_at' => Carbon::now(),

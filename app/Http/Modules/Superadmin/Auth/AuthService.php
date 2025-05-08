@@ -30,11 +30,11 @@ class AuthService
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
             }
 
             if (!Hash::check($payload->password, $user->password)) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.passwordInvalid'), $payload);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.passwordInvalid'), $payload);
             }
 
             $credentials = [
@@ -79,7 +79,7 @@ class AuthService
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $user);
             }
 
             $result = $this->repository->insertOtp($payload);
@@ -114,17 +114,17 @@ class AuthService
             $row = $this->repository->getOtp($where);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
             }
 
             if ($row->has_verified) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.hadVerified', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.hadVerified', ['attribute' => "Kode Otp {$where['otp_code']}"]), $where);
             }
 
             $diffSeconds = Carbon::now()->diffInSeconds(Carbon::parse($row->created_at));
 
             if ($diffSeconds > $row->otp_time) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.expiredOtp', ['attribute' => "Kode Otp {$where['otp_code']}", 'num' => '5']), $where);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.expiredOtp', ['attribute' => "Kode Otp {$where['otp_code']}", 'num' => '5']), $where);
             }
 
             $result = $this->repository->verifiedOtp($where, ['has_verified' => true]);
@@ -155,7 +155,7 @@ class AuthService
             $row = $this->repository->getOtp($condition);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.permissionCode'), $payload);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.permissionCode'), $payload);
             }
 
             $this->repository->deleteOtp($condition);
@@ -165,7 +165,7 @@ class AuthService
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
             }
 
             $user->password = Hash::make($payload['new_password']);
@@ -187,7 +187,7 @@ class AuthService
             ]);
 
             if (!$user) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $payload);
             }
 
             $user->password = Hash::make($payload['new_password']);
@@ -208,7 +208,7 @@ class AuthService
 
         // If no token is provided, return an error
         if (!$token) {
-            return new LaravelResponseContract(false, 404, __('validation.custom.error.auth.noProvideToken'), $token);
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.auth.noProvideToken'), $token);
         }
 
         try {
@@ -246,7 +246,7 @@ class AuthService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
             $result = $this->repository->update($id, (array) $payload);

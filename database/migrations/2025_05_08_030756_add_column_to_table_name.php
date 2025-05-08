@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('master_organisasi', function (Blueprint $table) {
             $table->uuid('approved_by')->nullable();
+            $table->bigInteger('order_number')->nullable()->default(null);
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('master_organisasi', function (Blueprint $table) {
             $table->dropColumn('approved_by');
+            $table->dropColumn('order_number');
         });
     }
 };

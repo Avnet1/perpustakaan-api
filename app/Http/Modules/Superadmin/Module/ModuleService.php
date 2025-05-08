@@ -67,7 +67,7 @@ class ModuleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
             $row->icon = getFileUrl($row->icon);
@@ -174,7 +174,7 @@ class ModuleService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->icon);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
             if ($row->icon != null) {
@@ -208,7 +208,7 @@ class ModuleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
 
@@ -223,7 +223,7 @@ class ModuleService
             );
 
             if ($row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul} atau No.urut {$payload->urutan}"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Modul {$payload->nama_modul} atau No.urut {$payload->urutan}"]), $row);
             }
 
 
@@ -248,7 +248,7 @@ class ModuleService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Modul']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);

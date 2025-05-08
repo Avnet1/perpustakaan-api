@@ -12,7 +12,7 @@ class RabbitMQSubscriberCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'rabbitmq:consume {exchange} {queue}';
+    protected $signature = 'rabbitmq:subscribe {exchange} {queue}';
 
     /**
      * The console command description.

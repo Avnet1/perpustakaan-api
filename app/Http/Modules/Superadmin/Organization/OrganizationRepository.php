@@ -22,6 +22,11 @@ class OrganizationRepository
         return MasterOrganisasi::whereNull('deleted_at');
     }
 
+    public function getLasOrder()
+    {
+        return MasterOrganisasi::orderBy('order_number', 'desc')->first();
+    }
+
     public function insert(array $payload)
     {
         return MasterOrganisasi::store($payload);

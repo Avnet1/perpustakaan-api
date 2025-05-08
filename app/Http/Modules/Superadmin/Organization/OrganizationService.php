@@ -6,6 +6,7 @@ use App\Helpers\ImageStorageHelper;
 use App\Http\Contracts\LaravelResponseContract;
 use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\MasterOrganisasi;
+use App\Services\RabbitMQPublisherService;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -24,49 +25,47 @@ class OrganizationService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
-        $url = asset('storage');
+        try {
+            $url = asset('storage');
 
-        $sqlQuery = MasterOrganisasi::whereNull('deleted_at')->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo")
-            ->withCount(['modules as total_layanan']);
+            $sqlQuery = MasterOrganisasi::whereNull('deleted_at')->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo")
+                ->withCount(['modules as total_layanan']);
 
-        if ($filters?->paging?->search) {
-            $search = $filters->paging->search;
-            $sqlQuery->where(function ($builder) use ($search) {
-                $builder
-                    ->where("kode_member", "ilike", "%{$search}%")
-                    ->orWhere("nama_organisasi", "ilike", '%' . "%{$search}%")
-                    ->orWhere("provinsi", "ilike", '%' . "%{$search}%")
-                    ->orWhere("kabupaten_kota", "ilike", '%' . "%{$search}%")
-                    ->orWhere("kecamatan", "ilike", '%' . "%{$search}%")
-                    ->orWhere("kelurahan_desa", "ilike", '%' . "%{$search}%")
-                    ->orWhere("alamat", "ilike", '%' . "%{$search}%")
-                    ->orWhere("email", "ilike", '%' . "%{$search}%");
-            });
+            if ($filters?->paging?->search) {
+                $search = $filters->paging->search;
+                $sqlQuery->where(function ($builder) use ($search) {
+                    $builder
+                        ->where("kode_member", "ilike", "%{$search}%")
+                        ->orWhere("nama_organisasi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("provinsi", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kabupaten_kota", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kecamatan", "ilike", '%' . "%{$search}%")
+                        ->orWhere("kelurahan_desa", "ilike", '%' . "%{$search}%")
+                        ->orWhere("alamat", "ilike", '%' . "%{$search}%")
+                        ->orWhere("email", "ilike", '%' . "%{$search}%");
+                });
+            }
+
+            foreach ($filters->sorting as $column => $order) {
+                $sqlQuery->orderBy($column, $order);
+            }
+
+
+            $sqlQueryCount = $sqlQuery;
+            $sqlQueryRows = $sqlQuery;
+
+            $totalRows = $sqlQueryCount->count();
+            $rows =  $sqlQueryRows
+                ->skip($filters->paging->skip)
+                ->take($filters->paging->limit)
+                ->get()
+                ->makeHidden(['db_user', 'db_pass', 'db_name']);
+
+            $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.fetch'), $response);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
         }
-
-        foreach ($filters->sorting as $column => $order) {
-            $sqlQuery->orderBy($column, $order);
-        }
-
-
-        $sqlQueryCount = $sqlQuery;
-        $sqlQueryRows = $sqlQuery;
-
-        $totalRows = $sqlQueryCount->count();
-        $rows =  $sqlQueryRows
-            ->skip($filters->paging->skip)
-            ->take($filters->paging->limit)
-            ->get()
-            ->makeHidden(['db_user', 'db_pass', 'db_name']);
-
-        $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-        return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.fetch'), $response);
-
-        // try {
-
-        // } catch (Exception $e) {
-        //     return sendErrorResponse($e);
-        // }
     }
 
     public function findById(string $id): LaravelResponseInterface
@@ -75,7 +74,7 @@ class OrganizationService
         try {
             $result = $this->repository->findById($id);
             if (!$result) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $result);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $result);
             }
 
             $result->logo = getFileUrl($result->logo);
@@ -112,19 +111,14 @@ class OrganizationService
 
     public function storeInfo(mixed $payload): LaravelResponseInterface
     {
-
         try {
 
-            $row = queryCheckExisted(
-                $this->repository->getQuery(),
-                [
-                    'kode_member' => $payload->kode_member,
-                    'nama_organisasi' => "%{$payload->kode_member}%",
-                ]
-            );
+            $row = $this->repository->findByCondition([
+                'kode_member' => $payload->kode_member,
+            ]);
 
             if ($row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Member ({$payload->kode_member}) atau Nama organisasi {$payload->kode_member}"]), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Kode Member ({$payload->kode_member})"]), $row);
             }
 
 
@@ -170,7 +164,7 @@ class OrganizationService
             if (!$row) {
                 DB::rollBack();
                 deleteFileInStorage($payload->logo);
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Organisasi']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Organisasi']), $row);
             }
 
             if ($row->logo != null) {
@@ -205,7 +199,7 @@ class OrganizationService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
             $row = queryCheckExisted(
@@ -247,7 +241,7 @@ class OrganizationService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Data Organisasi']), $row);
             }
 
             $pathFile = null;
@@ -285,13 +279,48 @@ class OrganizationService
             $row = $this->repository->findById($id);
 
             if (!$row) {
-                return new LaravelResponseContract(false, 404, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
             }
 
             $this->repository->delete($id, (array) $payload);
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.organization.delete'), (object) [
                 "{$this->primaryKey}" => $id,
+            ]);
+        } catch (Exception $e) {
+            return sendErrorResponse($e);
+        }
+    }
+
+    public function approved(string $id, mixed $payload): LaravelResponseInterface
+    {
+        try {
+            $row = $this->repository->findById($id);
+
+            if (!$row) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'ID Organisasi']), $row);
+            }
+
+            if ($row->is_approved) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.existApproved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), $row);
+            }
+
+            $lastOrder = $this->repository->getLasOrder();
+            $payload->db_name = "db_organisasi_" . $lastOrder ? $lastOrder->order_number + 1 : 1;
+            $payload->order_number = $lastOrder ? $lastOrder->order_number + 1 : 1;
+
+            $result = $this->repository->update($id, (array) $payload);
+
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), $result);
+            }
+
+            $rabbitMQ = new RabbitMQPublisherService();
+            $rabbitMQ->publisher($result, config('constants.message_broker.exchange.organization'), config('constants.message_broker.queue.organization'));
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), (object) [
+                "{$this->primaryKey}" => $id,
+                "is_approved" => $result->is_approved
             ]);
         } catch (Exception $e) {
             return sendErrorResponse($e);
