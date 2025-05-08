@@ -130,7 +130,7 @@ Route::prefix('v1')->group(function () {
 
                 Route::get('/{organisasi_id}', [SA_OrganizationController::class, 'findById']);
 
-                Route::get('/approved/{organisasi_id}', [SA_OrganizationController::class, 'approve']);
+                Route::get('/approved/{organisasi_id}', [SA_OrganizationController::class, 'approved']);
 
                 Route::delete('/{organisasi_id}', [SA_OrganizationController::class, 'delete']);
             });

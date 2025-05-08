@@ -216,4 +216,21 @@ class OrganizationController extends Controller
         $result = $this->service->delete($id, $payload);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
     }
+
+    public function approved(Request $request): JsonResponse
+    {
+        $user = getUser($request);
+        $id = $request->route("{$this->primaryKey}");
+        $today = Carbon::now();
+        $payload = (object) [
+            'is_approved' => true,
+            'approved_at' => $today,
+            'approved_by' => $user->user_id,
+            'updated_at' => Carbon::now(),
+            'updated_by' => $user->user_id,
+        ];
+
+        $result = $this->service->approved($id, $payload);
+        return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
+    }
 }
