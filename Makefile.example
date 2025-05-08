@@ -16,7 +16,7 @@ local-run:
 
 # Deploy Dev
 app-dev-build:
-    docker-compose -f  $(compose-dev-file) build --no-cache
+	docker-compose -f  $(compose-dev-file) build --no-cache
 
 app-dev-deploy:
 	docker compose -f $(compose-dev-file) up -d --force-recreate --remove-orphans
