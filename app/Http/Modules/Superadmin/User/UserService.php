@@ -8,6 +8,7 @@ use App\Http\Interfaces\LaravelResponseInterface;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -69,13 +70,15 @@ class UserService
     public function findById(string $id): LaravelResponseInterface
     {
         try {
-            $row = $this->repository->findById($id);
+            $result = $this->repository->findById($id);
 
-            if (!$row) {
-                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
+            if (!$result) {
+                return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $result);
             }
 
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.find'), $row);
+            $result->photo = getFileUrl($result->photo);
+
+            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.find'), $result);
         } catch (Exception $e) {
             return sendErrorResponse($e);
         }
@@ -84,25 +87,34 @@ class UserService
 
     public function uploadImage(mixed $payload): LaravelResponseInterface
     {
-        DB::beginTransaction();
-        try {
-            $result = ImageStorageHelper::storeImage([
-                'image_path' => $payload->photo,
-                'created_by' => $payload->created_by
-            ], 'icon');
+        if (isset($payload->image_id)) {
+            $id = $payload->user_id;
+            $payload->updated_at = Carbon::now();
+            $payload->updated_by = $payload->created_by;
+            unset($payload->user_id);
+            unset($payload->created_by);
+            return self::changeImage($id, $payload);
+        } else {
+            DB::beginTransaction();
+            try {
+                $result = ImageStorageHelper::storeImage([
+                    'image_path' => $payload->photo,
+                    'created_by' => $payload->created_by
+                ], 'icon');
 
-            if (!$result->success) {
+                if (!$result->success) {
+                    DB::rollBack();
+                    deleteFileInStorage($payload->photo);
+                } else {
+                    DB::commit();
+                }
+
+                return $result;
+            } catch (Exception $e) {
                 DB::rollBack();
                 deleteFileInStorage($payload->photo);
-            } else {
-                DB::commit();
+                return sendErrorResponse($e);
             }
-
-            return $result;
-        } catch (Exception $e) {
-            DB::rollBack();
-            deleteFileInStorage($payload->photo);
-            return sendErrorResponse($e);
         }
     }
 

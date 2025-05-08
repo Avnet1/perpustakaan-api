@@ -37,7 +37,10 @@ class UserRepository
 
     public function findById(string $id)
     {
-        return User::with(['role'])->whereNull('deleted_at')->where("{$this->primaryKey}", $id)->first();
+        return User::with(['role'])
+            ->whereNull('deleted_at')
+            ->where("{$this->primaryKey}", $id)
+            ->first();
     }
 
 
