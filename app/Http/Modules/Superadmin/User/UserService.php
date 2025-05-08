@@ -25,8 +25,11 @@ class UserService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
+        $url = asset('storage');
         try {
-            $sqlQuery = User::with(['role'])->whereNull('deleted_at');
+            $sqlQuery = User::with(['role'])
+                ->selectRaw("*, (case when photo is null then null else CONCAT('$url/', photo) end) as photo")
+                ->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
