@@ -184,6 +184,23 @@ class UserService
                 }
             }
 
+            $pathFile = null;
+
+            if (isset($payload->image_id)) {
+                $row =  ImageStorageHelper::getImage($payload->image_id, 'photo');
+
+                if (!$row->success) {
+                    return $row;
+                }
+
+                $pathFile =  $row->data->image_path;
+                unset($payload->image_id);
+
+                $payload = array_merge((array) $payload, [
+                    "photo" => $pathFile
+                ]);
+            }
+
 
             $result = $this->repository->update($id, (array) $payload);
 
