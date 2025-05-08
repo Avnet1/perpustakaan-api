@@ -25,8 +25,11 @@ class UserService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
+        $url = asset('storage');
         try {
-            $sqlQuery = User::with(['role'])->whereNull('deleted_at');
+            $sqlQuery = User::with(['role'])
+                ->selectRaw("*, (case when photo is null then null else CONCAT('$url/', photo) end) as photo")
+                ->whereNull('deleted_at');
 
             if ($filters?->paging?->search) {
                 $search = $filters->paging->search;
@@ -164,7 +167,6 @@ class UserService
 
     public function update(string $id, mixed $payload): LaravelResponseInterface
     {
-
         try {
             $row = $this->repository->findById($id);
 
@@ -172,8 +174,12 @@ class UserService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'User']), $row);
             }
 
+            if (isset($payload->confirm_password)) {
+                unset($payload->confirm_password);
+            }
+
             if (isset($payload->password)) {
-                unset($payload->password);
+                $payload->password = Hash::make($payload->password);
             }
 
             if (isset($payload->email)) {
@@ -182,6 +188,23 @@ class UserService
                 if ($row) {
                     return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Email ({$row->email})"]), $row);
                 }
+            }
+
+            $pathFile = null;
+
+            if (isset($payload->image_id)) {
+                $row =  ImageStorageHelper::getImage($payload->image_id, 'photo');
+
+                if (!$row->success) {
+                    return $row;
+                }
+
+                $pathFile =  $row->data->image_path;
+                unset($payload->image_id);
+
+                $payload = array_merge((array) $payload, [
+                    "photo" => $pathFile
+                ]);
             }
 
 

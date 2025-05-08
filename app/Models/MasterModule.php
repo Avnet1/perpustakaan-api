@@ -90,7 +90,10 @@ class MasterModule extends Model
 
     public function listMenu()
     {
-        return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id');
+        $url = asset('storage');
+
+        return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id')
+            ->selectRaw("*, CASE WHEN icon IS NULL THEN NULL ELSE CONCAT('$url/', icon) END AS icon");
     }
 
 

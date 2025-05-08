@@ -71,33 +71,6 @@ class MenuService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
-        $condition = [];
-
-        if (isset($payload->nama_menu)) {
-            $condition['nama_menu'] = "%{$payload->nama_menu}%";
-        }
-
-        if (isset($payload->parent_id)) {
-            $condition['parent_id'] = $payload->parent_id;
-        }
-
-
-        $row = $this->repository->findByCondition($condition);
-
-        if ($row) {
-            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "menu"]), $row);
-        }
-
-
-        // $row = $this->repository->findByCondition([
-        //     'urutan' => $payload->urutan,
-        //     'parent_id' => $payload->parent_id
-        // ]);
-
-        // if ($row) {
-        //     return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "No. urut/Urutan ({$payload->urutan})"]), $row);
-        // }
-
         $pathIcon = null;
 
         if (isset($payload->image_id)) {
@@ -192,13 +165,23 @@ class MenuService
             return new LaravelResponseContract(false, 400, __('validation.custom.error.default.notFound', ['attribute' => 'Menu']), $row);
         }
 
-        // $row = $this->repository->checkExisted($id,  [
-        //     'nama_menu' => "%{$payload->nama_menu}%",
-        // ]);
 
-        // if ($row) {
-        //     return new LaravelResponseContract(false, 400, __('validation.custom.error.default.existedRow', ['attribute' => "Nama Menu {$payload->nama_menu}"]), $row);
-        // }
+        $pathFile = null;
+
+        if (isset($payload->image_id)) {
+            $row =  ImageStorageHelper::getImage($payload->image_id, 'icon');
+
+            if (!$row->success) {
+                return $row;
+            }
+
+            $pathFile =  $row->data->image_path;
+            unset($payload->image_id);
+
+            $payload = array_merge((array) $payload, [
+                "icon" => $pathFile
+            ]);
+        }
 
 
         $result = $this->repository->update($id, (array) $payload);
