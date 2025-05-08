@@ -15,6 +15,14 @@ local-run:
 
 
 # Deploy Dev
+app-certbot:
+	docker compose -f docker-compose.dev.yml run --rm certbot certonly \
+		--webroot --webroot-path=/var/www/certbot \
+		--email developer1@avnet.id \
+		--agree-tos \
+		--no-eff-email \
+		-d dev-sikeu-unimed.avnet.id
+
 app-dev-build:
 	docker-compose -f  $(compose-dev-file) build --no-cache
 
