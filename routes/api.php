@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ForceHttps;
 use App\Http\Middleware\SuperAdminMiddleware;
 use App\Http\Middleware\TokenValidateMiddleware;
 
