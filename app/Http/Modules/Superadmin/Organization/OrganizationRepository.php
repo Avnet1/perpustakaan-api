@@ -59,7 +59,6 @@ class OrganizationRepository
                 ]);
             }
         ])->whereNull('deleted_at')
-            ->selectRaw("*, (case when logo is null then null else CONCAT('$url/', logo) end) as logo")
             ->where("{$this->primaryKey}", $id)->first()->makeHidden(['db_pass']);
     }
 
