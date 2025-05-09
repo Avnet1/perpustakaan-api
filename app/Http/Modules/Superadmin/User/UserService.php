@@ -25,6 +25,7 @@ class UserService
 
     public function fetch(mixed $filters): LaravelResponseInterface
     {
+
         $url = asset('storage');
         $sqlQuery = User::join('roles', 'roles.role_id', '=', 'users.role_id')
             ->selectRaw("

@@ -7,6 +7,15 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
+
+if (!function_exists('sanitizeIdentifier')) {
+    function sanitizeIdentifier(string $input): string
+    {
+        // Only allow alphanumeric + underscore
+        return preg_replace('/[^a-zA-Z0-9_]/', '', $input);
+    }
+}
+
 if (!function_exists('getFileUrl')) {
     function getFileUrl($item)
     {
