@@ -71,6 +71,17 @@ class MenuService
 
     public function store(mixed $payload): LaravelResponseInterface
     {
+
+        $row = $this->repository->findByCondition([
+            'modul_id' => $payload->modul_id,
+            'nama_menu' => $payload->nama_menu,
+            'slug' => $payload->slug,
+        ]);
+
+        if (!$row) {
+            return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Data menu {$payload->nama_menu}"]), $row);
+        }
+
         $pathIcon = null;
 
         if (isset($payload->image_id)) {

@@ -30,7 +30,7 @@ class MenuRequest extends FormRequest
             case config('constants.route_name.superadmin.menu.store'):
                 return [
                     'modul_id' => 'required',
-                    'nama_modul' => 'required',
+                    'nama_menu' => 'required',
                     'slug' => 'required',
                     'urutan' => 'required',
                 ];
