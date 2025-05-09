@@ -93,6 +93,7 @@ class MasterModule extends Model
         $url = asset('storage');
 
         return $this->hasMany(MasterMenu::class, 'modul_id', 'modul_id')
+            ->whereNull('parent_id') // Tambahkan filter ini
             ->selectRaw("*, CASE WHEN icon IS NULL THEN NULL ELSE CONCAT('$url/', icon) END AS icon");
     }
 

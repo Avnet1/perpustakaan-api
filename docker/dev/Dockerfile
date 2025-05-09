@@ -44,7 +44,7 @@ RUN chown -R www-data:www-data /var/www
 
 RUN composer install
 
-RUN npm install && npm run build
+# RUN npm install && npm run build
 
 # Copy entrypoint.sh
 COPY ./docker/dev/entrypoint.sh /usr/local/bin/entrypoint.sh
