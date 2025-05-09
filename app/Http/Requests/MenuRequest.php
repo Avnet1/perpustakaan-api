@@ -55,11 +55,10 @@ class MenuRequest extends FormRequest
     public function messages()
     {
         return [
-
-            'modul_id.required' =>  __('validation.required', ['attribute' => 'Data ID Modul']),
-            'nama_modul.required' =>  __('validation.required', ['attribute' => 'Data Nama Modul']),
-            'slug.required' => __('validation.required', ['attribute' => 'Data slug']),
-            'urutan.required' =>  __('validation.required', ['attribute' => 'Data urutan']),
+            'modul_id.required' =>  __('validation.required', ['attribute' => 'ID Modul']),
+            'nama_menu.required' =>  __('validation.required', ['attribute' => 'Nama Menu']),
+            'slug.required' => __('validation.required', ['attribute' => 'Slug']),
+            'urutan.required' =>  __('validation.required', ['attribute' => 'Urutan']),
             'icon.required' =>  __('validation.required', ['attribute' => 'Logo/icon']),
             'icon.image' =>  __('validation.image', ['attribute' => 'Logo/Icon']),
             'icon.max' =>  __('validation.max.file', ['attribute' => 'Logo/Icon', 'max' => '5120']),

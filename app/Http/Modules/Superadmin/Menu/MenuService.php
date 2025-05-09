@@ -78,7 +78,7 @@ class MenuService
             'slug' => $payload->slug,
         ]);
 
-        if (!$row) {
+        if ($row) {
             return new LaravelResponseContract(false, 400, __('validation.custom.error.default.exists', ['attribute' => "Data menu {$payload->nama_menu}"]), $row);
         }
 

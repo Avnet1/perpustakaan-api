@@ -39,6 +39,10 @@ class OrganizeAccessModuleController extends Controller
         if ($request->has('end_service')) {
             $payload['end_service'] = $request->input('end_service');
         }
+
+        if ($request->has('is_active')) {
+            $payload['is_active'] = $request->input('is_active');
+        }
         return $payload;
     }
 
