@@ -58,6 +58,10 @@ class UserService
                 });
             }
 
+            if ($filters?->query?->role_id) {
+                $sqlQuery->where('role_id', $filters->query->role_id);
+            }
+
             if (!empty($filters->sorting)) {
                 foreach ($filters->sorting as $column => $order) {
                     if ($column === 'role_name') {
@@ -69,6 +73,7 @@ class UserService
                     }
                 }
             }
+
 
             // Clone query untuk count (tanpa pagination)
             $sqlQueryCount = clone $sqlQuery;

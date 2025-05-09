@@ -67,7 +67,8 @@ class UserController extends Controller
     {
         $filters = (object) [
             "paging" => defineRequestPaginateArgs($request),
-            "sorting" => defineRequestOrder($request, self::DEFAULT_SORT, self::SORT_COLUMNS)
+            "sorting" => defineRequestOrder($request, self::DEFAULT_SORT, self::SORT_COLUMNS),
+            "query" => $request->all()
         ];
         $result = $this->service->fetch($filters);
         return ResponseHelper::sendResponseJson($result->success, $result->code, $result->message, $result->data);
