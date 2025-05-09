@@ -14,9 +14,8 @@ class RabbitMQWorkerSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['exchange' => 'user_exchange', 'queue' => 'user_queue'],
-            ['exchange' => 'order_exchange', 'queue' => 'order_queue'],
-            ['exchange' => 'notif_exchange', 'queue' => 'notif_queue'],
+            ['exchange' => config('constants.message_broker.exchange.organization'), 'queue' => config('constants.message_broker.queue.organization')],
+            ['exchange' => config('constants.message_broker.exchange.notification'), 'queue' => config('constants.message_broker.queue.notification')],
         ];
 
         for ($i = 0; $i < count($data); $i++) {

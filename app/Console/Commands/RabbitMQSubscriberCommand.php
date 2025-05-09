@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\CreateDatabaseOrganizationHelper;
 use App\Services\RabbitMQSubscriberService;
 use Illuminate\Console\Command;
 
@@ -33,6 +34,20 @@ class RabbitMQSubscriberCommand extends Command
         $subscriber->subscriber($exchange, $queue, function ($exchange, $queue, $messageContent) {
             // Logika pemrosesan message
             logger("Processing message from {$queue}: {$messageContent}");
+
+            switch ($queue) {
+                case config('constants.message_broker.queue.organization'):
+                    CreateDatabaseOrganizationHelper::handle($messageContent);
+                    break;
+
+                case config('constants.message_broker.queue.notification'):
+
+                    break;
+
+                default:
+                    # code...
+                    break;
+            }
 
             // ... Tambahkan logika bisnis sesuai kebutuhan
         });

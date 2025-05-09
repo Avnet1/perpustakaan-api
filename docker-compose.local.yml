@@ -1,0 +1,37 @@
+# ./docker-compose.dev.yml
+services:
+  perpustakaan_dev_api:
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    container_name: perpustakaan_dev_api
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    depends_on:
+      - perpustakaan_dev_rabbitmq
+    env_file:
+      - .env
+    expose:
+      - "9000"
+    networks:
+      - perpustakaan_dev_network
+
+  perpustakaan_dev_rabbitmq:
+    image: rabbitmq:3.13.7-management-alpine
+    container_name: perpustakaan_dev_rabbitmq
+    restart: always
+    ports:
+      - "5677:5672"
+      - "15677:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=hessrL2Pc9PFs0TV5YrfYovQ
+    networks:
+      - perpustakaan_dev_network
+
+networks:
+  perpustakaan_dev_network:
+    name: perpustakaan_dev_network
+    external: true

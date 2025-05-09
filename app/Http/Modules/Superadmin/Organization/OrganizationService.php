@@ -294,6 +294,7 @@ class OrganizationService
 
     public function approved(string $id, mixed $payload): LaravelResponseInterface
     {
+
         try {
             $row = $this->repository->findById($id);
 
@@ -315,8 +316,8 @@ class OrganizationService
                 return new LaravelResponseContract(false, 400, __('validation.custom.error.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), $result);
             }
 
-            // $rabbitMQ = new RabbitMQPublisherService();
-            // $rabbitMQ->publisher($result, config('constants.message_broker.exchange.organization'), config('constants.message_broker.queue.organization'));
+            $rabbitMQ = new RabbitMQPublisherService();
+            $rabbitMQ->publisher($result, config('constants.message_broker.exchange.organization'), config('constants.message_broker.queue.organization'));
 
             return new LaravelResponseContract(true, 200, __('validation.custom.success.default.approved', ['attribute' => "Akses Database Organisasi {$row->nama_organisasi}"]), (object) [
                 "{$this->primaryKey}" => $id,

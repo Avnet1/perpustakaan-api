@@ -96,10 +96,12 @@ return [
 
     'message_broker' => [
         'queue' => [
-            'organization' => 'queue_organization'
+            'organization' => 'queue_organization',
+            'notification' => 'queue_notification'
         ],
         'exchange' => [
-            'organization' => 'exchange_organization'
+            'organization' => 'exchange_organization',
+            'notification' => 'exchange_notification'
         ]
     ]
 ];
