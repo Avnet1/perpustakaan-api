@@ -35,8 +35,7 @@ class ModuleService
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
                         ->where("nama_modul", "ilike", "%{$search}%")
-                        ->orWhere("slug", "ilike", '%' . "%{$search}%")
-                        ->orWhere("urutan", "=", $search);
+                        ->orWhere("slug", "ilike", '%' . "%{$search}%");
                 });
             }
 

@@ -299,6 +299,6 @@ if (!function_exists('formatStringToSlug')) {
 if (!function_exists('formatStringToSlug')) {
     function sendErrorResponse(Exception $e): LaravelResponseInterface
     {
-        return new LaravelResponseContract(false, 500, $e->getMessage(), $e);
+        return new LaravelResponseContract(false, 400, $e->getMessage(), $e);
     }
 }

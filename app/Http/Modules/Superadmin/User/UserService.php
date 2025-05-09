@@ -26,48 +26,49 @@ class UserService
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         $url = asset('storage');
-        try {
-            $sqlQuery = User::with(['role'])
-                ->selectRaw("*, (case when photo is null then null else CONCAT('$url/', photo) end) as photo")
-                ->whereNull('deleted_at');
+        $sqlQuery = User::join('roles', 'roles.role_id', '=', 'users.role_id')
+            ->selectRaw("
+            users.user_id as user_id,
+            users.name as name,
+            users.email as email,
+            (case when photo is null then null else CONCAT('$url/', photo) end) as photo,
+            roles.role_id as role_id,
+            roles.role_name as role_name,
+            users.created_at as created_at,
+            users.updated_at as updated_at
+        ")
+            ->whereNull('users.deleted_at');
 
-            if ($filters?->paging?->search) {
-                $search = $filters->paging->search;
-                $sqlQuery->where(function ($builder) use ($search) {
-                    $builder
-                        ->where("role.role_name", "ilike", "%{$search}%")
-                        ->orWhere("name", "ilike", '%' . "%{$search}%")
-                        ->orWhere("email", "ilike", '%' . "%{$search}%");
-                });
-            }
-
-            foreach ($filters->sorting as $column => $order) {
-                if ($column == 'role_name') {
-                    $sqlQuery->orderBy(
-                        Role::select('role_name')
-                            ->whereColumn('roles.role_id', 'users.role_id'),
-                        $order
-                    );
-                } else {
-                    $sqlQuery->orderBy($column, $order);
-                }
-            }
-
-
-            $sqlQueryCount = $sqlQuery;
-            $sqlQueryRows = $sqlQuery;
-
-            $totalRows = $sqlQueryCount->count();
-            $rows =  $sqlQueryRows
-                ->skip($filters->paging->skip)
-                ->take($filters->paging->limit)
-                ->get();
-
-            $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
-            return new LaravelResponseContract(true, 200, __('validation.custom.success.user.fetch'), $response);
-        } catch (\Exception $e) {
-            return sendErrorResponse($e);
+        if ($filters?->paging?->search) {
+            $search = $filters->paging->search;
+            $sqlQuery->where(function ($builder) use ($search) {
+                $builder
+                    ->where("roles.role_name", "ilike", "%{$search}%")
+                    ->orWhere("name", "ilike", '%' . "%{$search}%")
+                    ->orWhere("email", "ilike", '%' . "%{$search}%");
+            });
         }
+
+        if (isset($filters->query['role_id']) && $filters->query['role_id'] != '') {
+            $sqlQuery->where('roles.role_id', $filters->query['role_id']);
+        }
+
+        foreach ($filters->sorting as $column => $order) {
+            $sqlQuery->orderBy($column, $order);
+        }
+
+
+        $sqlQueryCount = $sqlQuery;
+        $sqlQueryRows = $sqlQuery;
+
+        $totalRows = $sqlQueryCount->count();
+        $rows =  $sqlQueryRows
+            ->skip($filters->paging->skip)
+            ->take($filters->paging->limit)
+            ->get();
+
+        $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
+        return new LaravelResponseContract(true, 200, __('validation.custom.success.user.fetch'), $response);
     }
 
     public function findById(string $id): LaravelResponseInterface
