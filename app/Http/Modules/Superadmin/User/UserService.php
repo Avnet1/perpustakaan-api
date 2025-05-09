@@ -26,46 +26,68 @@ class UserService
     public function fetch(mixed $filters): LaravelResponseInterface
     {
         $url = asset('storage');
-        try {
-            $sqlQuery = User::with(['role'])
-                ->selectRaw("*, (case when photo is null then null else CONCAT('$url/', photo) end) as photo")
-                ->whereNull('deleted_at');
 
-            if ($filters?->paging?->search) {
+        try {
+            $sqlQuery = DB::table('users')
+                ->selectRaw("
+                users.*,
+                (CASE
+                    WHEN users.photo IS NULL THEN NULL
+                    ELSE ? || '/' || users.photo
+                END) AS photo,
+                json_build_object(
+                    'role_id', roles.role_id,
+                    'role_name', roles.role_name,
+                    'role_slug', roles.role_slug,
+                    'created_at', roles.created_at,
+                    'updated_at', roles.updated_at,
+                    'created_by', roles.created_by,
+                    'updated_by', roles.updated_by
+                )::jsonb AS role
+            ", [$url])
+                ->leftJoin('roles', 'roles.role_id', '=', 'users.role_id')
+                ->whereNull('users.deleted_at');
+
+            if (!empty($filters?->paging?->search)) {
                 $search = $filters->paging->search;
                 $sqlQuery->where(function ($builder) use ($search) {
                     $builder
-                        ->where("role.role_name", "ilike", "%{$search}%")
-                        ->orWhere("name", "ilike", '%' . "%{$search}%")
-                        ->orWhere("email", "ilike", '%' . "%{$search}%");
+                        ->where("roles.role_name", "ilike", "%{$search}%")
+                        ->orWhere("users.name", "ilike", "%{$search}%")
+                        ->orWhere("users.email", "ilike", "%{$search}%");
                 });
             }
 
-            foreach ($filters->sorting as $column => $order) {
-                if ($column == 'role_name') {
-                    $sqlQuery->orderBy(
-                        Role::select('role_name')
-                            ->whereColumn('roles.role_id', 'users.role_id'),
-                        $order
-                    );
-                } else {
-                    $sqlQuery->orderBy($column, $order);
+            if (!empty($filters->sorting)) {
+                foreach ($filters->sorting as $column => $order) {
+                    if ($column === 'role_name') {
+                        // Tidak bisa pakai subquery dalam orderBy di Query Builder standar untuk join table,
+                        // jadi urutkan berdasarkan roles.role_name yang sudah dijoin
+                        $sqlQuery->orderBy('roles.role_name', $order);
+                    } else {
+                        $sqlQuery->orderBy("users.$column", $order);
+                    }
                 }
             }
 
-
-            $sqlQueryCount = $sqlQuery;
-            $sqlQueryRows = $sqlQuery;
-
+            // Clone query untuk count (tanpa pagination)
+            $sqlQueryCount = clone $sqlQuery;
             $totalRows = $sqlQueryCount->count();
-            $rows =  $sqlQueryRows
+
+            // Pagination
+            $rows = $sqlQuery
                 ->skip($filters->paging->skip)
                 ->take($filters->paging->limit)
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    $item->role = json_decode($item->role);
+                    return $item;
+                });
 
             $response = setPagination($rows, $totalRows, $filters->paging->page, $filters->paging->limit);
+
             return new LaravelResponseContract(true, 200, __('validation.custom.success.user.fetch'), $response);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return sendErrorResponse($e);
         }
     }
